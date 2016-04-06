@@ -1,6 +1,8 @@
 #ifndef GRAPHICSENGINE_H_INCLUDED
 #define GRAPHICSENGINE_H_INCLUDED
 
+#include "util/ProgramDefines.h"
+
 #include <GL/glew.h>
 #include <glm/detail/type_mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,7 +15,6 @@
 #include <stdio.h>
 
 #include "util/LoadShaders.h"
-#include "util/ProgramDefines.h"
 #include "render/Drawable.h"
 
 /**

@@ -48,8 +48,6 @@ private:
     void processMouseButtonReleased(sf::Event::MouseButtonEvent mouseButtonEvent);
     void processMouseScrolled(sf::Event::MouseWheelEvent mouseScrollEvent);
 
-    void processEvents();
-
 public:
     UI(GraphicsEngine* graph);
     ~UI();
@@ -58,6 +56,7 @@ public:
     glm::ivec2 prevMousePos() const;
     bool isMouseDown() const;
     GraphicsEngine* getEngine() const;
+    void processEvents();
 };
 
 #endif // UI_H_INCLUDED

@@ -1,8 +1,9 @@
+#include "util/LoadShaders.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <GL/glew.h>
-#include "util/LoadShaders.h"
 
 /**
 \file LoadShaders.cpp
