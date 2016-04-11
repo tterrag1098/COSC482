@@ -47,6 +47,10 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
         exit(EXIT_FAILURE);
     }
 
+    // Turn on the shader & get location of transformation matrix.
+    glUseProgram(program);
+    useTextureLoc = glGetUniformLocation(program, "useTexture");
+
     mode = GL_FILL;
     sscount = 1;
 
@@ -55,15 +59,45 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     else
         setFramerateLimit(0);
 
-    // Make it the active window for OpenGL calls
-    setActive();
+    clear(sf::Color::Transparent);
 
-    // Turn on the shader.
-    glUseProgram(program);
+    sf::Image texture;
+    bool texloaded = texture.loadFromFile("assets/bg.png");
 
-        // Find the location of the projection matrix.
+    if (!texloaded)
+    {
+        std::cerr << "Could not load texture." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    GLuint texID;
+    glGenTextures(1, &texID);
+
+//  Link the texture to the shader.
+    GLuint tex1_uniform_loc = glGetUniformLocation(program, "tex1");
+    glUniform1i(tex1_uniform_loc, 0);
+
+//  Load the texture into texture memory.
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glEnable(GL_BLEND);
+    glEnable(GL_ALPHA_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Find the location of the projection matrix.
     projLoc = glGetUniformLocation(program, "Projection");
     setProjectionMatrix();
+
+    // Make it the active window for OpenGL calls
+    setActive();
+    resize();
 }
 
 /**
@@ -77,7 +111,9 @@ GraphicsEngine::~GraphicsEngine() {}
 
 void GraphicsEngine::addObject(Drawable *obj)
 {
+    obj->load();
     objects.push_back(obj);
+    std::stable_sort(objects.begin(), objects.end(), [](const Drawable* a, const Drawable* b) { return a->sortIndex() < b->sortIndex(); });
 }
 
 /**
@@ -91,6 +127,10 @@ void GraphicsEngine::display()
 {
     // Clear the screen (Frame Buffer)
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glUniform1i(useTextureLoc, 1);
+    bg.draw();
+    glUniform1i(useTextureLoc, 0);
 
     for (Drawable* obj : objects)
     {
@@ -161,6 +201,7 @@ void GraphicsEngine::screenshotPNG()
 void GraphicsEngine::resize()
 {
     glViewport(0, 0, getSize().x, getSize().y);
+    setProjectionMatrix();
 }
 
 /**
@@ -198,28 +239,11 @@ them along with the projection matrix to the console window.
 
 void GraphicsEngine::setProjectionMatrix()
 {
-    glm::mat4 ProjectionMatrix = glm::mat4(1.0);
-
-    if (getSize().x > getSize().y)
-    {
-        GLfloat aspratio = (GLfloat)getSize().x / getSize().y;
-        ProjectionMatrix = glm::ortho(-aspratio, aspratio, -1.0f, 1.0f);
-    }
-    else
-    {
-        GLfloat aspratio = (GLfloat)getSize().y / getSize().x;
-        ProjectionMatrix = glm::ortho(-1.0f, 1.0f, -aspratio, aspratio);
-    }
-
+    float w = getSize().x;
+    float h = getSize().y;
+    glm::mat4 ProjectionMatrix = glm::ortho(0.0f, w, h, 0.0f);
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
 
-    glm::mat4 inv = glm::inverse(ProjectionMatrix);
-    glm::vec4 preImage = inv * glm::vec4(-1, 0, 0, 1);
-    screenBounds[0] = preImage.x;
-    preImage = inv * glm::vec4(1, 0, 0, 1);
-    screenBounds[1] = preImage.x;
-    preImage = inv * glm::vec4(0, -1, 0, 1);
-    screenBounds[2] = preImage.y;
-    preImage = inv * glm::vec4(0, 1, 0, 1);
-    screenBounds[3] = preImage.y;
+    bg.setWidth(w);
+    bg.setHeight(h);
 }

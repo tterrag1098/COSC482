@@ -3,6 +3,7 @@
 
 #include "core/GraphicsEngine.h"
 #include "render/Box.h"
+#include "render/Button.h"
 #include "tool/Tool.h"
 
 /**
@@ -28,8 +29,6 @@ class Tool;
 
 class UI
 {
-    friend class GraphicsEngine;
-
 private:
     GraphicsEngine* ge;  ///< Pointer to the GraphicsEngine that this processor is attached.
     bool mouseDown;      ///< Boolean tracking of the left mouse button.
@@ -48,13 +47,12 @@ private:
     void processMouseButtonReleased(sf::Event::MouseButtonEvent mouseButtonEvent);
     void processMouseScrolled(sf::Event::MouseWheelEvent mouseScrollEvent);
 
-    void processEvents();
-
 public:
     UI(GraphicsEngine* graph);
     ~UI();
 
-    glm::vec2 toScreenCoords(glm::ivec2 mousePosition) const;
+    void processEvents();
+
     glm::ivec2 prevMousePos() const;
     bool isMouseDown() const;
     GraphicsEngine* getEngine() const;

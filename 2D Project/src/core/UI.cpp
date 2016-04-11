@@ -24,6 +24,8 @@ UI::UI(GraphicsEngine* graph)
     ge = graph;
     mouseDown = false;
     tool = new ToolBox();
+    ge->addObject((new Box({10, 10}, 80, 300, {0, 0, 0, 0.75f}))->setSortIndex(1000));
+    ge->addObject((new Button(15, 15, 20))->setSortIndex(1001));
 }
 
 /**
@@ -34,31 +36,6 @@ No implementation needed at this point.
 */
 
 UI::~UI() {}
-
-/**
-\brief Method that takes in the integer mouse position coordinates from a mouse event
-and converts them into screen coordinates.
-
-It is assumed that the array screenBounds holds the bounds to the screen in the form
-(l, r, b, t).
-
-\param mousePosition --- A vec2 holding the x and y positions taken from the
-mouse position coordinates of a mouse event.
-
-\return A vec2 holding the screen (x, y) position of the mouse.
-
-*/
-
-glm::vec2 UI::toScreenCoords(glm::ivec2 mousePosition) const
-{
-    glm::vec2 sc;
-    float* screenBounds = ge->getScreenBounds();
-
-    sc.x = (float)mousePosition.x / ge->getSize().x * (screenBounds[1] - screenBounds[0]) + screenBounds[0];
-    sc.y = screenBounds[3] - (float)mousePosition.y / ge->getSize().y * (screenBounds[3] - screenBounds[2]);
-
-    return sc;
-}
 
 glm::ivec2 UI::prevMousePos() const
 {

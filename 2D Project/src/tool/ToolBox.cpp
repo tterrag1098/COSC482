@@ -13,8 +13,7 @@ void ToolBox::mousePressed(ToolContext<sf::Event::MouseButtonEvent> ctx)
 {
     if (ctx.event.button == sf::Mouse::Left)
     {
-        glm::vec2 sc = ctx.ui->toScreenCoords({ctx.event.x, ctx.event.y});
-        ctx.ui->getEngine()->addObject(lastBox = new Box({sc.x, sc.y}, 0, 0, {rand_float(), rand_float(), rand_float()}));
+        ctx.ui->getEngine()->addObject(lastBox = new Box({ctx.event.x, ctx.event.y}, 0, 0, {rand_float(), rand_float(), rand_float(), 1}));
     }
 }
 
@@ -23,9 +22,9 @@ void ToolBox::mouseMoved(ToolContext<sf::Event::MouseMoveEvent> ctx)
     const UI *ui = ctx.ui;
     if (lastBox && ui->isMouseDown())
     {
-        glm::vec2 last = ui->toScreenCoords(ui->prevMousePos());
-        glm::vec2 cur = ui->toScreenCoords({ctx.event.x, ctx.event.y});
+        glm::vec2 last = ui->prevMousePos();
+        glm::vec2 cur = {ctx.event.x, ctx.event.y};
         lastBox->setWidth(cur.x - last.x);
-        lastBox->setHeight(-cur.y + last.y);
+        lastBox->setHeight(cur.y - last.y);
     }
 }

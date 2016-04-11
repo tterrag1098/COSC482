@@ -7,9 +7,9 @@ float rand_float()
     return rand() / ((float) (RAND_MAX));
 }
 
-vec3 to_hsv(vec3 in)
+vec4 to_hsv(vec4 in)
 {
-    vec3 ret;
+    vec4 ret;
 
     float r = in.r, g = in.g, b = in.b;
 
@@ -44,12 +44,14 @@ vec3 to_hsv(vec3 in)
 
     ret.r /= 360;
 
+    ret.a = in.a;
+
     return ret;
 }
 
-vec3 to_rgb(vec3 in)
+vec4 to_rgb(vec4 in)
 {
-    vec3 ret;
+    vec4 ret;
 
     float h = in.r * 360, s = in.g, v = in.b;
 
@@ -100,6 +102,8 @@ vec3 to_rgb(vec3 in)
         ret.b = q;
         break;
     }
+
+    ret.a = in.a;
 
     return ret;
 }

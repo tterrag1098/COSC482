@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 
 #include <glm/detail/type_vec2.hpp>
-#include <glm/detail/type_vec3.hpp>
+#include <glm/detail/type_vec4.hpp>
 
 #include <vector>
 
@@ -15,19 +15,27 @@ class Drawable
 public:
     ~Drawable();
 
-    virtual void draw();
+    virtual void draw() const;
+    virtual void resized(int bounds[4]) {}
+
+    virtual Drawable* setSortIndex(int idx);
+    virtual int sortIndex() const;
+
+    void load();
 
 protected:
     Drawable(bool indexed);
 
-    void load();
+    void vert(glm::vec2 pos, glm::vec4 color, glm::vec2 uv = {0, 0});
+    void index_quad(int count);
 
-    virtual void refresh(){}
+    virtual void refresh() {}
 
-    virtual GLuint getDrawMode();
+    virtual GLuint getDrawMode() const;
 
     std::vector<glm::vec2> verts;
-    std::vector<glm::vec3> colors;
+    std::vector<glm::vec4> colors;
+    std::vector<glm::vec2> uvs;
     std::vector<GLuint> indices;
 
 private:
@@ -36,6 +44,7 @@ private:
     GLuint eboptr;  ///< ID for the index array buffer.
 
     bool indexed;
+    int idx = 0;
 };
 
 #endif // DRAWABLE_H

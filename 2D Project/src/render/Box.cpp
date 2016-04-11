@@ -32,12 +32,7 @@ and IDs, and finally loads the object data up to the graphics card.
 
 */
 
-int Box::index_tracker = 1;
-
-Box::Box(glm::vec2 c, GLfloat w, GLfloat h, glm::vec3 col) : Drawable(true), corner(c), width(w), height(h), color(col)
-{
-    load();
-}
+Box::Box(glm::vec2 c, GLfloat w, GLfloat h, glm::vec4 col) : Drawable(true), corner(c), width(w), height(h), color(col) {}
 
 /**
 \brief Destructor
@@ -63,15 +58,12 @@ the two arrays.
 
 void Box::refresh()
 {
-    verts.push_back({corner.x, corner.y - height});
-    verts.push_back({corner.x + width, corner.y - height});
-    verts.push_back({corner.x + width, corner.y});
-    verts.push_back({corner.x, corner.y});
+    vert({corner.x, corner.y + height}, color);
+    vert({corner.x + width, corner.y + height}, color);
+    vert({corner.x + width, corner.y}, color);
+    vert({corner.x, corner.y}, color);
 
     indices = {0, 3, 2, 0, 2, 1};
-
-    // Lazy solution
-    colors = {color, color, color, color};
 }
 
 /**
@@ -139,7 +131,7 @@ void Box::setCorner(glm::vec2 c)
 
 */
 
-void Box::setColor(glm::vec3 c)
+void Box::setColor(glm::vec4 c)
 {
     color = c;
     load();

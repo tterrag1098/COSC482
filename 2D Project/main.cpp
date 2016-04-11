@@ -5,8 +5,8 @@
 #include <iostream>
 #include <string>
 
-#include "GraphicsEngine.h"
-#include "UI.h"
+#include "core/GraphicsEngine.h"
+#include "core/UI.h"
 
 /**
 \file main.cpp

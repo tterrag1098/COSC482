@@ -15,6 +15,7 @@
 #include "util/LoadShaders.h"
 #include "util/ProgramDefines.h"
 #include "render/Drawable.h"
+#include "render/Background.h"
 
 /**
 \file GraphicsEngine.h
@@ -33,13 +34,17 @@ handles all of the graphics rendering in the program.
 
 */
 
+class UI;
+
 class GraphicsEngine : public sf::RenderWindow
 {
 private:
     GLenum mode;              ///< Mode, either point, line or fill.
     int sscount;              ///< Screenshot count to be appended to the screenshot filename.
     GLfloat screenBounds[4];  ///< (l, r, b, t) bounds for the screen.
+    GLuint useTextureLoc;     ///< Location ID of the texture use flag in the shader.
     GLuint projLoc;           ///< Uniform location of the projection matrix
+    Background bg = Background(16, 16);    ///< Background render object
 
     std::vector<Drawable*> objects;
 

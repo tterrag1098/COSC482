@@ -4,7 +4,7 @@
 #include <GL/glew.h>
 #include <iostream>
 #include <glm/detail/type_vec2.hpp>
-#include <glm/detail/type_vec3.hpp>
+#include <glm/detail/type_vec4.hpp>
 
 #include "render/Drawable.h"
 #include "util/ProgramDefines.h"
@@ -31,17 +31,16 @@ facilities for loading the data to the graphics card and invoking draw commands 
 
 class Box : public Drawable
 {
-private:
+protected:
     GLfloat width;        ///< Width of the box.
     GLfloat height;       ///< Height of the box.
-    glm::vec2 corner;       ///< The corner of the box.
-    glm::vec3 color;       ///< The color of the box.
+    glm::vec2 corner;     ///< The corner of the box.
+    glm::vec4 color;      ///< The color of the box.
 
-protected:
-    void refresh() override;
+    virtual void refresh() override;
 
 public:
-    Box(glm::vec2 c = {0, 0}, GLfloat w = 1, GLfloat h = 1, glm::vec3 col = WHITE);
+    Box(glm::vec2 c = {0, 0}, GLfloat w = 1, GLfloat h = 1, glm::vec4 col = WHITE);
     ~Box();
 
     bool contains(glm::vec2 p);
@@ -49,15 +48,12 @@ public:
     void setWidth(GLfloat w);
     void setHeight(GLfloat h);
     void setCorner(glm::vec2 c);
-    void setColor(glm::vec3 c);
+    void setColor(glm::vec4 c);
     void setHover(bool h);
 
     GLfloat getWidth();
     GLfloat getHeight();
     glm::vec2 getCorner();
-
-    int index;
-    static int index_tracker;
 };
 
 #endif // BOX_H_INCLUDED

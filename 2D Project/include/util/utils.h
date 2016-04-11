@@ -4,25 +4,25 @@
 #include "GL/gl.h"
 #include <random>
 
-#include <glm/detail/type_vec3.hpp>
+#include <glm/detail/type_vec4.hpp>
 
 using namespace glm;
 
-static const vec3 RED = {1.0f, 0.0f, 0.0f};
-static const vec3 GREEN = {0.0f, 1.0f, 0.0f};
-static const vec3 BLUE = {0.0f, 0.0f, 1.0f};
-static const vec3 BLACK = {0.0f, 0.0f, 0.0f};
-static const vec3 WHITE = {1.0f, 1.0f, 1.0f};
+static const vec4 RED = {1, 0, 0, 1};
+static const vec4 GREEN = {0, 1, 0, 1};
+static const vec4 BLUE = {0, 0, 1, 1};
+static const vec4 BLACK = {0, 0, 0, 1};
+static const vec4 WHITE = {1, 1, 1, 1};
 
-static const vec3 YELLOW = {1.0f, 1.0f, 0.0f};
-static const vec3 CYAN = {0.0f, 1.0f, 1.0f};
-static const vec3 MAGENTA = {1.0f, 0.0f, 1.0f};
+static const vec4 YELLOW = {1, 1, 0, 1};
+static const vec4 CYAN = {0, 1, 1, 1};
+static const vec4 MAGENTA = {1, 0, 1, 1};
 
 /** \brief Converts a color in RGB format into HSV format */
-vec3 to_hsv(vec3 in);
+vec4 to_hsv(vec4 in);
 
 /** \brief Converts a color in HSV format into RGB format */
-vec3 to_rgb(vec3 in);
+vec4 to_rgb(vec4 in);
 
 /* Misc Utils */
 
