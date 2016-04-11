@@ -2,11 +2,10 @@
 #define TOOL_H
 
 #include <string>
-#include <SFML/Window/Event.hpp>
 
-#include "ToolContext.h"
+#include "core/Listeners.h"
 
-class Tool
+class Tool : public Listener
 {
 public:
     Tool(std::string) {};
@@ -14,10 +13,6 @@ public:
 
     virtual void activated() {};
     virtual void deactivated() {};
-
-    virtual void mousePressed(ToolContext<sf::Event::MouseButtonEvent> ctx) {};
-    virtual void mouseReleased(ToolContext<sf::Event::MouseButtonEvent> ctx) {};
-    virtual void mouseMoved(ToolContext<sf::Event::MouseMoveEvent> ctx) {};
 
     std::string getName()
     {

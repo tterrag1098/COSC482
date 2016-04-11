@@ -9,7 +9,7 @@ void ToolBox::deactivated()
     lastBox = NULL;
 }
 
-void ToolBox::mousePressed(ToolContext<sf::Event::MouseButtonEvent> ctx)
+void ToolBox::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
     if (ctx.event.button == sf::Mouse::Left)
     {
@@ -17,7 +17,7 @@ void ToolBox::mousePressed(ToolContext<sf::Event::MouseButtonEvent> ctx)
     }
 }
 
-void ToolBox::mouseMoved(ToolContext<sf::Event::MouseMoveEvent> ctx)
+void ToolBox::mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx)
 {
     const UI *ui = ctx.ui;
     if (lastBox && ui->isMouseDown())
