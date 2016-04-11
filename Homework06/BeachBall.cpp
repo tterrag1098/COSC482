@@ -5,7 +5,7 @@
 
 \brief Implementation file for the BeachBall class.
 
-\author    
+\author
 \version   1.2
 \date      Written: 2/28/2016  <BR> Revised: 3/28/2016
 

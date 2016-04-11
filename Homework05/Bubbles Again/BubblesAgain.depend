@@ -1071,11 +1071,11 @@
 	"Bubble.h"
 	"ProgramDefines.h"
 
-1448220916 x:\development\cosc482\homework05\bubbles again\loadshaders.h
+1448224516 x:\development\cosc482\homework05\bubbles again\loadshaders.h
 	<GL/gl.h>
 	<string>
 
-1457139516 x:\development\cosc482\homework05\bubbles again\bubble.h
+1459569760 x:\development\cosc482\homework05\bubbles again\bubble.h
 	<SFML/Graphics.hpp>
 	<GL/glew.h>
 	<iostream>
@@ -1083,13 +1083,13 @@
 	"utils.h"
 	"ProgramDefines.h"
 
-1455348681 x:\development\cosc482\homework05\bubbles again\utils.h
+1459569760 x:\development\cosc482\homework05\bubbles again\utils.h
 	"GL/gl.h"
 	<random>
 
-1452645219 x:\development\cosc482\homework05\bubbles again\programdefines.h
+1452648819 x:\development\cosc482\homework05\bubbles again\programdefines.h
 
-1454897741 source:x:\development\cosc482\homework05\bubbles again\loadshaders.cpp
+1454901341 source:x:\development\cosc482\homework05\bubbles again\loadshaders.cpp
 	<cstdlib>
 	<iostream>
 	<fstream>
@@ -1115,6 +1115,12 @@
 1457140322 source:x:\development\cosc482\homework05\bubbles again\ui.cpp
 	"UI.h"
 
-1457132309 source:x:\development\cosc482\homework05\bubbles again\utils.cpp
+1457135909 source:x:\development\cosc482\homework05\bubbles again\utils.cpp
 	"utils.h"
+
+1457144456 source:x:\development\cosc482\homework05\bubbles again\bubble.cpp
+	"Bubble.h"
+	"utils.h"
+	<random>
+	<ctime>
 
