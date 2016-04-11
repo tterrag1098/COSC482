@@ -1,6 +1,8 @@
 #ifndef PROGRAMDEFINES_H_INCLUDED
 #define PROGRAMDEFINES_H_INCLUDED
 
+#define GLEW_STATIC
+
 /**
 \file ProgramDefines.h
 

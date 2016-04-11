@@ -1,7 +1,9 @@
 #ifndef LOADSHADERS_H
 #define LOADSHADERS_H
 
-#include <GL/gl.h>
+#include "util/ProgramDefines.h"
+
+#include <GL/glew.h>
 #include <string>
 
 /**
