@@ -2235,7 +2235,7 @@
 	"core/GraphicsEngine.h"
 	"core/UI.h"
 
-1459957575 c:\development\cosc482\2d project\include\core\graphicsengine.h
+1460390423 c:\development\cosc482\2d project\include\core\graphicsengine.h
 	"util/ProgramDefines.h"
 	<GL/glew.h>
 	<glm/detail/type_mat4x4.hpp>
@@ -2249,39 +2249,41 @@
 	<stdio.h>
 	"util/LoadShaders.h"
 	"render/Drawable.h"
+	"render/Background.h"
 
 1459957691 c:\development\cosc482\2d project\include\util\loadshaders.h
 	"util/ProgramDefines.h"
 	<GL/glew.h>
 	<string>
 
-1459957531 c:\development\cosc482\2d project\include\util\programdefines.h
+1460390423 c:\development\cosc482\2d project\include\util\programdefines.h
 
-1459957220 c:\development\cosc482\2d project\include\render\drawable.h
+1460390423 c:\development\cosc482\2d project\include\render\drawable.h
 	"util/ProgramDefines.h"
 	<GL/glew.h>
 	<glm/detail/type_vec2.hpp>
-	<glm/detail/type_vec3.hpp>
+	<glm/detail/type_vec4.hpp>
 	<vector>
 
-1459957315 c:\development\cosc482\2d project\include\core\ui.h
+1460390423 c:\development\cosc482\2d project\include\core\ui.h
 	"core/GraphicsEngine.h"
 	"render/Box.h"
+	"render/Button.h"
 	"tool/Tool.h"
 
-1459957220 c:\development\cosc482\2d project\include\render\box.h
+1460390423 c:\development\cosc482\2d project\include\render\box.h
 	<GL/glew.h>
 	<iostream>
 	<glm/detail/type_vec2.hpp>
-	<glm/detail/type_vec3.hpp>
+	<glm/detail/type_vec4.hpp>
 	"render/Drawable.h"
 	"util/ProgramDefines.h"
 	"util/utils.h"
 
-1459957220 c:\development\cosc482\2d project\include\util\utils.h
+1460390423 c:\development\cosc482\2d project\include\util\utils.h
 	"GL/gl.h"
 	<random>
-	<glm/detail/type_vec3.hpp>
+	<glm/detail/type_vec4.hpp>
 
 1459957220 c:\development\cosc482\2d project\include\tool\tool.h
 	<string>
@@ -2291,10 +2293,10 @@
 1459957220 c:\development\cosc482\2d project\include\tool\toolcontext.h
 	"core/UI.h"
 
-1459957220 source:c:\development\cosc482\2d project\src\core\graphicsengine.cpp
+1460390423 source:c:\development\cosc482\2d project\src\core\graphicsengine.cpp
 	"core/GraphicsEngine.h"
 
-1459957220 source:c:\development\cosc482\2d project\src\core\ui.cpp
+1460390423 source:c:\development\cosc482\2d project\src\core\ui.cpp
 	"core/UI.h"
 	"tool/ToolBox.h"
 
@@ -2302,23 +2304,23 @@
 	"tool/Tool.h"
 	"render/Box.h"
 
-1459957220 source:c:\development\cosc482\2d project\src\render\box.cpp
+1460395006 source:c:\development\cosc482\2d project\src\render\box.cpp
 	"render/Box.h"
 
-1459957220 source:c:\development\cosc482\2d project\src\render\drawable.cpp
+1460390423 source:c:\development\cosc482\2d project\src\render\drawable.cpp
 	"render/Drawable.h"
 
-1459957471 source:c:\development\cosc482\2d project\src\tool\toolbox.cpp
+1460390423 source:c:\development\cosc482\2d project\src\tool\toolbox.cpp
 	"tool/ToolBox.h"
 
-1459957220 source:c:\development\cosc482\2d project\src\util\loadshaders.cpp
+1459957622 source:c:\development\cosc482\2d project\src\util\loadshaders.cpp
+	"util/LoadShaders.h"
 	<cstdlib>
 	<iostream>
 	<fstream>
 	<GL/glew.h>
-	"util/LoadShaders.h"
 
-1459957220 source:c:\development\cosc482\2d project\src\util\utils.cpp
+1460390423 source:c:\development\cosc482\2d project\src\util\utils.cpp
 	"util/utils.h"
 
 1460376872 x:\development\cosc482\2d project\include\render\background.h
@@ -2329,5 +2331,15 @@
 	"util/utils.h"
 
 1460372448 source:x:\development\cosc482\2d project\src\render\button.cpp
+	"Button.h"
+
+1460390423 c:\development\cosc482\2d project\include\render\background.h
+	"render/Box.h"
+
+1460390423 c:\development\cosc482\2d project\include\render\button.h
+	"Drawable.h"
+	"util/utils.h"
+
+1460394997 source:c:\development\cosc482\2d project\src\render\button.cpp
 	"Button.h"
 

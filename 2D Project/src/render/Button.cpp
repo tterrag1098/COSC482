@@ -35,5 +35,5 @@ void Button::refresh()
     vert(pos + vec2(size - in, size - in), col_center);
     vert(pos + vec2(in, size - in), col_center);
 
-    indices = {0, 3, 2, 0, 2, 1, 4, 7, 6, 4, 6, 5, 8, 11, 10, 8, 10, 9, 12, 15, 14, 12, 14, 13, 16, 19, 18, 16, 18, 17};
+    index_quad(5);
 }

@@ -63,7 +63,7 @@ void Box::refresh()
     vert({corner.x + width, corner.y}, color);
     vert({corner.x, corner.y}, color);
 
-    indices = {0, 3, 2, 0, 2, 1};
+    index_quad(1);
 }
 
 /**

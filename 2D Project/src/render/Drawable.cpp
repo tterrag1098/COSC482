@@ -87,6 +87,15 @@ void Drawable::vert(glm::vec2 pos, glm::vec4 color, glm::vec2 uv)
     uvs.push_back(uv);
 }
 
+void Drawable::index_quad(int count)
+{
+    for (int i = 0; i < count * 4; i += 4)
+    {
+        std::vector<int> quad = {i, i + 3, i + 2, i, i + 2, i + 1};
+        indices.insert(indices.end(), quad.begin(), quad.end());
+    }
+}
+
 GLuint Drawable::getDrawMode() const
 {
     return GL_TRIANGLES;
