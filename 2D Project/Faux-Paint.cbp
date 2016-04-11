@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-DGLEW_STATIC" />
 					<Add directory="include" />
 					<Add directory="include/tool" />
 					<Add directory="include/render" />
@@ -62,6 +63,7 @@
 		<Unit filename="PassThroughFrag.glsl" />
 		<Unit filename="include/core/GraphicsEngine.h" />
 		<Unit filename="include/core/UI.h" />
+		<Unit filename="include/render/Background.h" />
 		<Unit filename="include/render/Box.h" />
 		<Unit filename="include/render/Button.h" />
 		<Unit filename="include/render/Drawable.h" />
