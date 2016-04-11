@@ -56,7 +56,6 @@ public:
     glm::ivec2 prevMousePos() const;
     bool isMouseDown() const;
     GraphicsEngine* getEngine() const;
-    void processEvents();
 };
 
 #endif // UI_H_INCLUDED
