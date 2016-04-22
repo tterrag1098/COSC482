@@ -32,9 +32,14 @@ inline ListenerContext<T> create_ctx(UI *ui, T event)
 class Listener
 {
 public:
-    virtual bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) { return false; };
-    virtual bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) { return false; };
-    virtual bool mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx) { return false; };
+    virtual ~Listener();
+
+    virtual bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx);
+    virtual bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx);
+    virtual bool mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx);
+
+protected:
+    std::vector<Listener*> children;
 };
 
 #endif // LISTENERS_H_INCLUDED

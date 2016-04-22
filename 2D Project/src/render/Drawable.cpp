@@ -1,24 +1,35 @@
 #include "render/Drawable.h"
 
-Drawable::Drawable(bool indexed) : indexed(indexed)
+Drawable::Drawable(bool indexed, bool visible) : indexed(indexed), visible(visible)
 {
-    glGenVertexArrays(1, &vboptr);
-    glGenBuffers(1, &bufptr);
-    if (indexed)
+    if (visible)
     {
-        glGenBuffers(1, &eboptr);
+        glGenVertexArrays(1, &vboptr);
+        glGenBuffers(1, &bufptr);
+        if (indexed)
+        {
+            glGenBuffers(1, &eboptr);
+        }
     }
 }
 
 Drawable::~Drawable()
 {
-    glBindVertexArray(vboptr);
-    glDeleteBuffers(1, &bufptr);
-    if (indexed)
+    if (visible)
     {
-        glDeleteBuffers(1, &eboptr);
+        glBindVertexArray(vboptr);
+        glDeleteBuffers(1, &bufptr);
+        if (indexed)
+        {
+            glDeleteBuffers(1, &eboptr);
+        }
+        glDeleteVertexArrays(1, &vboptr);
     }
-    glDeleteVertexArrays(1, &vboptr);
+
+    for (Drawable *d : children)
+    {
+        delete d;
+    }
 }
 
 Drawable* Drawable::setSortIndex(int idx)
@@ -41,49 +52,65 @@ void Drawable::load()
 
     refresh();
 
-    int vPosition = 0;
-    int vColor = 1;
-    int vTex = 2;
-
-    GLuint vertSize = sizeof(glm::vec2) * verts.size();
-    GLuint colorSize = sizeof(glm::vec4) * colors.size();
-    GLuint uvSize = sizeof(glm::vec2) * uvs.size();
-
-    glBindVertexArray(vboptr);
-
-    if (indexed)
+    if (visible)
     {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboptr);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * indices.size(), &indices[0], GL_DYNAMIC_DRAW);
+        int vPosition = 0;
+        int vColor = 1;
+        int vTex = 2;
+
+        GLuint vertSize = sizeof(glm::vec2) * verts.size();
+        GLuint colorSize = sizeof(glm::vec4) * colors.size();
+        GLuint uvSize = sizeof(glm::vec2) * uvs.size();
+
+        glBindVertexArray(vboptr);
+
+        if (indexed)
+        {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboptr);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * indices.size(), &indices[0], GL_DYNAMIC_DRAW);
+        }
+
+        glBindBuffer(GL_ARRAY_BUFFER, bufptr);
+        glBufferData(GL_ARRAY_BUFFER, vertSize + colorSize + uvSize, NULL, GL_DYNAMIC_DRAW);
+
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertSize, &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, vertSize, colorSize, &colors[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, vertSize + colorSize, uvSize, &uvs[0]);
+
+        glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(vertSize));
+        glVertexAttribPointer(vTex, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(vertSize + colorSize));
+
+        glEnableVertexAttribArray(vPosition);
+        glEnableVertexAttribArray(vColor);
+        glEnableVertexAttribArray(vTex);
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, bufptr);
-    glBufferData(GL_ARRAY_BUFFER, vertSize + colorSize + uvSize, NULL, GL_DYNAMIC_DRAW);
-
-    glBufferSubData(GL_ARRAY_BUFFER, 0, vertSize, &verts[0]);
-    glBufferSubData(GL_ARRAY_BUFFER, vertSize, colorSize, &colors[0]);
-    glBufferSubData(GL_ARRAY_BUFFER, vertSize + colorSize, uvSize, &uvs[0]);
-
-    glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(vertSize));
-    glVertexAttribPointer(vTex, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(vertSize + colorSize));
-
-    glEnableVertexAttribArray(vPosition);
-    glEnableVertexAttribArray(vColor);
-    glEnableVertexAttribArray(vTex);
+    for (Drawable *d : children)
+    {
+        d->load();
+    }
 }
 
 void Drawable::draw() const
 {
-    glBindVertexArray(vboptr);
-    if (indexed)
+    if (visible)
     {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboptr);
-        glDrawElements(getDrawMode(), indices.size(), GL_UNSIGNED_INT, NULL);
+        glBindVertexArray(vboptr);
+        if (indexed)
+        {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboptr);
+            glDrawElements(getDrawMode(), indices.size(), GL_UNSIGNED_INT, NULL);
+        }
+        else
+        {
+            glDrawArrays(getDrawMode(), 0, verts.size());
+        }
     }
-    else
+
+    for (Drawable *d : children)
     {
-        glDrawArrays(getDrawMode(), 0, verts.size());
+        d->draw();
     }
 }
 

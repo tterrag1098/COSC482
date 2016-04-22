@@ -16,19 +16,11 @@ public:
 
     void addButton(Tool *tool);
 
-    void refresh() override;
-    void draw() const override;
-
-    bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
-    bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
-    bool mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx) override;
-
 protected:
 private:
     glm::vec2 pos;
     Box *bg;
-
-    std::vector<ButtonTool*> buttons;
+    int buttons;
 
     const int padding = 3;
     const int butSize = 22;

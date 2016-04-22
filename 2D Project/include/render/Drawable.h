@@ -24,7 +24,7 @@ public:
     void load();
 
 protected:
-    Drawable(bool indexed);
+    Drawable(bool indexed = true, bool visible = true);
 
     void vert(glm::vec2 pos, glm::vec4 color, glm::vec2 uv = {0, 0});
     void index_quad(int count);
@@ -38,12 +38,14 @@ protected:
     std::vector<glm::vec2> uvs;
     std::vector<GLuint> indices;
 
+    std::vector<Drawable*> children;
+
 private:
     GLuint vboptr;  ///< ID for the VBO.
     GLuint bufptr;  ///< ID for the array buffer.
     GLuint eboptr;  ///< ID for the index array buffer.
 
-    bool indexed;
+    bool indexed, visible;
     int idx = 0;
 };
 

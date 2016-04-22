@@ -4,8 +4,8 @@ using namespace glm;
 
 void Button::refresh()
 {
-    vec4 col_center = {0.15f, 0.15f, 0.15f, 1};
-    vec4 col_light =  {0.3f, 0.3f, 0.3f, 1};
+    vec4 col_center = {0.2f, 0.2f, 0.2f, 1};
+    vec4 col_light =  {0.4f, 0.4f, 0.4f, 1};
     vec4 col_dark = BLACK;
 
     if (pressed)
@@ -15,7 +15,7 @@ void Button::refresh()
         col_dark = temp;
     }
 
-    int in = size / 10;
+    int in = 2 + (size / 12);
 
     vert(pos, col_light);
     vert(pos + vec2(in, in), col_light);
@@ -65,4 +65,26 @@ bool Button::mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx)
         return true;
     }
     return false;
+}
+
+void Button::setCorner(glm::vec2 p)
+{
+    pos = p;
+    load();
+}
+
+glm::vec2 Button::getCorner()
+{
+    return pos;
+}
+
+int Button::getSize()
+{
+    return size;
+}
+
+bool Button::contains(glm::vec2 p)
+{
+    bool ret = p.x > pos.x && p.x < pos.x + size && p.y > pos.y && p.y < pos.y + size;
+    return ret;
 }

@@ -32,6 +32,18 @@ UI::UI(GraphicsEngine* graph)
 
     ge->addObject(panel);
     addListener(panel);
+
+    Slider *test = new Slider(70, 18, 128, 0, 255);
+    test->setSortIndex(1001);
+    ge->addObject(test);
+    addListener(test);
+
+    std::vector<Button*> tests = {new Button({100, 160}, 10), new Button({120, 160}, 20), new Button({160, 160}, 40), new Button({240, 160}, 80)};
+    for (Button *b : tests)
+    {
+        ge->addObject(b);
+        addListener(b);
+    }
 }
 
 /**
@@ -127,11 +139,13 @@ alter the radius of the camera.
 void UI::processMouseMoved(sf::Event::MouseMoveEvent mouseMoveEvent)
 {
     ListenerContext<sf::Event::MouseMoveEvent> ctx = create_ctx(this, mouseMoveEvent);
-    tool->mouseMoved(ctx);
+    bool activated = false;
     for (Listener *l : listeners)
     {
-        if (l->mouseMoved(ctx)) break;
+        if (!activated && l->mouseMoved(ctx)) activated = true;
     }
+
+    if (!activated) tool->mouseMoved(ctx);
 }
 
 /**
@@ -145,12 +159,14 @@ of the mouse as the last position the mouse was at.
 void UI::processMouseButtonPressed(sf::Event::MouseButtonEvent mouseButtonEvent)
 {
     ListenerContext<sf::Event::MouseButtonEvent> ctx = create_ctx(this, mouseButtonEvent);
-    tool->mousePressed(ctx);
 
+    bool activated = false;
     for (Listener *l : listeners)
     {
-        if (l->mousePressed(ctx)) break;
+        if (!activated && l->mousePressed(ctx)) activated = true;
     }
+
+    if (!activated) tool->mousePressed(ctx);
 
     if (mouseButtonEvent.button == sf::Mouse::Left)
     {
@@ -171,11 +187,14 @@ exit any drag movement.
 void UI::processMouseButtonReleased(sf::Event::MouseButtonEvent mouseButtonEvent)
 {
     ListenerContext<sf::Event::MouseButtonEvent> ctx = create_ctx(this, mouseButtonEvent);
-    tool->mouseReleased(ctx);
+
+    bool activated = false;
     for (Listener *l : listeners)
     {
-        if (l->mouseReleased(ctx)) break;
+        if (!activated && l->mouseReleased(ctx)) activated = true;
     }
+
+    if (!activated) tool->mouseReleased(ctx);
 
     if (mouseButtonEvent.button == sf::Mouse::Left)
     {

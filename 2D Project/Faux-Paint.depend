@@ -2159,7 +2159,7 @@
 
 1460378191 x:\development\cosc482\2d project\include\util\programdefines.h
 
-1460376434 x:\development\cosc482\2d project\include\render\drawable.h
+1461362537 x:\development\cosc482\2d project\include\render\drawable.h
 	"util/ProgramDefines.h"
 	<GL/glew.h>
 	<glm/detail/type_vec2.hpp>
@@ -2177,7 +2177,7 @@
 	"tool/Tool.h"
 	"tool/ToolLine.h"
 
-1460376815 x:\development\cosc482\2d project\include\render\box.h
+1461364801 x:\development\cosc482\2d project\include\render\box.h
 	<GL/glew.h>
 	<iostream>
 	<glm/detail/type_vec2.hpp>
@@ -2191,10 +2191,10 @@
 	<random>
 	<glm/detail/type_vec4.hpp>
 
-1460441880 source:x:\development\cosc482\2d project\src\render\box.cpp
+1461364797 source:x:\development\cosc482\2d project\src\render\box.cpp
 	"render/Box.h"
 
-1461358228 source:x:\development\cosc482\2d project\src\render\drawable.cpp
+1461364458 source:x:\development\cosc482\2d project\src\render\drawable.cpp
 	"render/Drawable.h"
 
 1459841518 source:x:\development\cosc482\2d project\src\tool\tool.cpp
@@ -2398,22 +2398,23 @@
 	"render/Drawable.h"
 	"render/Background.h"
 
-1461345529 source:x:\development\cosc482\2d project\src\ui\button.cpp
+1461366972 source:x:\development\cosc482\2d project\src\ui\button.cpp
 	"ui/Button.h"
 
-1461345533 x:\development\cosc482\2d project\include\ui\button.h
+1461365619 x:\development\cosc482\2d project\include\ui\button.h
 	"Drawable.h"
 	"util/utils.h"
 	"ui/Listeners.h"
 
-1461345538 x:\development\cosc482\2d project\include\ui\listeners.h
+1461362077 x:\development\cosc482\2d project\include\ui\listeners.h
 	<SFML/Window/Event.hpp>
 	"ui/Listeners.h"
 
-1461354105 x:\development\cosc482\2d project\include\ui\ui.h
+1461363437 x:\development\cosc482\2d project\include\ui\ui.h
 	"render/GraphicsEngine.h"
 	"render/Box.h"
-	"ui/ToolPanel.h"
+	"ToolPanel.h"
+	"Slider.h"
 	"tool/Tool.h"
 	"tool/ToolLine.h"
 
@@ -2425,15 +2426,34 @@
 1461345543 source:x:\development\cosc482\2d project\src\ui\buttontool.cpp
 	"ui/ButtonTool.h"
 
-1461358816 source:x:\development\cosc482\2d project\src\ui\ui.cpp
+1461367558 source:x:\development\cosc482\2d project\src\ui\ui.cpp
 	"ui/UI.h"
 	"tool/ToolBox.h"
 
-1461358752 source:x:\development\cosc482\2d project\src\ui\toolpanel.cpp
+1461367685 source:x:\development\cosc482\2d project\src\ui\toolpanel.cpp
 	"ToolPanel.h"
 
-1461358714 x:\development\cosc482\2d project\include\ui\toolpanel.h
+1461362123 x:\development\cosc482\2d project\include\ui\toolpanel.h
 	<algorithm>
 	"render/Box.h"
 	"ButtonTool.h"
+
+1461361239 source:x:\development\cosc482\2d project\src\ui\colorpicker.cpp
+	"ColorPicker.h"
+
+1461361214 x:\development\cosc482\2d project\include\ui\colorpicker.h
+	"Box.h"
+
+1461367668 source:x:\development\cosc482\2d project\src\ui\slider.cpp
+	"Slider.h"
+
+1461367658 x:\development\cosc482\2d project\include\ui\slider.h
+	"Drawable.h"
+	"Listeners.h"
+	"Box.h"
+	"Button.h"
+	"UI.h"
+
+1461362057 source:x:\development\cosc482\2d project\src\ui\listener.cpp
+	"Listeners.h"
 

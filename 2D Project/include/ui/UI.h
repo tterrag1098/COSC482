@@ -3,7 +3,8 @@
 
 #include "render/GraphicsEngine.h"
 #include "render/Box.h"
-#include "ui/ToolPanel.h"
+#include "ToolPanel.h"
+#include "Slider.h"
 #include "tool/Tool.h"
 #include "tool/ToolLine.h"
 
