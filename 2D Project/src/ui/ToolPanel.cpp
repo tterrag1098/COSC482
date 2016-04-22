@@ -2,42 +2,46 @@
 
 ToolPanel::ToolPanel(int x, int y) : Drawable(false), pos({x, y})
 {
-    bg = Box(pos, 0, 0, {0, 0, 0, 0.75});
+    bg = new Box(pos, 0, 0, {0, 0, 0, 0.75});
 }
 
 void ToolPanel::refresh()
 {
-    for (ButtonTool b : buttons)
+    for (ButtonTool *b : buttons)
     {
-        b.load();
+        b->load();
     }
-    bg.load();
+    bg->load();
 }
 
 void ToolPanel::draw() const
 {
-    bg.draw();
-    for (ButtonTool b : buttons)
+    bg->draw();
+    for (ButtonTool *b : buttons)
     {
-        b.draw();
+        b->draw();
     }
 }
 
 void ToolPanel::addButton(Tool* tool)
 {
-    int x = padding + (buttons.size() % 2) * (butSize + padding);
-    int y = padding + ((butSize + padding) * (buttons.size() / 2));
-    ButtonTool button(x, y, butSize, tool);
+    int x = pos.x + padding + (buttons.size() % 2) * (butSize + padding);
+    int y = pos.y + padding + ((butSize + padding) * (buttons.size() / 2));
+    ButtonTool *button = new ButtonTool(x, y, butSize, tool);
 
-    button.load();
     buttons.push_back(button);
+
+    bg->setWidth(padding + ((butSize + padding) * std::min((int) buttons.size(), 2)));
+    bg->setHeight(padding + ((butSize + padding) * (buttons.size() / 2)));
+
+    load();
 }
 
 bool ToolPanel::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
-    for (ButtonTool b : buttons)
+    for (ButtonTool *b : buttons)
     {
-        if (b.mousePressed(ctx))
+        if (b->mousePressed(ctx))
         {
             return true;
         }
@@ -47,9 +51,9 @@ bool ToolPanel::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 
 bool ToolPanel::mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
-    for (ButtonTool b : buttons)
+    for (ButtonTool *b : buttons)
     {
-        if (b.mouseReleased(ctx))
+        if (b->mouseReleased(ctx))
         {
             return true;
         }
@@ -59,9 +63,9 @@ bool ToolPanel::mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 
 bool ToolPanel::mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx)
 {
-    for (ButtonTool b : buttons)
+    for (ButtonTool *b : buttons)
     {
-        if (b.mouseMoved(ctx))
+        if (b->mouseMoved(ctx))
         {
             return true;
         }

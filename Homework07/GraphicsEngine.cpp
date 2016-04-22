@@ -6,7 +6,7 @@
 
 This class extends sf::RenderWindow.
 
-\author    
+\author
 \version   1.2
 \date      Written: 2/28/2016  <BR> Revised: 4/1/2016
 
@@ -177,7 +177,7 @@ void GraphicsEngine::loadShaders()
     "        vec3 l = normalize(vec3(Lt.position)-vec3(position));\n"
     "        vec3 r = normalize(2.0*dot(l,normal)*normal - l);\n"
     "        vec3 v = normalize(eye-vec3(position));\n"
-    "		vec3 h = normalize(l + v);\n"
+    "		 vec3 h = normalize(l + v);\n"
     "        float dfang = max(0.0, dot(l, normal));\n"
     "        float specang = max(0.0, dot(r, v));\n"
     "        vec4 globalAmbientPortion = Mat.ambient*GlobalAmbient;\n"

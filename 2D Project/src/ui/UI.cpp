@@ -126,14 +126,12 @@ alter the radius of the camera.
 
 void UI::processMouseMoved(sf::Event::MouseMoveEvent mouseMoveEvent)
 {
-    std::cout << "Mouse Moved ";
     ListenerContext<sf::Event::MouseMoveEvent> ctx = create_ctx(this, mouseMoveEvent);
     tool->mouseMoved(ctx);
     for (Listener *l : listeners)
     {
         if (l->mouseMoved(ctx)) break;
     }
-    std::cout << "- Done!" << std::endl;
 }
 
 /**
@@ -146,7 +144,6 @@ of the mouse as the last position the mouse was at.
 
 void UI::processMouseButtonPressed(sf::Event::MouseButtonEvent mouseButtonEvent)
 {
-    std::cout << "Mouse Pressed ";
     ListenerContext<sf::Event::MouseButtonEvent> ctx = create_ctx(this, mouseButtonEvent);
     tool->mousePressed(ctx);
 
@@ -161,7 +158,6 @@ void UI::processMouseButtonPressed(sf::Event::MouseButtonEvent mouseButtonEvent)
         LastPosition.x = mouseButtonEvent.x;
         LastPosition.y = mouseButtonEvent.y;
     }
-    std::cout << "- Done!" << std::endl;
 }
 
 /**
@@ -174,7 +170,6 @@ exit any drag movement.
 
 void UI::processMouseButtonReleased(sf::Event::MouseButtonEvent mouseButtonEvent)
 {
-    std::cout << "Mouse Released ";
     ListenerContext<sf::Event::MouseButtonEvent> ctx = create_ctx(this, mouseButtonEvent);
     tool->mouseReleased(ctx);
     for (Listener *l : listeners)
@@ -186,7 +181,6 @@ void UI::processMouseButtonReleased(sf::Event::MouseButtonEvent mouseButtonEvent
     {
         mouseDown = false;
     }
-    std::cout << "- Done!" << std::endl;
 }
 
 /**

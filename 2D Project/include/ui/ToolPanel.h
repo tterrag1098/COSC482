@@ -1,6 +1,8 @@
 #ifndef TOOLPANEL_H
 #define TOOLPANEL_H
 
+#include <algorithm>
+
 #include "render/Box.h"
 #include "ButtonTool.h"
 
@@ -24,9 +26,9 @@ public:
 protected:
 private:
     glm::vec2 pos;
-    Box bg;
+    Box *bg;
 
-    std::vector<ButtonTool> buttons;
+    std::vector<ButtonTool*> buttons;
 
     const int padding = 3;
     const int butSize = 22;

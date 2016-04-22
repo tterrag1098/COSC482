@@ -2194,7 +2194,7 @@
 1460441880 source:x:\development\cosc482\2d project\src\render\box.cpp
 	"render/Box.h"
 
-1461208782 source:x:\development\cosc482\2d project\src\render\drawable.cpp
+1461358228 source:x:\development\cosc482\2d project\src\render\drawable.cpp
 	"render/Drawable.h"
 
 1459841518 source:x:\development\cosc482\2d project\src\tool\tool.cpp
@@ -2217,7 +2217,7 @@
 1459905383 source:x:\development\cosc482\2d project\src\util\utils.cpp
 	"util/utils.h"
 
-1461212632 source:x:\development\cosc482\2d project\src\tool\toolbox.cpp
+1461355706 source:x:\development\cosc482\2d project\src\tool\toolbox.cpp
 	"tool/ToolBox.h"
 
 1461345558 x:\development\cosc482\2d project\include\tool\toolbox.h
@@ -2379,7 +2379,7 @@
 	"LineSeg.h"
 	"ui/UI.h"
 
-1461355098 source:x:\development\cosc482\2d project\src\render\graphicsengine.cpp
+1461358809 source:x:\development\cosc482\2d project\src\render\graphicsengine.cpp
 	"GraphicsEngine.h"
 
 1460377042 x:\development\cosc482\2d project\include\render\graphicsengine.h
@@ -2425,14 +2425,15 @@
 1461345543 source:x:\development\cosc482\2d project\src\ui\buttontool.cpp
 	"ui/ButtonTool.h"
 
-1461354879 source:x:\development\cosc482\2d project\src\ui\ui.cpp
+1461358816 source:x:\development\cosc482\2d project\src\ui\ui.cpp
 	"ui/UI.h"
 	"tool/ToolBox.h"
 
-1461352267 source:x:\development\cosc482\2d project\src\ui\toolpanel.cpp
+1461358752 source:x:\development\cosc482\2d project\src\ui\toolpanel.cpp
 	"ToolPanel.h"
 
-1461352219 x:\development\cosc482\2d project\include\ui\toolpanel.h
+1461358714 x:\development\cosc482\2d project\include\ui\toolpanel.h
+	<algorithm>
 	"render/Box.h"
 	"ButtonTool.h"
 

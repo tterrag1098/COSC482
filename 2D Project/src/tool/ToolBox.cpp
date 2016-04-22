@@ -1,6 +1,9 @@
 #include "tool/ToolBox.h"
 
-ToolBox::ToolBox() : Tool("Box") {}
+ToolBox::ToolBox() : Tool("Box")
+{
+    lastBox = NULL;
+}
 
 ToolBox::~ToolBox() {}
 
