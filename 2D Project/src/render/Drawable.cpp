@@ -76,8 +76,15 @@ void Drawable::load()
 void Drawable::draw() const
 {
     glBindVertexArray(vboptr);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboptr);
-    glDrawElements(getDrawMode(), indexed ? indices.size() : verts.size(), GL_UNSIGNED_INT, NULL);
+    if (indexed)
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboptr);
+        glDrawElements(getDrawMode(), indices.size(), GL_UNSIGNED_INT, NULL);
+    }
+    else
+    {
+        glDrawArrays(getDrawMode(), 0, verts.size());
+    }
 }
 
 void Drawable::vert(glm::vec2 pos, glm::vec4 color, glm::vec2 uv)

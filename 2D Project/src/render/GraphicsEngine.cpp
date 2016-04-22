@@ -1,4 +1,4 @@
-#include "core/GraphicsEngine.h"
+#include "GraphicsEngine.h"
 
 /**
 \file GraphicsEngine.cpp
@@ -125,19 +125,27 @@ This function clears the screen and calls the draw functions of the box and circ
 
 void GraphicsEngine::display()
 {
+    std::cout << "Display ";
     // Clear the screen (Frame Buffer)
     glClear(GL_COLOR_BUFFER_BIT);
 
+    std::cout << "- Background";
     glUniform1i(useTextureLoc, 1);
+    std::cout << " Draw";
     bg.draw();
+    std::cout << "n";
     glUniform1i(useTextureLoc, 0);
+    std::cout << " Done!";
 
+    std::cout << " - Objects ";
     for (Drawable* obj : objects)
     {
         obj->draw();
     }
+    std::cout << "Done! ";
 
     sf::RenderWindow::display();
+    std::cout << "- Done!" << std::endl;
 }
 
 /**

@@ -3,7 +3,7 @@
 
 #include <SFML/Window/Event.hpp>
 
-#include "core/Listeners.h"
+#include "ui/Listeners.h"
 
 class UI;
 
@@ -14,12 +14,13 @@ public:
     ListenerContext(UI *ui, T e) : ui(ui), event(e) {};
     virtual ~ListenerContext() {};
 
-    const UI *ui;
     const T event;
+    UI* getUI() { return ui; }
+
 protected:
 
-
 private:
+    UI *ui;
 };
 
 template<typename T>
@@ -31,9 +32,9 @@ inline ListenerContext<T> create_ctx(UI *ui, T event)
 class Listener
 {
 public:
-    virtual void mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) {};
-    virtual void mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) {};
-    virtual void mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx) {};
+    virtual bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) { return false; };
+    virtual bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) { return false; };
+    virtual bool mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx) { return false; };
 };
 
 #endif // LISTENERS_H_INCLUDED

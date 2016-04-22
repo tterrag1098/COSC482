@@ -1,10 +1,11 @@
 #ifndef UI_H_INCLUDED
 #define UI_H_INCLUDED
 
-#include "core/GraphicsEngine.h"
+#include "render/GraphicsEngine.h"
 #include "render/Box.h"
-#include "render/Button.h"
+#include "ui/ToolPanel.h"
 #include "tool/Tool.h"
+#include "tool/ToolLine.h"
 
 /**
 \file UI.h
@@ -32,7 +33,9 @@ class UI
 private:
     GraphicsEngine* ge;  ///< Pointer to the GraphicsEngine that this processor is attached.
     bool mouseDown;      ///< Boolean tracking of the left mouse button.
-    Tool *tool;          ///< The active tool.
+    Tool *tool;   ///< The active tool.
+
+    std::vector<Listener*> listeners; ///< All listeners for UI events
 
     glm::ivec2 LastPosition;  ///< Last position of the mouse on the screen.
 
@@ -56,6 +59,8 @@ public:
     glm::ivec2 prevMousePos() const;
     bool isMouseDown() const;
     GraphicsEngine* getEngine() const;
+    void setToolActive(Tool *tool);
+    void addListener(Listener *l);
 };
 
 #endif // UI_H_INCLUDED

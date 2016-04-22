@@ -1,4 +1,4 @@
-#include "Button.h"
+#include "ui/Button.h"
 
 using namespace glm;
 
@@ -7,6 +7,13 @@ void Button::refresh()
     vec4 col_center = {0.15f, 0.15f, 0.15f, 1};
     vec4 col_light =  {0.3f, 0.3f, 0.3f, 1};
     vec4 col_dark = BLACK;
+
+    if (pressed)
+    {
+        vec4 temp = col_light;
+        col_light = col_dark;
+        col_dark = temp;
+    }
 
     int in = size / 10;
 
@@ -36,4 +43,26 @@ void Button::refresh()
     vert(pos + vec2(in, size - in), col_center);
 
     index_quad(5);
+}
+
+bool Button::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
+{
+    if (ctx.event.x > pos.x && ctx.event.x < pos.x + size && ctx.event.y > pos.y && ctx.event.y < pos.y + size)
+    {
+        pressed = true;
+        load();
+        return true;
+    }
+    return false;
+}
+
+bool Button::mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx)
+{
+    if (pressed)
+    {
+        pressed = false;
+        load();
+        return true;
+    }
+    return false;
 }

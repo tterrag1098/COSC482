@@ -1,4 +1,4 @@
-#include "core/UI.h"
+#include "ui/UI.h"
 #include "tool/ToolBox.h"
 
 /**
@@ -23,9 +23,15 @@ UI::UI(GraphicsEngine* graph)
 {
     ge = graph;
     mouseDown = false;
-    tool = new ToolBox();
-    ge->addObject((new Box({10, 10}, 80, 300, {0, 0, 0, 0.75f}))->setSortIndex(1000));
-    ge->addObject((new Button(15, 15, 20))->setSortIndex(1001));
+
+    ToolPanel *panel = new ToolPanel(10, 10);
+
+    panel->addButton(tool = new ToolBox());
+    panel->addButton(new ToolLine());
+    panel->setSortIndex(1001);
+
+    ge->addObject(panel);
+    addListener(panel);
 }
 
 /**
@@ -50,6 +56,16 @@ bool UI::isMouseDown() const
 GraphicsEngine* UI::getEngine() const
 {
     return ge;
+}
+
+void UI::addListener(Listener *l)
+{
+    listeners.push_back(l);
+}
+
+void UI::setToolActive(Tool *t)
+{
+    tool = t;
 }
 
 /**
@@ -110,7 +126,14 @@ alter the radius of the camera.
 
 void UI::processMouseMoved(sf::Event::MouseMoveEvent mouseMoveEvent)
 {
-    tool->mouseMoved(create_ctx(this, mouseMoveEvent));
+    std::cout << "Mouse Moved ";
+    ListenerContext<sf::Event::MouseMoveEvent> ctx = create_ctx(this, mouseMoveEvent);
+    tool->mouseMoved(ctx);
+    for (Listener *l : listeners)
+    {
+        if (l->mouseMoved(ctx)) break;
+    }
+    std::cout << "- Done!" << std::endl;
 }
 
 /**
@@ -123,7 +146,14 @@ of the mouse as the last position the mouse was at.
 
 void UI::processMouseButtonPressed(sf::Event::MouseButtonEvent mouseButtonEvent)
 {
-    tool->mousePressed(create_ctx(this, mouseButtonEvent));
+    std::cout << "Mouse Pressed ";
+    ListenerContext<sf::Event::MouseButtonEvent> ctx = create_ctx(this, mouseButtonEvent);
+    tool->mousePressed(ctx);
+
+    for (Listener *l : listeners)
+    {
+        if (l->mousePressed(ctx)) break;
+    }
 
     if (mouseButtonEvent.button == sf::Mouse::Left)
     {
@@ -131,6 +161,7 @@ void UI::processMouseButtonPressed(sf::Event::MouseButtonEvent mouseButtonEvent)
         LastPosition.x = mouseButtonEvent.x;
         LastPosition.y = mouseButtonEvent.y;
     }
+    std::cout << "- Done!" << std::endl;
 }
 
 /**
@@ -143,12 +174,19 @@ exit any drag movement.
 
 void UI::processMouseButtonReleased(sf::Event::MouseButtonEvent mouseButtonEvent)
 {
-    tool->mouseReleased(create_ctx(this, mouseButtonEvent));
+    std::cout << "Mouse Released ";
+    ListenerContext<sf::Event::MouseButtonEvent> ctx = create_ctx(this, mouseButtonEvent);
+    tool->mouseReleased(ctx);
+    for (Listener *l : listeners)
+    {
+        if (l->mouseReleased(ctx)) break;
+    }
 
     if (mouseButtonEvent.button == sf::Mouse::Left)
     {
         mouseDown = false;
     }
+    std::cout << "- Done!" << std::endl;
 }
 
 /**

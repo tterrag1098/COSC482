@@ -1,16 +1,15 @@
-#ifndef TOOLBOX_H
-#define TOOLBOX_H
+#ifndef TOOLLINE_H
+#define TOOLLINE_H
 
-#include "ui/Listeners.h"
+#include "Tool.h"
+#include "LineSeg.h"
 #include "ui/UI.h"
-#include "tool/Tool.h"
-#include "render/Box.h"
 
-class ToolBox : public Tool
+class ToolLine : public Tool
 {
     public:
-        ToolBox();
-        virtual ~ToolBox();
+        ToolLine() : Tool("Line"){};
+        virtual ~ToolLine(){};
 
         void deactivated() override;
 
@@ -19,7 +18,8 @@ class ToolBox : public Tool
 
     protected:
     private:
-        Box *lastBox;
+
+        LineSeg *lastLine = NULL;
 };
 
-#endif // TOOLBOX_H
+#endif // TOOLLINE_H

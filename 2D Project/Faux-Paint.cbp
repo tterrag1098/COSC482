@@ -17,6 +17,7 @@
 					<Add directory="include" />
 					<Add directory="include/tool" />
 					<Add directory="include/render" />
+					<Add directory="include/ui" />
 				</Compiler>
 				<Linker>
 					<Add library="sfml-graphics-d" />
@@ -34,6 +35,7 @@
 					<Add directory="include" />
 					<Add directory="include/tool" />
 					<Add directory="include/render" />
+					<Add directory="include/ui" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -61,25 +63,34 @@
 		</Linker>
 		<Unit filename="AspectRatioVert.glsl" />
 		<Unit filename="PassThroughFrag.glsl" />
-		<Unit filename="include/core/GraphicsEngine.h" />
-		<Unit filename="include/core/UI.h" />
 		<Unit filename="include/render/Background.h" />
 		<Unit filename="include/render/Box.h" />
-		<Unit filename="include/render/Button.h" />
 		<Unit filename="include/render/Drawable.h" />
+		<Unit filename="include/render/GraphicsEngine.h" />
+		<Unit filename="include/render/LineSeg.h" />
 		<Unit filename="include/tool/Tool.h" />
 		<Unit filename="include/tool/ToolBox.h" />
 		<Unit filename="include/tool/ToolContext.h" />
+		<Unit filename="include/tool/ToolLine.h" />
+		<Unit filename="include/ui/Button.h" />
+		<Unit filename="include/ui/ButtonTool.h" />
+		<Unit filename="include/ui/Listeners.h" />
+		<Unit filename="include/ui/ToolPanel.h" />
+		<Unit filename="include/ui/UI.h" />
 		<Unit filename="include/util/LoadShaders.h" />
 		<Unit filename="include/util/ProgramDefines.h" />
 		<Unit filename="include/util/utils.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="src/core/GraphicsEngine.cpp" />
-		<Unit filename="src/core/UI.cpp" />
 		<Unit filename="src/render/Box.cpp" />
-		<Unit filename="src/render/Button.cpp" />
 		<Unit filename="src/render/Drawable.cpp" />
+		<Unit filename="src/render/GraphicsEngine.cpp" />
+		<Unit filename="src/render/LineSeg.cpp" />
 		<Unit filename="src/tool/ToolBox.cpp" />
+		<Unit filename="src/tool/ToolLine.cpp" />
+		<Unit filename="src/ui/Button.cpp" />
+		<Unit filename="src/ui/ButtonTool.cpp" />
+		<Unit filename="src/ui/ToolPanel.cpp" />
+		<Unit filename="src/ui/UI.cpp" />
 		<Unit filename="src/util/LoadShaders.cpp" />
 		<Unit filename="src/util/utils.cpp" />
 		<Extensions>
