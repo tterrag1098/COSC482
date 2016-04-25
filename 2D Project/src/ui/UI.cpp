@@ -24,7 +24,7 @@ UI::UI(GraphicsEngine* graph)
     ge = graph;
     mouseDown = false;
 
-    ToolPanel *panel = new ToolPanel(10, 10);
+    ToolPanel *panel = new ToolPanel(ge, 10, 10);
 
     panel->addButton(tool = new ToolBox());
     panel->addButton(new ToolLine());

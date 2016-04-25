@@ -21,7 +21,7 @@ public:
     virtual void resized(sf::Vector2u size) {}
 
     virtual bool contains(glm::vec2 point) = 0;
-    virtual bool erase(glm::vec2 point) { return false; };
+    virtual bool erase(glm::vec2 point) { return contains(point); };
 
     virtual Drawable* setSortIndex(int idx);
     virtual int sortIndex() const;

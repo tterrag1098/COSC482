@@ -5,13 +5,14 @@
 
 #include "render/Box.h"
 #include "ButtonTool.h"
+#include "TexturedBox.h"
 
 class ButtonTool;
 
 class ToolPanel : public Drawable, public Listener
 {
 public:
-    ToolPanel(int x, int y);
+    ToolPanel(GraphicsEngine *ge, int x, int y);
     virtual ~ToolPanel() {};
 
     virtual bool contains(glm::vec2 point) override { return false; };
@@ -20,9 +21,11 @@ public:
 
 protected:
 private:
+    GraphicsEngine *ge;
     glm::vec2 pos;
     Box *bg;
     int buttons;
+    GLuint texId;
 
     const int padding = 3;
     const int butSize = 22;

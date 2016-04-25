@@ -8,7 +8,7 @@
 class ToolLine : public Tool
 {
     public:
-        ToolLine() : Tool("Line"){};
+        ToolLine() : Tool("Line", 1, 0) {};
         virtual ~ToolLine(){};
 
         void deactivated() override;

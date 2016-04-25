@@ -1,6 +1,6 @@
 #include "tool/ToolBox.h"
 
-ToolBox::ToolBox() : Tool("Box")
+ToolBox::ToolBox() : Tool("Box", 0, 0)
 {
     lastBox = NULL;
 }

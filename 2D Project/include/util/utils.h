@@ -1,7 +1,7 @@
 #ifndef STRUCTS_H_INCLUDED
 #define STRUCTS_H_INCLUDED
 
-#include "GL/gl.h"
+#include "GL/glew.h"
 #include <random>
 #include <sstream>
 #include <iomanip>

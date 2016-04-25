@@ -49,7 +49,8 @@ private:
     GLfloat screenBounds[4];  ///< (l, r, b, t) bounds for the screen.
     GLuint useTextureLoc;     ///< Location ID of the texture use flag in the shader.
     GLuint projLoc;           ///< Uniform location of the projection matrix
-    Background *bg;            ///< Background render object
+    Background *bg;           ///< Background render object
+    int texIdx;               ///< Index of the next texture to load
 
     std::vector<Drawable*> objects;
     std::vector<Drawable*> undoStack;
@@ -73,6 +74,8 @@ public:
     void resize();
     void setSize(unsigned int, unsigned int);
     void addObject(Drawable* obj, bool removable = true);
+    GLuint loadTexture(std::string path);
+    void activateTexture(int texId);
     GLfloat* getScreenBounds();
 };
 

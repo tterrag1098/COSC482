@@ -33,6 +33,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
                      sf::Style::Default,
                      sf::ContextSettings(24, 8, 4, 3, 3))
 {
+    texIdx = 1;
+
     // Turn on GLEW
     if (glewInit())
     {
@@ -51,7 +53,7 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
 
     // Turn on the shader & get location of transformation matrix.
     glUseProgram(defaultShader);
-    useTextureLoc = glGetUniformLocation(defaultShader, "useTexture");
+    useTextureLoc = glGetUniformLocation(defaultShader, "useTex");
 
     mode = GL_FILL;
     sscount = 1;
@@ -63,8 +65,23 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
 
     clear(sf::Color::White);
 
+    glEnable(GL_BLEND);
+    glEnable(GL_ALPHA_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Find the location of the projection matrix.
+    projLoc = glGetUniformLocation(defaultShader, "Projection");
+    setProjectionMatrix();
+
+    // Make it the active window for OpenGL calls
+    setActive();
+    resize();
+}
+
+GLuint GraphicsEngine::loadTexture(std::string path)
+{
     sf::Image texture;
-    bool texloaded = texture.loadFromFile("assets/bg.png");
+    bool texloaded = texture.loadFromFile(path);
 
     if (!texloaded)
     {
@@ -74,13 +91,9 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
 
     GLuint texID;
     glGenTextures(1, &texID);
-
-//  Link the texture to the shader.
-    GLuint tex1_uniform_loc = glGetUniformLocation(defaultShader, "tex1");
-    glUniform1i(tex1_uniform_loc, 0);
+    glUniform1i(glGetUniformLocation(defaultShader, "tex"), 0);
 
 //  Load the texture into texture memory.
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -89,19 +102,21 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glEnable(GL_BLEND);
-    glEnable(GL_ALPHA_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    return texID;
+}
 
-    bg = new Background(this);
-
-    // Find the location of the projection matrix.
-    projLoc = glGetUniformLocation(defaultShader, "Projection");
-    setProjectionMatrix();
-
-    // Make it the active window for OpenGL calls
-    setActive();
-    resize();
+void GraphicsEngine::activateTexture(int texId)
+{
+    if (texId >= 0)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glUniform1i(useTextureLoc, 1);
+        glBindTexture(GL_TEXTURE_2D, texId);
+    }
+    else
+    {
+        glUniform1i(useTextureLoc, 0);
+    }
 }
 
 /**
@@ -283,7 +298,4 @@ void GraphicsEngine::setProjectionMatrix()
     float h = getSize().y;
     glm::mat4 ProjectionMatrix = glm::ortho(0.0f, w, h, 0.0f);
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
-
-    bg->setWidth(w);
-    bg->setHeight(h);
 }

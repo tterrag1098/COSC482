@@ -2159,7 +2159,7 @@
 
 1461495330 x:\development\cosc482\2d project\include\util\programdefines.h
 
-1461542115 x:\development\cosc482\2d project\include\render\drawable.h
+1461597011 x:\development\cosc482\2d project\include\render\drawable.h
 	"util/ProgramDefines.h"
 	<GL/glew.h>
 	<SFML/System/Vector2.hpp>
@@ -2187,14 +2187,14 @@
 	"util/ProgramDefines.h"
 	"util/utils.h"
 
-1461543188 x:\development\cosc482\2d project\include\util\utils.h
-	"GL/gl.h"
+1461599772 x:\development\cosc482\2d project\include\util\utils.h
+	"GL/glew.h"
 	<random>
 	<sstream>
 	<iomanip>
 	<glm/common.hpp>
 
-1461364797 source:x:\development\cosc482\2d project\src\render\box.cpp
+1461600113 source:x:\development\cosc482\2d project\src\render\box.cpp
 	"render/Box.h"
 
 1461477827 source:x:\development\cosc482\2d project\src\render\drawable.cpp
@@ -2203,9 +2203,10 @@
 1459841518 source:x:\development\cosc482\2d project\src\tool\tool.cpp
 	"Tool.h"
 
-1461345551 x:\development\cosc482\2d project\include\tool\tool.h
+1461599751 x:\development\cosc482\2d project\include\tool\tool.h
 	<string>
 	"ui/Listeners.h"
+	"util/utils.h"
 
 1459844479 x:\development\cosc482\2d project\include\tool\toolcontext.h
 	"core/UI.h"
@@ -2220,7 +2221,7 @@
 1461470537 source:x:\development\cosc482\2d project\src\util\utils.cpp
 	"util/utils.h"
 
-1461486481 source:x:\development\cosc482\2d project\src\tool\toolbox.cpp
+1461599727 source:x:\development\cosc482\2d project\src\tool\toolbox.cpp
 	"tool/ToolBox.h"
 
 1461494407 x:\development\cosc482\2d project\include\tool\toolbox.h
@@ -2329,7 +2330,7 @@
 1460390423 source:c:\development\cosc482\2d project\src\util\utils.cpp
 	"util/utils.h"
 
-1461542095 x:\development\cosc482\2d project\include\render\background.h
+1461604651 x:\development\cosc482\2d project\include\render\background.h
 	"render/Box.h"
 	"GraphicsEngine.h"
 
@@ -2378,15 +2379,15 @@
 1461495849 source:x:\development\cosc482\2d project\src\tool\toolline.cpp
 	"ToolLine.h"
 
-1461495854 x:\development\cosc482\2d project\include\tool\toolline.h
+1461599720 x:\development\cosc482\2d project\include\tool\toolline.h
 	"Tool.h"
 	"LineSeg.h"
 	"ui/UI.h"
 
-1461537926 source:x:\development\cosc482\2d project\src\render\graphicsengine.cpp
+1461605162 source:x:\development\cosc482\2d project\src\render\graphicsengine.cpp
 	"GraphicsEngine.h"
 
-1461551103 x:\development\cosc482\2d project\include\render\graphicsengine.h
+1461604840 x:\development\cosc482\2d project\include\render\graphicsengine.h
 	"util/ProgramDefines.h"
 	<GL/glew.h>
 	<glm/detail/type_mat4x4.hpp>
@@ -2433,22 +2434,23 @@
 1461345543 source:x:\development\cosc482\2d project\src\ui\buttontool.cpp
 	"ui/ButtonTool.h"
 
-1461497546 source:x:\development\cosc482\2d project\src\ui\ui.cpp
+1461600832 source:x:\development\cosc482\2d project\src\ui\ui.cpp
 	"ui/UI.h"
 	"tool/ToolBox.h"
 
-1461495075 source:x:\development\cosc482\2d project\src\ui\toolpanel.cpp
+1461600821 source:x:\development\cosc482\2d project\src\ui\toolpanel.cpp
 	"ToolPanel.h"
 
-1461549021 x:\development\cosc482\2d project\include\ui\toolpanel.h
+1461604661 x:\development\cosc482\2d project\include\ui\toolpanel.h
 	<algorithm>
 	"render/Box.h"
 	"ButtonTool.h"
+	"TexturedBox.h"
 
-1461548997 source:x:\development\cosc482\2d project\src\ui\colorpicker.cpp
+1461598053 source:x:\development\cosc482\2d project\src\ui\colorpicker.cpp
 	"ColorPicker.h"
 
-1461543086 x:\development\cosc482\2d project\include\ui\colorpicker.h
+1461597990 x:\development\cosc482\2d project\include\ui\colorpicker.h
 	<iomanip>
 	<sstream>
 	"Box.h"
@@ -2484,10 +2486,10 @@
 1461474259 source:x:\development\cosc482\2d project\src\ui\textrendererttf.cpp
 	"TextRendererTTF.h"
 
-1461477822 source:x:\development\cosc482\2d project\src\render\background.cpp
+1461604693 source:x:\development\cosc482\2d project\src\render\background.cpp
 	"Background.h"
 
-1461537835 source:x:\development\cosc482\2d project\src\tool\tooldraw.cpp
+1461599786 source:x:\development\cosc482\2d project\src\tool\tooldraw.cpp
 	"ToolDraw.h"
 
 1461495863 x:\development\cosc482\2d project\include\tool\tooldraw.h
@@ -2502,4 +2504,11 @@
 
 1461548900 source:x:\development\cosc482\2d project\src\render\freeformline.cpp
 	"FreeformLine.h"
+
+1461604687 source:x:\development\cosc482\2d project\src\render\texturedbox.cpp
+	"TexturedBox.h"
+
+1461604684 x:\development\cosc482\2d project\include\render\texturedbox.h
+	"Box.h"
+	"GraphicsEngine.h"
 

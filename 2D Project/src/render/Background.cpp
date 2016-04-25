@@ -1,6 +1,9 @@
 #include "Background.h"
 
-Background::Background(GraphicsEngine *ge) : Box({0, 0}, 0, 0), ge(ge), texW(16), texH(16) {}
+Background::Background(GraphicsEngine *ge) : Box({0, 0}, 0, 0), ge(ge), texW(16), texH(16)
+{
+    texId = ge->loadTexture("assets/bg.png"); // WARNING this could break if used more than once. Currently only used for color picker.
+}
 
 void Background::refresh()
 {
@@ -15,7 +18,7 @@ void Background::refresh()
 
 void Background::draw()
 {
-    glUniform1i(ge->useTextureLoc, 1);
+    ge->activateTexture(texId);
     Box::draw();
-    glUniform1i(ge->useTextureLoc, 0);
+    ge->activateTexture(-1);
 }

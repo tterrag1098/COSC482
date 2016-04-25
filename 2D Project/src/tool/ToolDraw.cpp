@@ -1,6 +1,6 @@
 #include "ToolDraw.h"
 
-ToolDraw::ToolDraw() : Tool("Draw")
+ToolDraw::ToolDraw() : Tool("Draw", 2, 0)
 {
     curLine = NULL;
 }

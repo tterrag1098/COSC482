@@ -19,6 +19,7 @@ protected:
 private:
     GraphicsEngine *ge;
     int texW, texH;
+    GLuint texId;
 };
 
 #endif // BACKGROUND_H_INCLUDED
