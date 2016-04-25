@@ -1,0 +1,25 @@
+# Debug objects and executables 
+/**/bin
+/**/obj
+
+# Docs
+/**/doxygen
+
+# Code::Blocks files
+*.layout
+*.depend
+
+# Unused directories
+2D Project VS
+DemoPrograms
+Examples
+SFML*
+Random
+oldstuff
+WeirdSphereThingy
+
+# Unused files
+*.zip
+*.jar
+*.pdf
+*.exe
