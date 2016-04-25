@@ -3,10 +3,14 @@
 
 #include "render/GraphicsEngine.h"
 #include "render/Box.h"
+
+#include "Tool.h"
+#include "ToolLine.h"
+#include "ToolDraw.h"
+#include "ToolBox.h"
+
 #include "ToolPanel.h"
-#include "Slider.h"
-#include "tool/Tool.h"
-#include "tool/ToolLine.h"
+#include "ColorPicker.h"
 
 /**
 \file UI.h
@@ -28,6 +32,7 @@ and scene objects.
 */
 
 class Tool;
+class ColorPicker;
 
 class UI
 {
@@ -39,6 +44,8 @@ private:
     std::vector<Listener*> listeners; ///< All listeners for UI events
 
     glm::ivec2 LastPosition;  ///< Last position of the mouse on the screen.
+
+    ColorPicker *colorpicker;
 
     void keyPressed(sf::Event::KeyEvent keyevent);
     void keyboardStateProcessing();
@@ -60,6 +67,8 @@ public:
     glm::ivec2 prevMousePos() const;
     bool isMouseDown() const;
     GraphicsEngine* getEngine() const;
+    glm::vec4 getSelectedColor() const;
+
     void setToolActive(Tool *tool);
     void addListener(Listener *l);
 };

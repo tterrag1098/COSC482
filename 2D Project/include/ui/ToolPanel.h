@@ -14,6 +14,8 @@ public:
     ToolPanel(int x, int y);
     virtual ~ToolPanel() {};
 
+    virtual bool contains(glm::vec2 point) override { return false; };
+
     void addButton(Tool *tool);
 
 protected:

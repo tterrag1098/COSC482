@@ -5,6 +5,8 @@
 
 #include <GL/glew.h>
 
+#include <SFML/System/Vector2.hpp>
+
 #include <glm/detail/type_vec2.hpp>
 #include <glm/detail/type_vec4.hpp>
 
@@ -13,10 +15,13 @@
 class Drawable
 {
 public:
-    ~Drawable();
+    virtual ~Drawable();
 
-    virtual void draw() const;
-    virtual void resized(int bounds[4]) {}
+    virtual void draw();
+    virtual void resized(sf::Vector2u size) {}
+
+    virtual bool contains(glm::vec2 point) = 0;
+    virtual bool erase(glm::vec2 point) { return false; };
 
     virtual Drawable* setSortIndex(int idx);
     virtual int sortIndex() const;

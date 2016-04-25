@@ -28,22 +28,24 @@ UI::UI(GraphicsEngine* graph)
 
     panel->addButton(tool = new ToolBox());
     panel->addButton(new ToolLine());
+    panel->addButton(new ToolDraw());
+
     panel->setSortIndex(1001);
 
-    ge->addObject(panel);
+    ge->addObject(panel, false);
     addListener(panel);
 
-    Slider *test = new Slider(70, 18, 128, 0, 255);
-    test->setSortIndex(1001);
-    ge->addObject(test);
-    addListener(test);
+    colorpicker = new ColorPicker(ge);
+    colorpicker->setSortIndex(1001);
+    ge->addObject(colorpicker, false);
+    addListener(colorpicker);
 
-    std::vector<Button*> tests = {new Button({100, 160}, 10), new Button({120, 160}, 20), new Button({160, 160}, 40), new Button({240, 160}, 80)};
-    for (Button *b : tests)
-    {
-        ge->addObject(b);
-        addListener(b);
-    }
+    //std::vector<Button*> tests = {new Button({100, 160}, 10), new Button({120, 160}, 20), new Button({160, 160}, 40), new Button({240, 160}, 80)};
+    //for (Button *b : tests)
+    //{
+    //    ge->addObject(b);
+    //    addListener(b);
+    //}
 }
 
 /**
@@ -68,6 +70,11 @@ bool UI::isMouseDown() const
 GraphicsEngine* UI::getEngine() const
 {
     return ge;
+}
+
+glm::vec4 UI::getSelectedColor() const
+{
+    return colorpicker->getColor();
 }
 
 void UI::addListener(Listener *l)
@@ -243,6 +250,16 @@ void UI::keyPressed(sf::Event::KeyEvent keyevent)
 
     case sf::Keyboard::F10:
         ge->screenshotJPG();
+        break;
+
+    case sf::Keyboard::Z:
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
+            ge->undo();
+        break;
+
+    case sf::Keyboard::Y:
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
+            ge->redo();
         break;
 
     default:

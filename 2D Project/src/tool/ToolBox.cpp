@@ -16,7 +16,7 @@ bool ToolBox::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
     if (ctx.event.button == sf::Mouse::Left)
     {
-        ctx.getUI()->getEngine()->addObject(lastBox = new Box({ctx.event.x, ctx.event.y}, 0, 0, {rand_float(), rand_float(), rand_float(), 1}));
+        ctx.getUI()->getEngine()->addObject(lastBox = new Box({ctx.event.x, ctx.event.y}, 0, 0, ctx.getUI()->getSelectedColor()));
         return true;
     }
     return false;
@@ -32,6 +32,10 @@ bool ToolBox::mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx)
         lastBox->setWidth(cur.x - last.x);
         lastBox->setHeight(cur.y - last.y);
         return true;
+    }
+    else
+    {
+        lastBox = NULL;
     }
     return false;
 }

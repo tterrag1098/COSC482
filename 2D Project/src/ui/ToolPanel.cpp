@@ -18,7 +18,7 @@ void ToolPanel::addButton(Tool* tool)
     buttons++;
 
     bg->setWidth(padding + ((butSize + padding) * std::min(buttons, 2)));
-    bg->setHeight(padding + ((butSize + padding) * (buttons / 2)));
+    bg->setHeight(padding + ((butSize + padding) * ((buttons + 1) / 2)));
 
     load();
 }

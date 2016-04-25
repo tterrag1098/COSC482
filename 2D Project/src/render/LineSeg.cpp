@@ -7,10 +7,14 @@ void LineSeg::refresh()
     vert(pos2, color);
 }
 
-void LineSeg::draw() const
+void LineSeg::draw()
 {
-    glLineWidth(2);
     Drawable::draw();
+}
+
+bool LineSeg::contains(glm::vec2 point)
+{
+    return onLine(pos1, pos2, point);
 }
 
 void LineSeg::setPos2(glm::vec2 pos)

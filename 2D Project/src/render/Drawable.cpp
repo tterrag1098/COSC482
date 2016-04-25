@@ -92,7 +92,7 @@ void Drawable::load()
     }
 }
 
-void Drawable::draw() const
+void Drawable::draw()
 {
     if (visible)
     {

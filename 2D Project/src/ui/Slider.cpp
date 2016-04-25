@@ -9,6 +9,8 @@ Slider::Slider(int x, int y, int width, int min, int max) : Drawable(false), wid
 
     Listener::children.push_back(thumb);
     Drawable::children.push_back(thumb);
+
+    setValue(max);
 }
 
 Slider::~Slider()
@@ -19,6 +21,28 @@ Slider::~Slider()
 int Slider::getValue()
 {
     return pos;
+}
+
+void Slider::setX(int x)
+{
+    glm::vec2 tcorner = thumb->getCorner();
+    glm::vec2 bcorner = bar->getCorner();
+
+    int off = tcorner.x - bcorner.x;
+
+    tcorner.x = x + off;
+    bcorner.x = x;
+
+    thumb->setCorner(tcorner);
+    bar->setCorner(bcorner);
+}
+
+void Slider::setValue(int value)
+{
+    pos = value;
+    glm::vec2 corner = thumb->getCorner();
+    corner.x = bar->getCorner().x + ((float) pos / (max - min)) * width;
+    thumb->setCorner(corner);
 }
 
 bool Slider::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)

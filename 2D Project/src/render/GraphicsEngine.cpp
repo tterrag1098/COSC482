@@ -11,6 +11,8 @@ This class extends sf::RenderWindow.
 
 */
 
+GLuint GraphicsEngine::defaultShader = 0;
+
 /**
 \brief Constructor
 
@@ -39,17 +41,17 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     }
 
     //  Load the shaders
-    GLuint program = LoadShadersFromFile("AspectRatioVert.glsl", "PassThroughFrag.glsl");
+    defaultShader = LoadShadersFromFile("AspectRatioVert.glsl", "PassThroughFrag.glsl");
 
-    if (!program)
+    if (!defaultShader)
     {
         std::cerr << "Could not load Shader programs." << std::endl;
         exit(EXIT_FAILURE);
     }
 
     // Turn on the shader & get location of transformation matrix.
-    glUseProgram(program);
-    useTextureLoc = glGetUniformLocation(program, "useTexture");
+    glUseProgram(defaultShader);
+    useTextureLoc = glGetUniformLocation(defaultShader, "useTexture");
 
     mode = GL_FILL;
     sscount = 1;
@@ -59,7 +61,7 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     else
         setFramerateLimit(0);
 
-    clear(sf::Color::Transparent);
+    clear(sf::Color::White);
 
     sf::Image texture;
     bool texloaded = texture.loadFromFile("assets/bg.png");
@@ -74,7 +76,7 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glGenTextures(1, &texID);
 
 //  Link the texture to the shader.
-    GLuint tex1_uniform_loc = glGetUniformLocation(program, "tex1");
+    GLuint tex1_uniform_loc = glGetUniformLocation(defaultShader, "tex1");
     glUniform1i(tex1_uniform_loc, 0);
 
 //  Load the texture into texture memory.
@@ -91,8 +93,10 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glEnable(GL_ALPHA_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    bg = new Background(this);
+
     // Find the location of the projection matrix.
-    projLoc = glGetUniformLocation(program, "Projection");
+    projLoc = glGetUniformLocation(defaultShader, "Projection");
     setProjectionMatrix();
 
     // Make it the active window for OpenGL calls
@@ -109,11 +113,17 @@ Currently empty, no allocated memory to clear.
 
 GraphicsEngine::~GraphicsEngine() {}
 
-void GraphicsEngine::addObject(Drawable *obj)
+void GraphicsEngine::addObject(Drawable *obj, bool removable)
 {
     obj->load();
     objects.push_back(obj);
     std::stable_sort(objects.begin(), objects.end(), [](const Drawable* a, const Drawable* b) { return a->sortIndex() < b->sortIndex(); });
+
+    if (removable)
+    {
+        undoStack.push_back(obj);
+        redoStack.clear();
+    }
 }
 
 /**
@@ -128,9 +138,10 @@ void GraphicsEngine::display()
     // Clear the screen (Frame Buffer)
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUniform1i(useTextureLoc, 1);
-    bg.draw();
-    glUniform1i(useTextureLoc, 0);
+    //bg->draw();
+
+    glLineWidth(2);
+    glPointSize(3);
 
     for (Drawable* obj : objects)
     {
@@ -153,6 +164,29 @@ void GraphicsEngine::changeMode()
         mode = GL_FILL;
 
     glPolygonMode(GL_FRONT_AND_BACK, mode);
+}
+
+void GraphicsEngine::undo()
+{
+    if (!undoStack.empty())
+    {
+        objects.erase(std::find(objects.begin(), objects.end(), undoStack.back()));
+        redoStack.push_back(undoStack.back());
+        undoStack.pop_back();
+    }
+}
+
+void GraphicsEngine::redo()
+{
+    if (!redoStack.empty())
+    {
+        Drawable *obj = redoStack.back();
+        obj->load();
+        objects.push_back(obj);
+        std::stable_sort(objects.begin(), objects.end(), [](const Drawable* a, const Drawable* b) { return a->sortIndex() < b->sortIndex(); });
+        redoStack.pop_back();
+        undoStack.push_back(obj);
+    }
 }
 
 /**
@@ -201,6 +235,12 @@ void GraphicsEngine::screenshotPNG()
 void GraphicsEngine::resize()
 {
     glViewport(0, 0, getSize().x, getSize().y);
+
+    for (Drawable *d : objects)
+    {
+        d->resized(getSize());
+    }
+
     setProjectionMatrix();
 }
 
@@ -244,6 +284,6 @@ void GraphicsEngine::setProjectionMatrix()
     glm::mat4 ProjectionMatrix = glm::ortho(0.0f, w, h, 0.0f);
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
 
-    bg.setWidth(w);
-    bg.setHeight(h);
+    bg->setWidth(w);
+    bg->setHeight(h);
 }

@@ -13,7 +13,13 @@ public:
     Slider(int x, int y, int width, int min, int max);
     virtual ~Slider();
 
+    virtual bool contains(glm::vec2 point) override { return false; }
+
     int getValue();
+    void setValue(int value);
+
+    void setX(int x);
+    void setY(int y);
 
     bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
     bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;

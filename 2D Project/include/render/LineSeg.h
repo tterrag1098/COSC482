@@ -10,8 +10,10 @@ class LineSeg : public Drawable
         LineSeg(glm::vec2 p1 = {0, 0}, glm::vec2 p2 = {0, 0}, glm::vec4 col = BLACK) : Drawable(false), pos1(p1), pos2(p2), color(col) {};
         virtual ~LineSeg(){};
 
+        virtual bool contains(glm::vec2 point) override;
+
         void setPos2(glm::vec2 pos);
-        void draw() const override;
+        void draw() override;
 
     protected:
         glm::vec2 pos1, pos2;
