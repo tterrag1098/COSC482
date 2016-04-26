@@ -10,7 +10,7 @@ Slider::Slider(int x, int y, int width, int min, int max) : Drawable(false), wid
     Listener::children.push_back(thumb);
     Drawable::children.push_back(thumb);
 
-    setValue(max);
+    setValue(min);
 }
 
 Slider::~Slider()
@@ -48,6 +48,12 @@ void Slider::setValue(int value)
 bool Slider::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
     bool pressed = Listener::mousePressed(ctx);
+    if (!pressed && bar->contains({ctx.event.x, ctx.event.y}))
+    {
+        thumb->setCorner({ctx.event.x - (thumb->getSize() / 2), thumb->getCorner().y});
+        calculateValue();
+        pressed = true;
+    }
     if (pressed)
     {
         dragging = true;
@@ -72,11 +78,15 @@ bool Slider::mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx)
         glm::vec2 corner = thumb->getCorner();
         float move = pressPos.x + (mouse.x - lastPos.x);
         corner.x = std::max(bar->getCorner().x, std::min(move, bar->getCorner().x + bar->getWidth() - thumb->getSize()));
-        pos = (corner.x - bar->getCorner().x) * ((float) (max - min) / width);
-        pos += min;
-        std::cout << pos << std::endl;
+        calculateValue();
         thumb->setCorner(corner);
         return true;
     }
     return false;
+}
+
+void Slider::calculateValue()
+{
+    pos = (thumb->getCorner().x - bar->getCorner().x) * ((float) (max - min) / width);
+    pos += min;
 }

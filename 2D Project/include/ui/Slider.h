@@ -32,6 +32,8 @@ private:
     bool dragging;
     glm::vec2 pressPos;
 
+    void calculateValue();
+
     Box *bar;
     Button *thumb;
 };

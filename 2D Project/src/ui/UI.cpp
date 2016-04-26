@@ -26,9 +26,9 @@ UI::UI(GraphicsEngine* graph)
 
     ToolPanel *panel = new ToolPanel(ge, 10, 10);
 
-    panel->addButton(tool = new ToolBox());
+    panel->addButton(tool = new ToolDraw());
     panel->addButton(new ToolLine());
-    panel->addButton(new ToolDraw());
+    panel->addButton(new ToolBox());
 
     panel->setSortIndex(1001);
 
