@@ -4,10 +4,10 @@
 #include "render/GraphicsEngine.h"
 #include "render/Box.h"
 
-#include "Tool.h"
 #include "ToolLine.h"
 #include "ToolDraw.h"
 #include "ToolBox.h"
+#include "ToolFill.h"
 
 #include "ToolPanel.h"
 #include "ColorPicker.h"

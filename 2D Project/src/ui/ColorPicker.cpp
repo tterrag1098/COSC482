@@ -96,3 +96,13 @@ glm::vec4 ColorPicker::getColor()
 {
     return glm::vec4(prevColor) / 255.0f;
 }
+
+bool ColorPicker::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
+{
+    return Listener::mousePressed(ctx) || bg->contains({ctx.event.x, ctx.event.y});
+}
+
+bool ColorPicker::mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx)
+{
+    return Listener::mouseReleased(ctx) || bg->contains({ctx.event.x, ctx.event.y});
+}

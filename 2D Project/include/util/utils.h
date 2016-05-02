@@ -6,7 +6,9 @@
 #include <sstream>
 #include <iomanip>
 
+#include <SFML/System/Vector2.hpp>
 #include <glm/common.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace glm;
 
@@ -65,6 +67,13 @@ inline bool onLine(glm::vec2 pos1, glm::vec2 pos2, glm::vec2 point)
         return (std::fabs (point.y - (M * point.x + C)) <= tolerance);
     }
     return false;
+}
+
+inline vec4 readColor(sf::Vector2u size, int x, int y)
+{
+    vec4 col;
+    glReadPixels(x, size.y - y, 1, 1, GL_RGBA, GL_FLOAT, glm::value_ptr(col));
+    return col;
 }
 
 #endif // STRUCTS_H_INCLUDED

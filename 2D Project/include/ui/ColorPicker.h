@@ -14,28 +14,31 @@ class Slider;
 
 class ColorPicker : public Listener, public Drawable
 {
-    public:
-        ColorPicker(GraphicsEngine *ge);
-        virtual ~ColorPicker();
+public:
+    ColorPicker(GraphicsEngine *ge);
+    virtual ~ColorPicker();
 
-        virtual bool contains(glm::vec2 point) override;
+    virtual bool contains(glm::vec2 point) override;
 
-        void resized(sf::Vector2u size) override;
-        void draw() override;
+    void resized(sf::Vector2u size) override;
+    void draw() override;
 
-        glm::vec4 getColor();
+    bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
+    bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
 
-    protected:
-    private:
-        GraphicsEngine *ge;
-        Slider *r, *g, *b, *a;
-        Box *bg;
-        Box *colorbg, *color;
-        glm::ivec4 prevColor;
-        TextRendererTTF text;
+    glm::vec4 getColor();
 
-        glm::vec2 pos;
-        const int width, height;
+protected:
+private:
+    GraphicsEngine *ge;
+    Slider *r, *g, *b, *a;
+    Box *bg;
+    Box *colorbg, *color;
+    glm::ivec4 prevColor;
+    TextRendererTTF text;
+
+    glm::vec2 pos;
+    const int width, height;
 };
 
 #endif // COLORPICKER_H

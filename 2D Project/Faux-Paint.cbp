@@ -70,11 +70,13 @@
 		<Unit filename="include/render/FreeformLine.h" />
 		<Unit filename="include/render/GraphicsEngine.h" />
 		<Unit filename="include/render/LineSeg.h" />
+		<Unit filename="include/render/PointBlob.h" />
 		<Unit filename="include/render/TexturedBox.h" />
 		<Unit filename="include/tool/Tool.h" />
 		<Unit filename="include/tool/ToolBox.h" />
 		<Unit filename="include/tool/ToolContext.h" />
 		<Unit filename="include/tool/ToolDraw.h" />
+		<Unit filename="include/tool/ToolFill.h" />
 		<Unit filename="include/tool/ToolLine.h" />
 		<Unit filename="include/ui/Button.h" />
 		<Unit filename="include/ui/ButtonTool.h" />
@@ -94,9 +96,11 @@
 		<Unit filename="src/render/FreeformLine.cpp" />
 		<Unit filename="src/render/GraphicsEngine.cpp" />
 		<Unit filename="src/render/LineSeg.cpp" />
+		<Unit filename="src/render/PointBlob.cpp" />
 		<Unit filename="src/render/TexturedBox.cpp" />
 		<Unit filename="src/tool/ToolBox.cpp" />
 		<Unit filename="src/tool/ToolDraw.cpp" />
+		<Unit filename="src/tool/ToolFill.cpp" />
 		<Unit filename="src/tool/ToolLine.cpp" />
 		<Unit filename="src/ui/Button.cpp" />
 		<Unit filename="src/ui/ButtonTool.cpp" />

@@ -65,6 +65,7 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
 
     clear(sf::Color::White);
 
+    glDisable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     glEnable(GL_ALPHA_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -156,7 +157,6 @@ void GraphicsEngine::display()
     //bg->draw();
 
     glLineWidth(2);
-    glPointSize(3);
 
     for (Drawable* obj : objects)
     {

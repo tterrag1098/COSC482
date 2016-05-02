@@ -29,6 +29,7 @@ UI::UI(GraphicsEngine* graph)
     panel->addButton(tool = new ToolDraw());
     panel->addButton(new ToolLine());
     panel->addButton(new ToolBox());
+    panel->addButton(new ToolFill());
 
     panel->setSortIndex(1001);
 
