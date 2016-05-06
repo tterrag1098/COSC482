@@ -7,6 +7,7 @@
 #include <SFML/System.hpp>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <stdio.h>
 
 #define GLM_SWIZZLE
@@ -24,6 +25,8 @@
 #include "MaterialPresets.h"
 #include "Models.h"
 #include "ObjModel.h"
+#include "PhysicsEngine.h"
+#include "BodyModel.h"
 
 /**
 \file GraphicsEngine.h
@@ -48,19 +51,12 @@ class GraphicsEngine : public sf::RenderWindow
 private:
     GLenum mode;    ///< Mode, either point, line or fill.
     int sscount;    ///< Screenshot count to be appended to the screenshot filename.
-    Axes coords;    ///< Axes Object
 
-    GLuint ModelLoc;       ///< Location ID of the Model matrix in the shader.
-    GLuint NormalLoc;      ///< Location ID of the Normal matrix in the shader.
-    GLuint PVMLoc;         ///< Location ID of the PVM matrix in the shader.
-    GLuint texTransLoc;    ///< Location ID of the texture transformation matrix in the shader.
-    GLuint program;        ///< ID of the shader program.
-    GLuint CMprogram;      ///< ID of the cube map shader program.
+    std::vector<Drawable*> objects;
 
     SphericalCamera sphcamera;   ///< Spherical Camera
     YPRCamera yprcamera;         ///< Yaw-Pitch-Roll Camera
     int CameraNumber;            ///< Camera number 1 = spherical, 2 = yaw-pitch-roll.
-    SphericalCamera LtPos[10];   ///< Spherical "Camera" to control position of the light.
 
     Material mat;         ///< Material of the current object.
     Light lt[10];         ///< Light object.
@@ -68,15 +64,14 @@ private:
     GLuint CubeMapTexId;  ///< Cube Map Texture ID.
 
     Models lightobj;  ///< Used for sphere at light source.
-    Models obj;       ///< Model Object
+    Models star;
     Models CMSphere;  ///< Sphere Object for Cube Map
-    ObjModel objmodel;
 
     glm::mat4 projection;  ///< Projection Matrix
     glm::mat4 model;       ///< Model Matrix
     glm::mat4 textrans;    ///< Texture transformation matrix.
 
-    GLboolean drawAxes;    ///< Boolean for axes being drawn.
+    PhysicsEngine *pe;
 
     void screenshot(std::string ext);
     void printOpenGLErrors();
@@ -87,14 +82,21 @@ public:
     GraphicsEngine(std::string, GLint, GLint);
     ~GraphicsEngine();
 
+    static GLuint ModelLoc;       ///< Location ID of the Model matrix in the shader.
+    static GLuint NormalLoc;      ///< Location ID of the Normal matrix in the shader.
+    static GLuint PVMLoc;         ///< Location ID of the PVM matrix in the shader.
+    static GLuint texTransLoc;    ///< Location ID of the texture transformation matrix in the shader.
+    static GLuint program;        ///< ID of the shader program.
+    static GLuint CMprogram;      ///< ID of the cube map shader program.
+
     void display();
     void changeMode();
     void screenshotPNG();
     void screenshotJPG();
     void resize();
     void setSize(unsigned int, unsigned int);
+    void addObject(Drawable* obj, bool removable = true);
     GLfloat* getScreenBounds();
-    void setDrawAxes(GLboolean b);
 
     GLboolean isSphericalCameraOn();
     void setSphericalCameraOn();
@@ -115,8 +117,6 @@ public:
     void turnTexturesOn(std::string name, int num);
     void turnTextureOff(std::string name, int i);
     void turnTextureOn(std::string name, int i);
-
-    void toggleDrawAxes();
 
     void LoadLights(Light Lt[], std::string name, int num);
     void LoadLight(Light Lt, std::string name, int i);

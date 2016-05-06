@@ -12,6 +12,13 @@ This class extends sf::RenderWindow.
 
 */
 
+GLuint GraphicsEngine::ModelLoc = 0;
+GLuint GraphicsEngine::NormalLoc = 0;
+GLuint GraphicsEngine::PVMLoc = 0;
+GLuint GraphicsEngine::texTransLoc = 0;
+GLuint GraphicsEngine::program = 0;
+GLuint GraphicsEngine::CMprogram = 0;
+
 /**
 \brief Constructor
 
@@ -32,9 +39,25 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
                      sf::ContextSettings(24, 8, 4, 3, 3))
 {
     //objmodel.Load("Models/spaceship.obj");
-    objmodel.Load("Models/spaceship4.obj");
+    //objmodel.Load("Models/spaceship4.obj");
 
-    //  Load the shaders
+    pe = new PhysicsEngine();
+
+    Models *m = new Models();
+    m->createSphereOBJ(5, 20, 20);
+    BodyModel *star = new BodyModel(m, {0, 0, 0}, 10000000000);
+    addObject(star);
+    pe->addBody(star);
+
+    Models *m2 = new Models();
+    m2->createSphereOBJ(1, 20, 20);
+    BodyModel *star2 = new BodyModel(m2, {20, 0, 0}, 1000);
+    star2->getVelocity().z = 3;
+    //star2->getVelocity().y = -0.5;
+    addObject(star2);
+    pe->addBody(star2);
+
+    // Load the shaders
     program = LoadShadersFromFile("VertexShaderLightingTexture.glsl", "PhongMultipleLightsAndTexture.glsl");
 
     if (!program)
@@ -62,10 +85,9 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     mode = GL_FILL;
     sscount = 1;
     CameraNumber = 1;
-    drawAxes = GL_TRUE;
 
     // Set position of spherical camera
-    sphcamera.setPosition(50, 30, 20);
+    sphcamera.setPosition(200, 0, 90);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -110,9 +132,9 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     CMSphere.createSphereOBJ(100, 20, 20);
     CMSphere.load(0, 1, 2, 3);
 
-    obj.createSphereOBJ(1, 20, 20);
+//    obj.createSphereOBJ(1, 20, 20);
 //    obj.createPartialSphereOBJ(1, 30, 30, -PI, PI/2, -PI/4, PI/4);
-    obj.createTorusOBJ(1, 2, 25, 25);
+//    obj.createTorusOBJ(1, 2, 25, 25);
 //    obj.createPartialTorusOBJ(1, 2, 25, 25, 0, PI/2, 0, PI);
 //    obj.createTrefoilOBJ(0.5, 1.5, 2, 0.2, 1.0, 200, 20);
 //    obj.createUmbilicTorusOBJ(100, 20);
@@ -122,19 +144,7 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
 //    obj.createHelicalTorusOBJ(1.0, 2.0, 0.2, -2*PI, 2*PI, 50, 20);
 //    obj.createMobiusOBJ(-0.5, 0.5, 30, 30);
 //    obj.createTessellatedWallOBJ(2, 2, 1, 1);
-    obj.load(0, 1, 2, 3);
-
-    LtPos[0].setTheta(45);
-    LtPos[0].setPsi(45);
-    LtPos[0].setR(15);
-
-    LtPos[1].setTheta(100);
-    LtPos[1].setPsi(-45);
-    LtPos[1].setR(20);
-
-    LtPos[2].setTheta(-100);
-    LtPos[2].setPsi(60);
-    LtPos[2].setR(20);
+//    obj.load(0, 1, 2, 3);
 
     model = glm::scale(glm::mat4(1.0), glm::vec3(6, 6, 6));
 
@@ -162,43 +172,29 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     sf::Image texture;
     std::string filename;
 
-    glGenTextures(6, texID);
+    glGenTextures(1, texID);
 
-    for (int i = 0; i < 6; i++)
-    {
-        if (i == 0)
-            filename = "Textures/metal024.bmp";
-        else if (i == 1)
-            filename = "Textures/Repeat-brick.jpg";
-        else if (i == 2)
-            filename = "Textures/amazaque.bmp";
-        else if (i == 3)
-            filename = "Textures/misc152.bmp";
-        else if (i == 4)
-            filename = "Textures/Starfield001.jpg";
-        else if (i == 5)
-            filename = "Models/spaceship.jpg";
+    filename = "assets/sunmap.jpg";
 
-        if (!texture.loadFromFile(filename))
-            std::cerr << "Could not load texture: " << filename << std::endl;
+    if (!texture.loadFromFile(filename))
+        std::cerr << "Could not load texture: " << filename << std::endl;
 
-        char arrayname[10];
-        sprintf(arrayname, "tex[%d]", i);
+    char arrayname[10];
+    sprintf(arrayname, "tex[%d]", 0);
 
-        //  Link the texture to the shader.
-        GLuint tex1_uniform_loc = glGetUniformLocation(program, arrayname);
-        glUniform1i(tex1_uniform_loc, i);
+    //  Link the texture to the shader.
+    GLuint tex1_uniform_loc = glGetUniformLocation(program, arrayname);
+    glUniform1i(tex1_uniform_loc, 0);
 
-        //  Load the texture into texture memory.
-        glActiveTexture(GL_TEXTURE0+i);
-        glBindTexture(GL_TEXTURE_2D, texID[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    }
+    //  Load the texture into texture memory.
+    glActiveTexture(GL_TEXTURE0+0);
+    glBindTexture(GL_TEXTURE_2D, texID[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glUseProgram(CMprogram);
 
@@ -211,24 +207,24 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glBindTexture (GL_TEXTURE_CUBE_MAP, CubeMapTexId);
 
     // Setup some parameters for texture filters and mipmapping
-    glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    texture.loadFromFile("assets/skybox_right1.png");
+    texture.loadFromFile("assets/skybox_left.png");
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
-    texture.loadFromFile("assets/skybox_left2.png");
+    texture.loadFromFile("assets/skybox_right.png");
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
-    texture.loadFromFile("assets/skybox_top3.png");
+    texture.loadFromFile("assets/skybox_up.png");
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
-    texture.loadFromFile("assets/skybox_bottom4.png");
+    texture.loadFromFile("assets/skybox_down.png");
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
-    texture.loadFromFile("assets/skybox_front5.png");
+    texture.loadFromFile("assets/skybox_front.png");
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
-    texture.loadFromFile("assets/skybox_back6.png");
+    texture.loadFromFile("assets/skybox_back.png");
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
 
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -248,6 +244,12 @@ Currently empty, no allocated memory to clear.
 
 GraphicsEngine::~GraphicsEngine() {}
 
+void GraphicsEngine::addObject(Drawable *obj, bool removable)
+{
+    obj->load();
+    objects.push_back(obj);
+}
+
 /**
 \brief The function responsible for drawing to the OpenGL frame buffer.
 
@@ -257,6 +259,8 @@ This function clears the screen and calls the draw functions of the box and circ
 
 void GraphicsEngine::display()
 {
+    pe->updateObjects();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Set view matrix via current camera.
@@ -266,20 +270,14 @@ void GraphicsEngine::display()
     else if (CameraNumber == 2)
         view = yprcamera.lookAt();
 
-    glUseProgram(CMprogram);
-    glUniformMatrix4fv(glGetUniformLocation(CMprogram, "PVM"),
-                       1, GL_FALSE, glm::value_ptr(projection*view*model));
+    glm::mat4 pvm = projection * view * model;
 
-    CMSphere.draw();
+    glUseProgram(CMprogram);
+    glUniformMatrix4fv(glGetUniformLocation(CMprogram, "PVM"), 1, GL_FALSE, glm::value_ptr(pvm));
+
+    CMSphere.draw(pvm);
 
     glUseProgram(program);
-
-    for (int i = 0; i < 3; i++)
-    {
-        lt[i].setPosition(glm::vec4(LtPos[i].getPosition(), 1.0));
-        lt[i].setSpotDirection(-LtPos[i].getPosition());
-    }
-    LoadLights(lt, "Lt", 3);
 
     glm::vec3 eye;
     if (CameraNumber == 1)
@@ -295,26 +293,19 @@ void GraphicsEngine::display()
     // Set axes scaling.
     glm::mat4 axesscale = glm::scale(glm::mat4(1.0), glm::vec3(10, 10, 10));
 
-    // Load matrix product to shader.
-    glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*axesscale));
-
-    if (drawAxes)
-        coords.draw();
-
     glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*model));
     glUniformMatrix4fv(texTransLoc, 1, GL_FALSE, glm::value_ptr(textrans));
 
     turnLightsOn("Lt", 3);
-    turnTextureOn("useTexture", 5);
+    turnTextureOn("useTexture", 0);
 
-    glm::mat4 scaledown = glm::scale(glm::mat4(1.0), glm::vec3(.2, .2, .2));
-    glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*model*scaledown));
-    objmodel.draw();
+    for (Drawable* obj : objects)
+    {
+        obj->draw(pvm);
+    }
 
     glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*model));
-
-//    pot.draw();
-//    obj.draw();
+    glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
     turnLightsOff("Lt", 3);
     turnTexturesOff("useTexture", 6);
@@ -327,7 +318,7 @@ void GraphicsEngine::display()
         ltpos.z = lt[i].getPosition().z;
 
         glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*(glm::translate(glm::mat4(1.0), ltpos))));
-        lightobj.draw();
+        lightobj.draw(pvm);
     }
 
     sf::RenderWindow::display();
@@ -421,11 +412,6 @@ void GraphicsEngine::setSize(unsigned int width, unsigned int height)
 SphericalCamera* GraphicsEngine::getSphericalCamera()
 {
     return &sphcamera;
-}
-
-SphericalCamera* GraphicsEngine::getLtPos()
-{
-    return &LtPos[0];
 }
 
 /**
@@ -539,19 +525,6 @@ void GraphicsEngine::setYPRCameraOn()
 {
     CameraNumber = 2;
 }
-
-/**
-\brief Sets the boolean to draw the axes or not.
-
-\param b --- Draws the axes if true and not if false.
-
-*/
-
-void GraphicsEngine::setDrawAxes(GLboolean b)
-{
-    drawAxes = b;
-}
-
 
 /**
 \brief Turns the light on
@@ -743,16 +716,6 @@ void GraphicsEngine::turnLightsOff(std::string name, int num)
 {
     for (int i = 0; i < num; i++)
         turnLightOff(name.c_str(), i);
-}
-
-/**
-\brief Toggles the boolean to draw the axes or not.
-
-*/
-
-void GraphicsEngine::toggleDrawAxes()
-{
-    drawAxes = !drawAxes;
 }
 
 /**

@@ -276,7 +276,7 @@ void Models::setColor(GLfloat r, GLfloat g, GLfloat b)
     red = r;
     green = g;
     blue = b;
-    reloadData();
+    load();
 }
 
 /**
@@ -293,7 +293,7 @@ void Models::setBorderColor(GLfloat r, GLfloat g, GLfloat b)
     bred = r;
     bgreen = g;
     bblue = b;
-    reloadData();
+    load();
 }
 
 /**
@@ -301,7 +301,7 @@ void Models::setBorderColor(GLfloat r, GLfloat g, GLfloat b)
 
 */
 
-void Models::reloadData()
+void Models::load()
 {
     load(vPosition, vColor, vNormal, vTex);
     reload = GL_TRUE;
@@ -525,7 +525,7 @@ void Models::load(GLint v, GLint c, GLint n, GLint t)
 
 */
 
-void Models::draw()
+void Models::draw(glm::mat4 pvm)
 {
     if (drawFaces)
     {

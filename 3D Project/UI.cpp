@@ -195,10 +195,6 @@ void UI::keyPressed(sf::Event::KeyEvent keyevent)
         ge->setSize(600, 600);
         break;
 
-    case sf::Keyboard::X:
-        ge->toggleDrawAxes();
-        break;
-
     default:
         break;
     }
@@ -216,8 +212,6 @@ void UI::keyboardStateProcessing()
         keyboardStateProcessingSphericalCamera();
     else
         keyboardStateProcessingYPRCamera();
-
-    keyboardStateProcessingLight();
 
 }
 
@@ -270,39 +264,6 @@ void UI::keyboardStateProcessingSphericalCamera()
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
             ge->getSphericalCamera()->addPsi(-1);
-    }
-}
-
-
-void UI::keyboardStateProcessingLight()
-{
-    bool ctrldown = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);
-    bool altdown = sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt) || sf::Keyboard::isKeyPressed(sf::Keyboard::RAlt);
-
-    if (altdown)
-    {
-        if (ctrldown)
-        {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-                ge->getLtPos()->addR(-0.1);
-
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-                ge->getLtPos()->addR(0.1);
-        }
-        else
-        {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                ge->getLtPos()->addTheta(1);
-
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                ge->getLtPos()->addTheta(-1);
-
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-                ge->getLtPos()->addPsi(1);
-
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-                ge->getLtPos()->addPsi(-1);
-        }
     }
 }
 

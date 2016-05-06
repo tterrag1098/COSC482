@@ -6,8 +6,10 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <glm/glm.hpp>
 
 #include "ProgramDefines.h"
+#include "Drawable.h"
 
 /**
 \file Models.h
@@ -43,7 +45,7 @@ obj.draw();
 
 */
 
-class Models
+class Models : public Drawable
 {
 private:
     GLint lon;         ///< Number of longitudinal divisions.
@@ -83,8 +85,8 @@ public:
     ~Models();
 
     void load(GLint v, GLint c, GLint n, GLint t);
-    void reloadData();
-    void draw();
+    void load() override;
+    void draw(glm::mat4 pvm) override;
 
     void setDrawBorder(GLboolean d);
     void setDrawFaces(GLboolean d);
