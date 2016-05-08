@@ -1,13 +1,12 @@
 #include "PhysicsEngine.h"
+#include <iostream>
 
 PhysicsEngine::PhysicsEngine()
 {
-    //ctor
 }
 
 PhysicsEngine::~PhysicsEngine()
 {
-    //dtor
 }
 
 void PhysicsEngine::addBody(Body *b)
@@ -17,6 +16,13 @@ void PhysicsEngine::addBody(Body *b)
 
 void PhysicsEngine::updateObjects()
 {
+    if (firstTick)
+    {
+        clock.restart();
+        firstTick = false;
+        return;
+    }
+
     for (int i = 0; i < bodies.size(); i++)
     {
         Body *b1 = bodies[i];

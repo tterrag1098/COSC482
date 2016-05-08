@@ -13,6 +13,7 @@ class BodyModel : public Body, public Drawable
         virtual ~BodyModel();
 
         void draw(glm::mat4 pvm) override;
+        glm::mat4 getModelMat() override;
         void applyForce(double tickDiff) override;
 
     protected:

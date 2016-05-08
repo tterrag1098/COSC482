@@ -10,6 +10,7 @@
 
 #include "ProgramDefines.h"
 #include "Drawable.h"
+#include "MaterialPresets.h"
 
 /**
 \file Models.h
@@ -81,6 +82,7 @@ private:
     int pos(int i, int j, int k);
 
 public:
+    Models(Material mat);
     Models();
     ~Models();
 

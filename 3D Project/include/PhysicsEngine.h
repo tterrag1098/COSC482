@@ -23,6 +23,7 @@ public:
 protected:
 private:
     sf::Clock clock;
+    bool firstTick = true;
     void applyForce(Body *b1, Body *b2);
 
     std::vector<Body*> bodies;

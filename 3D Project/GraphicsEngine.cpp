@@ -16,8 +16,6 @@ GLuint GraphicsEngine::ModelLoc = 0;
 GLuint GraphicsEngine::NormalLoc = 0;
 GLuint GraphicsEngine::PVMLoc = 0;
 GLuint GraphicsEngine::texTransLoc = 0;
-GLuint GraphicsEngine::program = 0;
-GLuint GraphicsEngine::CMprogram = 0;
 
 /**
 \brief Constructor
@@ -36,50 +34,114 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     sf::RenderWindow(sf::VideoMode(width, height),
                      title,
                      sf::Style::Default,
-                     sf::ContextSettings(24, 8, 4, 3, 3))
+                     sf::ContextSettings(24, 8, 4, 3, 3)),
+
+    fboShader(Shader("World.vert", "World.frag")),
+    screenShader(Shader("PostProcessing.vert", "PostProcessing.frag")),
+    cmShader(Shader("CubeMap.vert", "CubeMap.frag"))
 {
-    //objmodel.Load("Models/spaceship.obj");
-    //objmodel.Load("Models/spaceship4.obj");
+    glGenFramebuffers(1, &worldFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
+
+    glGenTextures(1, &fboTex);
+    glBindTexture(GL_TEXTURE_2D, fboTex);
+
+    screenShader.use();
+    glUniform1i(glGetUniformLocation(screenShader.program, "screenTex"), 0);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, getSize().x, getSize().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0);
+
+    GLuint rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, getSize().x, getSize().y);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR: Framebuffer is not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glGenVertexArrays(1, &screenVao);
+    GLuint buffer;
+    glGenBuffers(1, &buffer);
+
+    glBindVertexArray(screenVao);
+
+    sf::Vector2u scr = getSize();
+    glm::vec2 verts[6] = {{-1, -1}, {1, -1}, {-1, 1}, {-1, 1}, {1, -1}, {1, 1}};
+    glm::vec2 uvs[6] = {{0, 0}, {1, 0}, {0, 1}, {0, 1}, {1, 0}, {1, 1}};
+
+    int size = sizeof(glm::vec2) * 6;
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, size * 2, NULL, GL_STATIC_DRAW);
+
+    glBufferSubData(GL_ARRAY_BUFFER, 0, size, verts);
+    glBufferSubData(GL_ARRAY_BUFFER, size, size, uvs);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(size));
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
     pe = new PhysicsEngine();
 
-    Models *m = new Models();
-    m->createSphereOBJ(5, 20, 20);
-    BodyModel *star = new BodyModel(m, {0, 0, 0}, 10000000000);
+    Material sun(
+                 0, 0, 0, 0,
+                 0, 0, 0, 0,
+                 0, 0, 0, 0,
+                 1, 1, 0.8, 1,
+                 1
+            );
+
+    Models *m = new Models(sun);
+    m->createSphereOBJ(3, 20, 20);
+    BodyModel *star = new BodyModel(m, {4, 0, 0}, 1000000000);
+    star->getVelocity().z = -1.2;
     addObject(star);
     pe->addBody(star);
 
-    Models *m2 = new Models();
-    m2->createSphereOBJ(1, 20, 20);
-    BodyModel *star2 = new BodyModel(m2, {20, 0, 0}, 1000);
-    star2->getVelocity().z = 3;
-    //star2->getVelocity().y = -0.5;
+    Models *m2 = new Models(sun);
+    m2->createSphereOBJ(3, 20, 20);
+    BodyModel *star2 = new BodyModel(m2, {-4, 0, 0}, 1000000000);
+    star2->getVelocity().z = 1.2;
     addObject(star2);
     pe->addBody(star2);
 
-    // Load the shaders
-    program = LoadShadersFromFile("VertexShaderLightingTexture.glsl", "PhongMultipleLightsAndTexture.glsl");
+    Models *m3 = new Models();
+    m3->createSphereOBJ(1, 20, 20);
+    BodyModel *star3 = new BodyModel(m3, {10, 0, 0}, 10000);
+    star3->getVelocity().z = 3;
+    addObject(star3);
+    pe->addBody(star3);
 
-    if (!program)
+    if (!fboShader.program)
     {
         std::cerr << "Could not load Shader programs." << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    CMprogram = LoadShadersFromFile("VertexShaderCubeMap.glsl", "FragmentCubeMap.glsl");
-
-    if (!CMprogram)
+    if (!cmShader.program)
     {
         std::cerr << "Could not load Cube Map Shader programs." << std::endl;
         exit(EXIT_FAILURE);
     }
 
     // Turn on the shader & get location of transformation matrix.
-    glUseProgram(program);
-    PVMLoc = glGetUniformLocation(program, "PVM");
-    ModelLoc = glGetUniformLocation(program, "Model");
-    NormalLoc = glGetUniformLocation(program, "NormalMatrix");
-    texTransLoc = glGetUniformLocation(program, "textrans");
+    fboShader.use();
+    PVMLoc = glGetUniformLocation(fboShader.program, "PVM");
+    ModelLoc = glGetUniformLocation(fboShader.program, "Model");
+    NormalLoc = glGetUniformLocation(fboShader.program, "NormalMatrix");
+    texTransLoc = glGetUniformLocation(fboShader.program, "textrans");
 
     // Initialize some data.
     mode = GL_FILL;
@@ -87,7 +149,7 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     CameraNumber = 1;
 
     // Set position of spherical camera
-    sphcamera.setPosition(200, 0, 90);
+    sphcamera.setPosition(30, 0, 90);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -104,53 +166,17 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
 
     //mat = Materials::redPlastic;
     //mat = Materials::bluePlastic;
-    mat = Materials::whitePlastic;
+    mat = Materials::chrome;
 
-    for (int i = 0; i < 3; i++)
-        lt[i].setLight(true,
-                       30.0, 30.0, 30.0, 1.0,
-                       -1.0, -1.0, -1.0,
-                       0.0, 0.0, 0.0, 1.0,
-                       0.70, 0.70, 0.70, 1.0,
-                       0.70, 0.70, 0.70, 1.0,
-                       180.0, 0.0,
-                       1.0, 0.0, 0.0
-                      );
-
-    LoadLights(lt, "Lt", 3);
     loadMaterial(mat);
-    glUniform1i(glGetUniformLocation(program, "numLights"), 3);
 
     glm::vec4 GlobalAmbient(0.2, 0.2, 0.2, 1);
-    glUniform4fv(glGetUniformLocation(program, "GlobalAmbient"), 1, glm::value_ptr(GlobalAmbient));
-
-    lightobj.createSphereOBJ(0.25, 7, 7);
-    lightobj.load(0, 1, 2, 3);
-    lightobj.setColor(1, 1, 0);
-    lightobj.setDrawBorder(GL_TRUE);
+    glUniform4fv(glGetUniformLocation(fboShader.program, "GlobalAmbient"), 1, glm::value_ptr(GlobalAmbient));
 
     CMSphere.createSphereOBJ(100, 20, 20);
     CMSphere.load(0, 1, 2, 3);
 
-//    obj.createSphereOBJ(1, 20, 20);
-//    obj.createPartialSphereOBJ(1, 30, 30, -PI, PI/2, -PI/4, PI/4);
-//    obj.createTorusOBJ(1, 2, 25, 25);
-//    obj.createPartialTorusOBJ(1, 2, 25, 25, 0, PI/2, 0, PI);
-//    obj.createTrefoilOBJ(0.5, 1.5, 2, 0.2, 1.0, 200, 20);
-//    obj.createUmbilicTorusOBJ(100, 20);
-//    obj.createBraidedTorusOBJ(0.5, 1.25, 2, 0.2, 1.0, 200, 20);
-//    obj.createExpHornOBJ(0.5, 1, 2, 20, 20);
-//    obj.createQuadHornOBJ(0.5, 1, 2, 20, 20);
-//    obj.createHelicalTorusOBJ(1.0, 2.0, 0.2, -2*PI, 2*PI, 50, 20);
-//    obj.createMobiusOBJ(-0.5, 0.5, 30, 30);
-//    obj.createTessellatedWallOBJ(2, 2, 1, 1);
-//    obj.load(0, 1, 2, 3);
-
-    model = glm::scale(glm::mat4(1.0), glm::vec3(6, 6, 6));
-
-    //  Model matrix experiments
-//    model = glm::rotate(model, 90*degf, glm::vec3(1, 0, 0));
-//    model = glm::translate(model, glm::vec3(0.2, 0.5, 0.3));
+    model = glm::mat4(1.0);
 
     // Load model matrix.
     glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -172,22 +198,18 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     sf::Image texture;
     std::string filename;
 
-    glGenTextures(1, texID);
+    glGenTextures(6, texID);
 
     filename = "assets/sunmap.jpg";
 
     if (!texture.loadFromFile(filename))
         std::cerr << "Could not load texture: " << filename << std::endl;
 
-    char arrayname[10];
-    sprintf(arrayname, "tex[%d]", 0);
-
     //  Link the texture to the shader.
-    GLuint tex1_uniform_loc = glGetUniformLocation(program, arrayname);
+    GLuint tex1_uniform_loc = glGetUniformLocation(fboShader.program, "tex");
     glUniform1i(tex1_uniform_loc, 0);
 
     //  Load the texture into texture memory.
-    glActiveTexture(GL_TEXTURE0+0);
     glBindTexture(GL_TEXTURE_2D, texID[0]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -196,11 +218,10 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glUseProgram(CMprogram);
+    cmShader.use();
 
     //  Load in Cube Map
-    glActiveTexture(GL_TEXTURE0+10);
-    glUniform1i(glGetUniformLocation(CMprogram, "cmtex"), 10);
+    glUniform1i(glGetUniformLocation(cmShader.program, "cmtex"), 0);
 
     // Generate a new cube map texture and bind to it
     glGenTextures (1, &CubeMapTexId);
@@ -229,6 +250,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
 
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
+    printOpenGLErrors();
+
     // Make it the active window for OpenGL calls, resize to set projection matrix.
     setActive();
     resize();
@@ -248,6 +271,25 @@ void GraphicsEngine::addObject(Drawable *obj, bool removable)
 {
     obj->load();
     objects.push_back(obj);
+
+    fboShader.use();
+
+    if (obj->getMaterial().getEmission() != glm::vec4(0, 0, 0, 1))
+    {
+        glm::vec4 e = obj->getMaterial().getEmission();
+        Light lt;
+        lt.setLight(true,
+                0.0, 0.0, 0.0, 1.0,
+                -1.0, -1.0, -1.0,
+                0.0, 0.0, 0.0, 1.0,
+                e.r, e.g, e.b, e.a,
+                e.r, e.g, e.b, e.a,
+                180.0, 0.0,
+                1.0, 0.0, 0.0
+            );
+        LoadLight(lt, "Lt", nextLight++);
+        glUniform1i(glGetUniformLocation(fboShader.program, "numLights"), nextLight);
+    }
 }
 
 /**
@@ -261,7 +303,13 @@ void GraphicsEngine::display()
 {
     pe->updateObjects();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glActiveTexture(GL_TEXTURE0);
+
+    // First pass
+    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // We're not using stencil buffer now
+    glEnable(GL_DEPTH_TEST);
 
     // Set view matrix via current camera.
     glm::mat4 view(1.0);
@@ -272,12 +320,12 @@ void GraphicsEngine::display()
 
     glm::mat4 pvm = projection * view * model;
 
-    glUseProgram(CMprogram);
-    glUniformMatrix4fv(glGetUniformLocation(CMprogram, "PVM"), 1, GL_FALSE, glm::value_ptr(pvm));
+    //cmShader.use();
+    //glUniformMatrix4fv(glGetUniformLocation(cmShader.program, "PVM"), 1, GL_FALSE, glm::value_ptr(pvm));
 
-    CMSphere.draw(pvm);
+    //CMSphere.draw(pvm);
 
-    glUseProgram(program);
+    fboShader.use();
 
     glm::vec3 eye;
     if (CameraNumber == 1)
@@ -285,44 +333,65 @@ void GraphicsEngine::display()
     else if (CameraNumber == 2)
         eye = yprcamera.getPosition();
 
-    glUniform3fv(glGetUniformLocation(program, "eye"), 1, glm::value_ptr(eye));
+    glUniform3fv(glGetUniformLocation(fboShader.program, "eye"), 1, glm::value_ptr(eye));
 
-    turnLightsOff("Lt", 3);
-    turnTexturesOff("useTexture", 6);
+    turnTexturesOff("useTexture", 10);
 
-    // Set axes scaling.
-    glm::mat4 axesscale = glm::scale(glm::mat4(1.0), glm::vec3(10, 10, 10));
-
-    glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*model));
     glUniformMatrix4fv(texTransLoc, 1, GL_FALSE, glm::value_ptr(textrans));
 
-    turnLightsOn("Lt", 3);
+    //turnLightsOn("Lt", 3);
+    glBindTexture(GL_TEXTURE_2D, texID[0]);
     turnTextureOn("useTexture", 0);
 
+    // Lighting pass
+    for (Drawable *obj : objects)
+    {
+        if (obj->getLight() >= 0)
+        {
+            glm::mat4 model = obj->getModelMat();
+            char name[10];
+            sprintf(name, "Lt[%d].position", obj->getLight());
+            glUniform4fv(glGetUniformLocation(fboShader.program, name), 1, glm::value_ptr(model * glm::vec4(0, 0, 0, 1)));
+        }
+    }
+
+    // Drawing pass
     for (Drawable* obj : objects)
     {
+        glm::mat4 model = obj->getModelMat();
+        glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(pvm * model));
+
+        glm::mat3 nM(model);
+        nM = glm::transpose(glm::inverse(nM));
+        glUniformMatrix3fv(NormalLoc, 1, GL_FALSE, glm::value_ptr(nM));
+
+        loadMaterial(obj->getMaterial());
+
         obj->draw(pvm);
     }
 
     glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*model));
     glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-    turnLightsOff("Lt", 3);
     turnTexturesOff("useTexture", 6);
 
-    for (int i = 0; i < 3; i++)
-    {
-        glm::vec3 ltpos;
-        ltpos.x = lt[i].getPosition().x;
-        ltpos.y = lt[i].getPosition().y;
-        ltpos.z = lt[i].getPosition().z;
+    screenShader.use();
 
-        glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*(glm::translate(glm::mat4(1.0), ltpos))));
-        lightobj.draw(pvm);
-    }
+    // Second pass
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    sf::RenderWindow::display();
+    screenShader.use();
+    glBindVertexArray(screenVao);
+    glDisable(GL_DEPTH_TEST);
+    glBindTexture(GL_TEXTURE_2D, fboTex);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+
     printOpenGLErrors();
+    sf::RenderWindow::display();
 }
 
 /**
@@ -533,8 +602,8 @@ void GraphicsEngine::setYPRCameraOn()
 
 void GraphicsEngine::turnLightOn()
 {
-    glUseProgram(program);
-    glUniform1i(glGetUniformLocation(program, "Lt.on"), true);
+    fboShader.use();
+    glUniform1i(glGetUniformLocation(fboShader.program, "Lt.on"), true);
 }
 
 /**
@@ -544,8 +613,8 @@ void GraphicsEngine::turnLightOn()
 
 void GraphicsEngine::turnLightOff()
 {
-    glUseProgram(program);
-    glUniform1i(glGetUniformLocation(program, "Lt.on"), false);
+    fboShader.use();
+    glUniform1i(glGetUniformLocation(fboShader.program, "Lt.on"), false);
 }
 
 /**
@@ -557,17 +626,17 @@ void GraphicsEngine::turnLightOff()
 
 void GraphicsEngine::loadLight(Light Lt)
 {
-    glUseProgram(program);
+    fboShader.use();
 
-    glUniform1i(glGetUniformLocation(program, "Lt.on"), Lt.getOn());
-    glUniform4fv(glGetUniformLocation(program, "Lt.position"), 1, glm::value_ptr(Lt.getPosition()));
-    glUniform4fv(glGetUniformLocation(program, "Lt.ambient"), 1, glm::value_ptr(Lt.getAmbient()));
-    glUniform4fv(glGetUniformLocation(program, "Lt.diffuse"), 1, glm::value_ptr(Lt.getDiffuse()));
-    glUniform4fv(glGetUniformLocation(program, "Lt.specular"), 1, glm::value_ptr(Lt.getSpecular()));
-    glUniform3fv(glGetUniformLocation(program, "Lt.spotDirection"), 1, glm::value_ptr(Lt.getSpotDirection()));
-    glUniform3fv(glGetUniformLocation(program, "Lt.attenuation"), 1, glm::value_ptr(Lt.getAttenuation()));
-    glUniform1f(glGetUniformLocation(program, "Lt.spotCutoff"), Lt.getSpotCutoff());
-    glUniform1f(glGetUniformLocation(program, "Lt.spotExponent"), Lt.getSpotExponent());
+    glUniform1i(glGetUniformLocation(fboShader.program, "Lt.on"), Lt.getOn());
+    glUniform4fv(glGetUniformLocation(fboShader.program, "Lt.position"), 1, glm::value_ptr(Lt.getPosition()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, "Lt.ambient"), 1, glm::value_ptr(Lt.getAmbient()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, "Lt.diffuse"), 1, glm::value_ptr(Lt.getDiffuse()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, "Lt.specular"), 1, glm::value_ptr(Lt.getSpecular()));
+    glUniform3fv(glGetUniformLocation(fboShader.program, "Lt.spotDirection"), 1, glm::value_ptr(Lt.getSpotDirection()));
+    glUniform3fv(glGetUniformLocation(fboShader.program, "Lt.attenuation"), 1, glm::value_ptr(Lt.getAttenuation()));
+    glUniform1f(glGetUniformLocation(fboShader.program, "Lt.spotCutoff"), Lt.getSpotCutoff());
+    glUniform1f(glGetUniformLocation(fboShader.program, "Lt.spotExponent"), Lt.getSpotExponent());
 }
 
 /**
@@ -579,13 +648,13 @@ void GraphicsEngine::loadLight(Light Lt)
 
 void GraphicsEngine::loadMaterial(Material Mat)
 {
-    glUseProgram(program);
+    fboShader.use();
 
-    glUniform4fv(glGetUniformLocation(program, "Mat.ambient"), 1, glm::value_ptr(Mat.getAmbient()));
-    glUniform4fv(glGetUniformLocation(program, "Mat.diffuse"), 1, glm::value_ptr(Mat.getDiffuse()));
-    glUniform4fv(glGetUniformLocation(program, "Mat.specular"), 1, glm::value_ptr(Mat.getSpecular()));
-    glUniform4fv(glGetUniformLocation(program, "Mat.emission"), 1, glm::value_ptr(Mat.getEmission()));
-    glUniform1f(glGetUniformLocation(program, "Mat.shininess"), Mat.getShininess());
+    glUniform4fv(glGetUniformLocation(fboShader.program, "Mat.ambient"), 1, glm::value_ptr(Mat.getAmbient()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, "Mat.diffuse"), 1, glm::value_ptr(Mat.getDiffuse()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, "Mat.specular"), 1, glm::value_ptr(Mat.getSpecular()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, "Mat.emission"), 1, glm::value_ptr(Mat.getEmission()));
+    glUniform1f(glGetUniformLocation(fboShader.program, "Mat.shininess"), Mat.getShininess());
 }
 
 /**
@@ -601,36 +670,36 @@ void GraphicsEngine::loadMaterial(Material Mat)
 
 void GraphicsEngine::LoadLight(Light Lt, std::string name, int i)
 {
-    glUseProgram(program);
+    fboShader.use();
 
     const char* arrayname = name.c_str();  // array name in the shader.
     char locID[100];
     sprintf(locID, "%s[%d].%s", arrayname, i, "on");
-    glUniform1i(glGetUniformLocation(program, locID), Lt.getOn());
+    glUniform1i(glGetUniformLocation(fboShader.program, locID), Lt.getOn());
 
     sprintf(locID, "%s[%d].%s", arrayname, i, "position");
-    glUniform4fv(glGetUniformLocation(program, locID), 1, glm::value_ptr(Lt.getPosition()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, locID), 1, glm::value_ptr(Lt.getPosition()));
 
     sprintf(locID, "%s[%d].%s", arrayname, i, "ambient");
-    glUniform4fv(glGetUniformLocation(program, locID), 1, glm::value_ptr(Lt.getAmbient()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, locID), 1, glm::value_ptr(Lt.getAmbient()));
 
     sprintf(locID, "%s[%d].%s", arrayname, i, "diffuse");
-    glUniform4fv(glGetUniformLocation(program, locID), 1, glm::value_ptr(Lt.getDiffuse()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, locID), 1, glm::value_ptr(Lt.getDiffuse()));
 
     sprintf(locID, "%s[%d].%s", arrayname, i, "specular");
-    glUniform4fv(glGetUniformLocation(program, locID), 1, glm::value_ptr(Lt.getSpecular()));
+    glUniform4fv(glGetUniformLocation(fboShader.program, locID), 1, glm::value_ptr(Lt.getSpecular()));
 
     sprintf(locID, "%s[%d].%s", arrayname, i, "spotDirection");
-    glUniform3fv(glGetUniformLocation(program, locID), 1, glm::value_ptr(Lt.getSpotDirection()));
+    glUniform3fv(glGetUniformLocation(fboShader.program, locID), 1, glm::value_ptr(Lt.getSpotDirection()));
 
     sprintf(locID, "%s[%d].%s", arrayname, i, "attenuation");
-    glUniform3fv(glGetUniformLocation(program, locID), 1, glm::value_ptr(Lt.getAttenuation()));
+    glUniform3fv(glGetUniformLocation(fboShader.program, locID), 1, glm::value_ptr(Lt.getAttenuation()));
 
     sprintf(locID, "%s[%d].%s", arrayname, i, "spotCutoff");
-    glUniform1f(glGetUniformLocation(program, locID), Lt.getSpotCutoff());
+    glUniform1f(glGetUniformLocation(fboShader.program, locID), Lt.getSpotCutoff());
 
     sprintf(locID, "%s[%d].%s", arrayname, i, "spotExponent");
-    glUniform1f(glGetUniformLocation(program, locID), Lt.getSpotExponent());
+    glUniform1f(glGetUniformLocation(fboShader.program, locID), Lt.getSpotExponent());
 }
 
 /**
@@ -661,12 +730,12 @@ void GraphicsEngine::LoadLights(Light Lt[], std::string name, int num)
 
 void GraphicsEngine::turnLightOn(std::string name, int i)
 {
-    glUseProgram(program);
+    fboShader.use();
 
     const char* arrayname = name.c_str();  // array name in the shader.
     char locID[100];
     sprintf(locID, "%s[%d].%s", arrayname, i, "on");
-    glUniform1i(glGetUniformLocation(program, locID), true);
+    glUniform1i(glGetUniformLocation(fboShader.program, locID), true);
 }
 
 /**
@@ -680,12 +749,12 @@ void GraphicsEngine::turnLightOn(std::string name, int i)
 
 void GraphicsEngine::turnLightOff(std::string name, int i)
 {
-    glUseProgram(program);
+    fboShader.use();
 
     const char* arrayname = name.c_str();  // array name in the shader.
     char locID[100];
     sprintf(locID, "%s[%d].%s", arrayname, i, "on");
-    glUniform1i(glGetUniformLocation(program, locID), false);
+    glUniform1i(glGetUniformLocation(fboShader.program, locID), false);
 }
 
 /**
@@ -744,12 +813,12 @@ void GraphicsEngine::turnTexturesOff(std::string name, int num)
 
 void GraphicsEngine::turnTextureOff(std::string name, int i)
 {
-    glUseProgram(program);
+    fboShader.use();
 
     const char* arrayname = name.c_str();  // array name in the shader.
     char locID[100];
     sprintf(locID, "%s[%d]", arrayname, i);
-    glUniform1i(glGetUniformLocation(program, locID), false);
+    glUniform1i(glGetUniformLocation(fboShader.program, locID), false);
 }
 
 /**
@@ -778,10 +847,10 @@ void GraphicsEngine::turnTexturesOn(std::string name, int num)
 
 void GraphicsEngine::turnTextureOn(std::string name, int i)
 {
-    glUseProgram(program);
+    fboShader.use();
 
     const char* arrayname = name.c_str();  // array name in the shader.
     char locID[100];
     sprintf(locID, "%s[%d]", arrayname, i);
-    glUniform1i(glGetUniformLocation(program, locID), true);
+    glUniform1i(glGetUniformLocation(fboShader.program, locID), true);
 }

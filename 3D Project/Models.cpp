@@ -14,8 +14,9 @@
 \brief Constructor, default.
 
 */
+Models::Models() : Models(Materials::whitePlastic) {}
 
-Models::Models()
+Models::Models(Material mat) : Drawable(mat)
 {
     lon = 0;
     lat = 0;

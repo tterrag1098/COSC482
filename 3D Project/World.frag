@@ -65,10 +65,10 @@ uniform Material Mat;
 uniform vec3 eye;
 uniform vec4 GlobalAmbient;
 uniform int numLights;
-uniform bool useTexture[10];
+uniform bool useTexture;
 uniform mat4 textrans;
 
-uniform sampler2D tex[10];
+uniform sampler2D tex;
 
 out vec4 fColor;
 
@@ -87,12 +87,13 @@ void main()
             usingLights = true;
             vec3 n = normalize(normal);
             vec3 l = normalize(vec3(Lt[i].position)-vec3(position));
-            vec3 r = normalize(2.0*dot(l,n)*n - l);
             vec3 v = normalize(eye-vec3(position));
+			vec3 h = normalize(l + v);
             float lightDistance =length(vec3(Lt[i].position)-vec3(position));
 
             float dfang = max(0.0, dot(l, n));
-            float specang = max(0.0, dot(r, v));
+            float specang = max(0.0, dot(n, h));
+
             if (dfang == 0)
                 specang = 0;
 
@@ -126,22 +127,16 @@ void main()
     else
         fColor = color;
 
-    vec4 texhom = vec4(tex_coord, 0, 1);
-    vec4 transtex = textrans * texhom;
-    vec2 transtex2 = vec2(transtex);
+	if (useTexture)
+	{
+		vec4 texhom = vec4(tex_coord, 0, 1);
+		vec4 transtex = textrans * texhom;
+		vec2 transtex2 = vec2(transtex);
 
-    int textureCount = 0;
-    for (int i = 0; i < 10; i++)
-        if (useTexture[i])
-            textureCount++;
+		vec4 texColor = texture(tex, transtex2);
 
-    vec4 texColor = vec4(0.0);
-    for (int i = 0; i < 10; i++)
-        if (useTexture[i])
-            texColor += 1.0/textureCount * texture(tex[i], transtex2);
-
-    if (textureCount > 0)
-        fColor = 0.25*fColor + 0.75*texColor;
-
+		fColor = 0.25*fColor + 0.75*texColor;
+	}
+	
     fColor = min(fColor, vec4(1.0));
 }

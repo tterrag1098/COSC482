@@ -15,7 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "LoadShaders.h"
+#include "Shader.h"
 #include "ProgramDefines.h"
 #include "SphericalCamera.h"
 #include "YPRCamera.h"
@@ -57,19 +57,21 @@ private:
     SphericalCamera sphcamera;   ///< Spherical Camera
     YPRCamera yprcamera;         ///< Yaw-Pitch-Roll Camera
     int CameraNumber;            ///< Camera number 1 = spherical, 2 = yaw-pitch-roll.
+    GLuint nextLight = 0;
 
     Material mat;         ///< Material of the current object.
-    Light lt[10];         ///< Light object.
     GLuint texID[6];      ///< Texture IDs.
     GLuint CubeMapTexId;  ///< Cube Map Texture ID.
 
-    Models lightobj;  ///< Used for sphere at light source.
-    Models star;
     Models CMSphere;  ///< Sphere Object for Cube Map
 
     glm::mat4 projection;  ///< Projection Matrix
     glm::mat4 model;       ///< Model Matrix
     glm::mat4 textrans;    ///< Texture transformation matrix.
+
+    GLuint worldFbo;
+    GLuint screenVao;
+    GLuint fboTex;
 
     PhysicsEngine *pe;
 
@@ -86,8 +88,10 @@ public:
     static GLuint NormalLoc;      ///< Location ID of the Normal matrix in the shader.
     static GLuint PVMLoc;         ///< Location ID of the PVM matrix in the shader.
     static GLuint texTransLoc;    ///< Location ID of the texture transformation matrix in the shader.
-    static GLuint program;        ///< ID of the shader program.
-    static GLuint CMprogram;      ///< ID of the cube map shader program.
+
+    Shader fboShader;      ///< ID of the shader program.
+    Shader screenShader;   ///< ID of the post-processing shader.
+    Shader cmShader;       ///< ID of the cube map shader program.
 
     void display();
     void changeMode();

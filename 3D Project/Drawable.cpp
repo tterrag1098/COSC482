@@ -1,6 +1,6 @@
 #include "Drawable.h"
 
-Drawable::Drawable(bool visible) : visible(visible) {}
+Drawable::Drawable(Material mat, bool visible) : material(mat), visible(visible) {}
 
 Drawable::~Drawable()
 {
@@ -26,3 +26,17 @@ void Drawable::draw(glm::mat4 pvm)
     }
 }
 
+glm::mat4 Drawable::getModelMat()
+{
+    return glm::mat4(1.0);
+}
+
+Material Drawable::getMaterial()
+{
+    return material;
+}
+
+int Drawable::getLight()
+{
+    return light;
+}
