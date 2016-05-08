@@ -117,11 +117,6 @@ public:
     void turnLightsOn(std::string name, int num);
     void turnLightsOff(std::string name, int num);
 
-    void turnTexturesOff(std::string name, int num);
-    void turnTexturesOn(std::string name, int num);
-    void turnTextureOff(std::string name, int i);
-    void turnTextureOn(std::string name, int i);
-
     void LoadLights(Light Lt[], std::string name, int num);
     void LoadLight(Light Lt, std::string name, int i);
 

@@ -335,13 +335,10 @@ void GraphicsEngine::display()
 
     glUniform3fv(glGetUniformLocation(fboShader.program, "eye"), 1, glm::value_ptr(eye));
 
-    turnTexturesOff("useTexture", 10);
-
     glUniformMatrix4fv(texTransLoc, 1, GL_FALSE, glm::value_ptr(textrans));
 
     //turnLightsOn("Lt", 3);
     glBindTexture(GL_TEXTURE_2D, texID[0]);
-    turnTextureOn("useTexture", 0);
 
     // Lighting pass
     for (Drawable *obj : objects)
@@ -373,8 +370,6 @@ void GraphicsEngine::display()
 
     glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*model));
     glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-    turnTexturesOff("useTexture", 6);
 
     screenShader.use();
 
@@ -785,72 +780,4 @@ void GraphicsEngine::turnLightsOff(std::string name, int num)
 {
     for (int i = 0; i < num; i++)
         turnLightOff(name.c_str(), i);
-}
-
-/**
-\brief Turns the first num textures off.
-
-\param name --- The name of the boolean texture array in the shader.
-
-\param num --- Number of textures to turn off.
-
-*/
-
-void GraphicsEngine::turnTexturesOff(std::string name, int num)
-{
-    for (int i = 0; i < num; i++)
-        turnTextureOff(name.c_str(), i);
-}
-
-/**
-\brief Turns the ith texture off.
-
-\param name --- The name of the boolean texture array in the shader.
-
-\param i --- Number of the texture to turn off.
-
-*/
-
-void GraphicsEngine::turnTextureOff(std::string name, int i)
-{
-    fboShader.use();
-
-    const char* arrayname = name.c_str();  // array name in the shader.
-    char locID[100];
-    sprintf(locID, "%s[%d]", arrayname, i);
-    glUniform1i(glGetUniformLocation(fboShader.program, locID), false);
-}
-
-/**
-\brief Turns the first num textures on.
-
-\param name --- The name of the boolean texture array in the shader.
-
-\param num --- Number of textures to turn on.
-
-*/
-
-void GraphicsEngine::turnTexturesOn(std::string name, int num)
-{
-    for (int i = 0; i < num; i++)
-        turnTextureOn(name.c_str(), i);
-}
-
-/**
-\brief Turns the ith texture on.
-
-\param name --- The name of the boolean texture array in the shader.
-
-\param i --- Number of the texture to turn on.
-
-*/
-
-void GraphicsEngine::turnTextureOn(std::string name, int i)
-{
-    fboShader.use();
-
-    const char* arrayname = name.c_str();  // array name in the shader.
-    char locID[100];
-    sprintf(locID, "%s[%d]", arrayname, i);
-    glUniform1i(glGetUniformLocation(fboShader.program, locID), true);
 }
