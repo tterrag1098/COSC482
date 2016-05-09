@@ -1,4 +1,5 @@
 #include "ui/ButtonTool.h"
+#include "UI.h"
 
 bool ButtonTool::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {

@@ -1,4 +1,5 @@
 #include "Background.h"
+#include "GraphicsEngine.h"
 
 Background::Background(GraphicsEngine *ge) : Box({0, 0}, 0, 0), ge(ge), texW(16), texH(16)
 {

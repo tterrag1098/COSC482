@@ -1,16 +1,9 @@
 #ifndef UI_H_INCLUDED
 #define UI_H_INCLUDED
 
-#include "render/GraphicsEngine.h"
-#include "render/Box.h"
-
-#include "ToolLine.h"
-#include "ToolDraw.h"
-#include "ToolBox.h"
-#include "ToolFill.h"
-
-#include "ToolPanel.h"
-#include "ColorPicker.h"
+#include <vector>
+#include <glm/glm.hpp>
+#include <SFML/Window/Event.hpp>
 
 /**
 \file UI.h
@@ -31,8 +24,14 @@ and scene objects.
 
 */
 
+class GraphicsEngine;
+
+class Listener;
+
 class Tool;
 class ColorPicker;
+class ThicknessSlider;
+class FillButton;
 
 class UI
 {
@@ -46,6 +45,8 @@ private:
     glm::ivec2 LastPosition;  ///< Last position of the mouse on the screen.
 
     ColorPicker *colorpicker;
+    ThicknessSlider *thickness;
+    FillButton *fillBut;
 
     void keyPressed(sf::Event::KeyEvent keyevent);
     void keyboardStateProcessing();
@@ -68,6 +69,8 @@ public:
     bool isMouseDown() const;
     GraphicsEngine* getEngine() const;
     glm::vec4 getSelectedColor() const;
+    int getThickness() const;
+    bool shouldFill() const;
 
     void setToolActive(Tool *tool);
     void addListener(Listener *l);

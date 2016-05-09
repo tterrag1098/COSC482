@@ -1,4 +1,9 @@
 #include "ToolPanel.h"
+#include "GraphicsEngine.h"
+#include "Tool.h"
+#include "Box.h"
+#include "ButtonTool.h"
+#include "TexturedBox.h"
 
 ToolPanel::ToolPanel(GraphicsEngine *ge, int x, int y) : Drawable(false), ge(ge), pos({x, y}), buttons(0)
 {
@@ -30,3 +35,12 @@ void ToolPanel::addButton(Tool* tool)
     load();
 }
 
+bool ToolPanel::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
+{
+    return Listener::mousePressed(ctx) || bg->contains({ctx.event.x, ctx.event.y});
+}
+
+bool ToolPanel::mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx)
+{
+    return Listener::mouseReleased(ctx) || bg->contains({ctx.event.x, ctx.event.y});
+}

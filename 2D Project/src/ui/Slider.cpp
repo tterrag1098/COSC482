@@ -1,4 +1,7 @@
 #include "Slider.h"
+#include "Box.h"
+#include "Button.h"
+#include "UI.h"
 
 Slider::Slider(int x, int y, int width, int min, int max) : Drawable(false), width(width), min(min), max(max), dragging(false)
 {
@@ -41,7 +44,7 @@ void Slider::setValue(int value)
 {
     pos = value;
     glm::vec2 corner = thumb->getCorner();
-    corner.x = bar->getCorner().x + ((float) pos / (max - min)) * width;
+    corner.x = bar->getCorner().x + (pos / (max - min)) * width;
     thumb->setCorner(corner);
 }
 

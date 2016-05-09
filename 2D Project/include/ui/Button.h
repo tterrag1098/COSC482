@@ -2,8 +2,8 @@
 #define BUTTON_H
 
 #include "Drawable.h"
-#include "util/utils.h"
-#include "ui/Listeners.h"
+#include "Listeners.h"
+#include "glm/glm.hpp"
 
 class Button : public Drawable, public Listener
 {

@@ -14,10 +14,7 @@
 #include <string>
 #include <stdio.h>
 
-#include "util/LoadShaders.h"
-#include "render/Drawable.h"
-#include "render/Background.h"
-#include "Listeners.h"
+class Drawable;
 
 /**
 \file GraphicsEngine.h
@@ -52,6 +49,11 @@ private:
     Background *bg;           ///< Background render object
     int texIdx;               ///< Index of the next texture to load
 
+    GLuint rbo;
+    GLuint fboTex;
+    GLuint screenVao;
+
+    std::vector<Drawable*> guiElements;
     std::vector<Drawable*> objects;
     std::vector<Drawable*> undoStack;
     std::vector<Drawable*> redoStack;
@@ -64,6 +66,8 @@ public:
     ~GraphicsEngine();
 
     static GLuint defaultShader;
+    static GLuint fboShader;
+    static GLuint fbo;
 
     void display();
     void changeMode();
@@ -74,6 +78,7 @@ public:
     void resize();
     void setSize(unsigned int, unsigned int);
     void addObject(Drawable* obj, bool removable = true);
+    void addUIElement(Drawable* obj);
     GLuint loadTexture(std::string path);
     void activateTexture(int texId);
     GLfloat* getScreenBounds();

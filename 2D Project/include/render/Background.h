@@ -2,7 +2,6 @@
 #define BACKGROUND_H_INCLUDED
 
 #include "render/Box.h"
-#include "GraphicsEngine.h"
 
 class GraphicsEngine;
 

@@ -1,4 +1,7 @@
 #include "ColorPicker.h"
+#include "Background.h"
+#include "Slider.h"
+#include "GraphicsEngine.h"
 
 ColorPicker::ColorPicker(GraphicsEngine *ge) : ge(ge), width(180), height(150)
 {

@@ -2,8 +2,8 @@
 #define TOOLDRAW_H
 
 #include "Tool.h"
-#include "FreeformLine.h"
-#include "UI.h"
+
+class FreeformLine;
 
 class ToolDraw : public Tool
 {

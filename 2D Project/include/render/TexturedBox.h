@@ -2,7 +2,8 @@
 #define TEXTUREDBOX_H
 
 #include "Box.h"
-#include "GraphicsEngine.h"
+
+class GraphicsEngine;
 
 class TexturedBox : public Box
 {

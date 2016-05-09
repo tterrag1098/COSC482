@@ -101,7 +101,7 @@ private:
     GLboolean freetypeError;  ///< Freetype loading error flag.
     GLboolean glewError;      ///< GLEW loading error flag.
 
-    GLuint program;           ///< Text rendering shader program.
+    static GLuint program;    ///< Text rendering shader program.
     GLint attribute_coord;    ///< Coordinate attribute location for shader program.
     GLint uniform_tex;        ///< Texture attribute location for shader program.
     GLint uniform_color;      ///< Color attribute location for shader program.

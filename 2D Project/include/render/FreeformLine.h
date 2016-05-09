@@ -2,13 +2,12 @@
 #define FREEFORMLINE_H
 
 #include "Drawable.h"
-#include "util/utils.h"
 #include <vector>
 
 class FreeformLine : public Drawable
 {
     public:
-        FreeformLine(glm::vec4 c);
+        FreeformLine(int size, glm::vec4 c);
         virtual ~FreeformLine();
 
         virtual bool contains(glm::vec2 point) override;
@@ -21,6 +20,7 @@ class FreeformLine : public Drawable
 
     protected:
     private:
+        float size;
         glm::vec4 color;
         std::vector<glm::vec2> points;
 };

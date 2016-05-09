@@ -1,5 +1,14 @@
 #include "ui/UI.h"
 #include "tool/ToolBox.h"
+#include "ToolPanel.h"
+#include "ColorPicker.h"
+#include "ThicknessSlider.h"
+#include "FillButton.h"
+#include "ToolDraw.h"
+#include "ToolLine.h"
+#include "ToolBox.h"
+#include "ToolFill.h"
+#include "GraphicsEngine.h"
 
 /**
 \file UI.cpp
@@ -31,15 +40,20 @@ UI::UI(GraphicsEngine* graph)
     panel->addButton(new ToolBox());
     panel->addButton(new ToolFill());
 
-    panel->setSortIndex(1001);
-
-    ge->addObject(panel, false);
+    ge->addUIElement(panel);
     addListener(panel);
 
     colorpicker = new ColorPicker(ge);
-    colorpicker->setSortIndex(1001);
-    ge->addObject(colorpicker, false);
+    ge->addUIElement(colorpicker);
     addListener(colorpicker);
+
+    thickness = new ThicknessSlider(graph);
+    ge->addUIElement(thickness);
+    addListener(thickness);
+
+    fillBut = new FillButton(graph);
+    ge->addUIElement(fillBut);
+    addListener(fillBut);
 
     //std::vector<Button*> tests = {new Button({100, 160}, 10), new Button({120, 160}, 20), new Button({160, 160}, 40), new Button({240, 160}, 80)};
     //for (Button *b : tests)
@@ -76,6 +90,16 @@ GraphicsEngine* UI::getEngine() const
 glm::vec4 UI::getSelectedColor() const
 {
     return colorpicker->getColor();
+}
+
+int UI::getThickness() const
+{
+    return thickness->getThickness();
+}
+
+bool UI::shouldFill() const
+{
+    return fillBut->fill();
 }
 
 void UI::addListener(Listener *l)

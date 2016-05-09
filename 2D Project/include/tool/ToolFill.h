@@ -2,8 +2,6 @@
 #define TOOLFILL_H
 
 #include "Tool.h"
-#include "UI.h"
-#include "PointBlob.h"
 #include <stack>
 #include <unordered_set>
 

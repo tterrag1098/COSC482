@@ -1,4 +1,8 @@
 #include "tool/ToolBox.h"
+#include "Listeners.h"
+#include "UI.h"
+#include "Box.h"
+#include "GraphicsEngine.h"
 
 ToolBox::ToolBox() : Tool("Box", 0, 0)
 {

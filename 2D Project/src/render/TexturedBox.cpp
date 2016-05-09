@@ -1,4 +1,5 @@
 #include "TexturedBox.h"
+#include "GraphicsEngine.h"
 
 TexturedBox::TexturedBox(GraphicsEngine *ge, glm::vec2 c, GLfloat w, GLfloat h, GLuint tex, glm::vec4 uvs) : Box(c, w, h), ge(ge), texId(tex), uvs(uvs) {}
 

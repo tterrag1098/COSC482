@@ -1,4 +1,7 @@
 #include "ToolLine.h"
+#include "LineSeg.h"
+#include "UI.h"
+#include "GraphicsEngine.h"
 
 void ToolLine::deactivated()
 {
@@ -10,7 +13,7 @@ bool ToolLine::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
     if (ctx.event.button == sf::Mouse::Left)
     {
         glm::vec2 pos = {ctx.event.x, ctx.event.y};
-        ctx.getUI()->getEngine()->addObject(lastLine = new LineSeg(pos, pos, ctx.getUI()->getSelectedColor()));
+        ctx.getUI()->getEngine()->addObject(lastLine = new LineSeg(ctx.getUI()->getThickness(), pos, pos, ctx.getUI()->getSelectedColor()));
         return true;
     }
     return false;

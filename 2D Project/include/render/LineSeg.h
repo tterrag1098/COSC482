@@ -7,7 +7,7 @@
 class LineSeg : public Drawable
 {
     public:
-        LineSeg(glm::vec2 p1 = {0, 0}, glm::vec2 p2 = {0, 0}, glm::vec4 col = BLACK) : Drawable(false), pos1(p1), pos2(p2), color(col) {};
+        LineSeg(int size, glm::vec2 p1 = {0, 0}, glm::vec2 p2 = {0, 0}, glm::vec4 col = BLACK) : Drawable(false), pos1(p1), pos2(p2), color(col) {};
         virtual ~LineSeg(){};
 
         virtual bool contains(glm::vec2 point) override;
@@ -16,6 +16,7 @@ class LineSeg : public Drawable
         void draw() override;
 
     protected:
+        int size;
         glm::vec2 pos1, pos2;
         glm::vec4 color;
 

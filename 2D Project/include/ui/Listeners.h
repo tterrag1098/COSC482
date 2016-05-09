@@ -3,8 +3,6 @@
 
 #include <SFML/Window/Event.hpp>
 
-#include "ui/Listeners.h"
-
 class UI;
 
 template <typename T>

@@ -1,4 +1,9 @@
 #include "ToolFill.h"
+#include "GraphicsEngine.h"
+#include "UI.h"
+#include "PointBlob.h"
+#include "GraphicsEngine.h"
+#include "util/utils.h"
 
 ToolFill::ToolFill() : Tool("Fill", 3, 0) {}
 
@@ -46,8 +51,11 @@ bool ToolFill::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 
     if (col == newCol) return false;
 
+    glBindFramebuffer(GL_FRAMEBUFFER, GraphicsEngine::fbo);
     std::vector<glm::vec2> points;
     floodFill(points, size, {ctx.event.x, ctx.event.y}, col);
     ctx.getUI()->getEngine()->addObject(new PointBlob(newCol, points));
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     return true;
 }

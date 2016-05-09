@@ -1,10 +1,9 @@
 #ifndef TOOLBOX_H
 #define TOOLBOX_H
 
-#include "ui/Listeners.h"
-#include "ui/UI.h"
-#include "tool/Tool.h"
-#include "render/Box.h"
+#include "Tool.h"
+
+class Box;
 
 class ToolBox : public Tool
 {

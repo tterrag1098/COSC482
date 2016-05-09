@@ -3,9 +3,9 @@
 
 #include "Drawable.h"
 #include "Listeners.h"
-#include "Box.h"
-#include "Button.h"
-#include "UI.h"
+
+class Button;
+class Box;
 
 class Slider : public Drawable, public Listener
 {

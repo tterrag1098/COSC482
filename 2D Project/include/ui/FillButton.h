@@ -1,44 +1,38 @@
-#ifndef COLORPICKER_H
-#define COLORPICKER_H
-
-#include <iomanip>
-#include <sstream>
+#ifndef THICKNESSSLIDER_H
+#define THICKNESSSLIDER_H
 
 #include "Listeners.h"
 #include "Drawable.h"
 #include "TextRendererTTF.h"
 
-class Slider;
 class GraphicsEngine;
+class StateButton;
 class Box;
 
-class ColorPicker : public Listener, public Drawable
+class FillButton : public Listener, public Drawable
 {
 public:
-    ColorPicker(GraphicsEngine *ge);
-    virtual ~ColorPicker();
-
-    virtual bool contains(glm::vec2 point) override;
+    FillButton(GraphicsEngine *ge);
+    virtual ~FillButton();
 
     void resized(sf::Vector2u size) override;
     void draw() override;
 
+    virtual bool contains(glm::vec2 point) override { return false; };
+
     bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
     bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
 
-    glm::vec4 getColor();
+    bool fill();
 
 protected:
 private:
     GraphicsEngine *ge;
-    Slider *r, *g, *b, *a;
+    StateButton *but;
     Box *bg;
-    Box *colorbg, *color;
-    glm::ivec4 prevColor;
     TextRendererTTF text;
 
     glm::vec2 pos;
     const int width, height;
 };
-
-#endif // COLORPICKER_H
+#endif // THICKNESSSLIDER_H

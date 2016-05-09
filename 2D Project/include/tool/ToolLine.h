@@ -2,8 +2,8 @@
 #define TOOLLINE_H
 
 #include "Tool.h"
-#include "LineSeg.h"
-#include "ui/UI.h"
+
+class LineSeg;
 
 class ToolLine : public Tool
 {

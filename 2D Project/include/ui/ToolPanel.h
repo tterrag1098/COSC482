@@ -3,11 +3,13 @@
 
 #include <algorithm>
 
-#include "render/Box.h"
-#include "ButtonTool.h"
-#include "TexturedBox.h"
+#include "Drawable.h"
+#include "Listeners.h"
 
+class GraphicsEngine;
 class ButtonTool;
+class Tool;
+class Box;
 
 class ToolPanel : public Drawable, public Listener
 {
@@ -16,6 +18,9 @@ public:
     virtual ~ToolPanel() {};
 
     virtual bool contains(glm::vec2 point) override { return false; };
+
+    bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
+    bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
 
     void addButton(Tool *tool);
 

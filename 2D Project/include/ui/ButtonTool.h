@@ -1,9 +1,9 @@
 #ifndef BUTTONTOOL_H
 #define BUTTONTOOL_H
 
-#include <ui/Button.h>
-#include <tool/Tool.h>
-#include <ui/UI.h>
+#include "Button.h"
+
+class Tool;
 
 class ButtonTool : public Button
 {
