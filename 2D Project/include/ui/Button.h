@@ -16,6 +16,7 @@ public:
     bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
 
     void setCorner(glm::vec2 pos);
+    void setPressed(bool pressed);
 
     glm::vec2 getCorner();
     int getSize();

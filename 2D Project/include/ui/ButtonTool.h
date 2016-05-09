@@ -12,6 +12,8 @@ class ButtonTool : public Button
         virtual ~ButtonTool(){};
 
         bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
+        bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
+
     protected:
     private:
         Tool *tool;

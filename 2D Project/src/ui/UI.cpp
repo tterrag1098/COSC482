@@ -3,11 +3,15 @@
 #include "ToolPanel.h"
 #include "ColorPicker.h"
 #include "ThicknessSlider.h"
-#include "FillButton.h"
+#include "OptionButton.h"
+
 #include "ToolDraw.h"
 #include "ToolLine.h"
 #include "ToolBox.h"
 #include "ToolFill.h"
+#include "ToolBezier.h"
+#include "ToolEllipse.h"
+
 #include "GraphicsEngine.h"
 
 /**
@@ -35,10 +39,12 @@ UI::UI(GraphicsEngine* graph)
 
     ToolPanel *panel = new ToolPanel(ge, 10, 10);
 
-    panel->addButton(tool = new ToolDraw());
+    panel->addButton(tool = new ToolDraw(), true);
     panel->addButton(new ToolLine());
     panel->addButton(new ToolBox());
+    panel->addButton(new ToolEllipse());
     panel->addButton(new ToolFill());
+    panel->addButton(new ToolBezier());
 
     ge->addUIElement(panel);
     addListener(panel);
@@ -51,9 +57,9 @@ UI::UI(GraphicsEngine* graph)
     ge->addUIElement(thickness);
     addListener(thickness);
 
-    fillBut = new FillButton(graph);
-    ge->addUIElement(fillBut);
-    addListener(fillBut);
+    option = new OptionButton(this);
+    ge->addUIElement(option);
+    addListener(option);
 
     //std::vector<Button*> tests = {new Button({100, 160}, 10), new Button({120, 160}, 20), new Button({160, 160}, 40), new Button({240, 160}, 80)};
     //for (Button *b : tests)
@@ -97,9 +103,14 @@ int UI::getThickness() const
     return thickness->getThickness();
 }
 
-bool UI::shouldFill() const
+bool UI::optionState() const
 {
-    return fillBut->fill();
+    return option->state();
+}
+
+const Tool* UI::getTool() const
+{
+    return tool;
 }
 
 void UI::addListener(Listener *l)
@@ -174,7 +185,7 @@ void UI::processMouseMoved(sf::Event::MouseMoveEvent mouseMoveEvent)
     bool activated = false;
     for (Listener *l : listeners)
     {
-        if (!activated && l->mouseMoved(ctx)) activated = true;
+        activated |= l->mouseMoved(ctx);
     }
 
     if (!activated) tool->mouseMoved(ctx);
@@ -195,7 +206,7 @@ void UI::processMouseButtonPressed(sf::Event::MouseButtonEvent mouseButtonEvent)
     bool activated = false;
     for (Listener *l : listeners)
     {
-        if (!activated && l->mousePressed(ctx)) activated = true;
+        activated |= l->mousePressed(ctx);
     }
 
     if (!activated) tool->mousePressed(ctx);
@@ -223,7 +234,7 @@ void UI::processMouseButtonReleased(sf::Event::MouseButtonEvent mouseButtonEvent
     bool activated = false;
     for (Listener *l : listeners)
     {
-        if (!activated && l->mouseReleased(ctx)) activated = true;
+        activated |= l->mouseReleased(ctx);
     }
 
     if (!activated) tool->mouseReleased(ctx);

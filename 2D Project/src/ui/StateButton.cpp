@@ -1,6 +1,9 @@
 #include "StateButton.h"
 
-StateButton::StateButton(int x, int y, int size) : Button({x, y}, size) {};
+StateButton::StateButton(int x, int y, int size) : Button({x, y}, size)
+{
+    state = false;
+}
 
 bool StateButton::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {

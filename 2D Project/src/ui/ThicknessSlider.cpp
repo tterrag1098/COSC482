@@ -42,6 +42,8 @@ void ThicknessSlider::draw()
     char str[3];
     sprintf(str, "Thickness:%d", thickness->getValue());
     tr.draw(str, pos.x + (width / 2) - (tr.textWidth(str) / 2), ge->getSize().y - 178 - 18, 0);
+
+    glUseProgram(GraphicsEngine::defaultShader);
 }
 
 int ThicknessSlider::getThickness()

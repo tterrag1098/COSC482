@@ -20,8 +20,6 @@ rendering system and rotation of text was added to the functionality.
 
 */
 
-GLuint TextRendererTTF::program = 0;
-
 /**
 \brief Constructor
 
@@ -68,34 +66,31 @@ TextRendererTTF::TextRendererTTF(std::string fontFile)
         glewError = GL_TRUE;
     }
 
-    if (!program)
+    std::string vertShade =
+    "#version 330\n"
+    "attribute vec4 coord;\n"
+    "varying vec2 texpos;\n"
+    "uniform mat4 rotMat;\n"
+    "void main(void) {\n"
+    "  gl_Position = rotMat * vec4(coord.xy, 0, 1);\n"
+    "  texpos = coord.zw;\n"
+    "}\n";
+
+    std::string fragShade =
+    "#version 330\n"
+    "varying vec2 texpos;\n"
+    "uniform sampler2D tex;\n"
+    "uniform vec4 color;\n"
+    "void main(void) {\n"
+    "  gl_FragColor = vec4(1, 1, 1, texture2D(tex, texpos).a) * color;\n"
+    "}\n";
+
+    program = LoadShadersFromMemory(vertShade, fragShade);
+
+    if(program == 0)
     {
-        std::string vertShade =
-        "#version 330\n"
-        "attribute vec4 coord;\n"
-        "varying vec2 texpos;\n"
-        "uniform mat4 rotMat;\n"
-        "void main(void) {\n"
-        "  gl_Position = rotMat * vec4(coord.xy, 0, 1);\n"
-        "  texpos = coord.zw;\n"
-        "}\n";
-
-        std::string fragShade =
-        "#version 330\n"
-        "varying vec2 texpos;\n"
-        "uniform sampler2D tex;\n"
-        "uniform vec4 color;\n"
-        "void main(void) {\n"
-        "  gl_FragColor = vec4(1, 1, 1, texture2D(tex, texpos).a) * color;\n"
-        "}\n";
-
-        program = LoadShadersFromMemory(vertShade, fragShade);
-
-        if(program == 0)
-        {
-            std::cerr << "Unable to create text shader." << std::endl;
-            shaderError = GL_TRUE;
-        }
+        std::cerr << "Unable to create text shader." << std::endl;
+        shaderError = GL_TRUE;
     }
 
     attribute_coord = glGetAttribLocation(program, "coord");

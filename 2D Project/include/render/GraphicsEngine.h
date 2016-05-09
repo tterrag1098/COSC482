@@ -77,7 +77,8 @@ public:
     void redo();
     void resize();
     void setSize(unsigned int, unsigned int);
-    void addObject(Drawable* obj, bool removable = true);
+    void addObject(Drawable* obj);
+    void removeObject(Drawable* obj);
     void addUIElement(Drawable* obj);
     GLuint loadTexture(std::string path);
     void activateTexture(int texId);

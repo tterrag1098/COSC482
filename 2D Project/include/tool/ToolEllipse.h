@@ -1,15 +1,15 @@
-#ifndef TOOLBOX_H
-#define TOOLBOX_H
+#ifndef TOOLELLIPSE_H
+#define TOOLELLIPSE_H
 
 #include "Tool.h"
 
-class Box;
+class Ellipse;
 
-class ToolBox : public Tool
+class ToolEllipse : public Tool
 {
 public:
-    ToolBox();
-    virtual ~ToolBox();
+    ToolEllipse();
+    virtual ~ToolEllipse();
 
     void deactivated() override;
 
@@ -21,7 +21,6 @@ public:
 
 protected:
 private:
-    Box *lastBox;
+    Ellipse *ellipse;
 };
-
-#endif // TOOLBOX_H
+#endif // TOOLELLIPSE_H

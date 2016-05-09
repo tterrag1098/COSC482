@@ -15,6 +15,9 @@ public:
     virtual void activated() {};
     virtual void deactivated() {};
 
+    virtual bool hasOption() const { return false; };
+    virtual std::string getOptionName() const { return ""; };
+
     std::string getName() { return name; }
     glm::ivec2 getIconPos() { return iconPos; }
 

@@ -7,7 +7,7 @@
 #include <iomanip>
 
 #include <SFML/System/Vector2.hpp>
-#include <glm/common.hpp>
+#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace glm;
@@ -51,8 +51,7 @@ inline bool is_between(float x, float bound1, float bound2, float tolerance)
       ((x >= (bound2 - tolerance)) && (x <= (bound1 + tolerance))));
 }
 
-const float tolerance = 0.001f;
-inline bool onLine(glm::vec2 pos1, glm::vec2 pos2, glm::vec2 point)
+inline bool onLine(glm::vec2 pos1, glm::vec2 pos2, glm::vec2 point, float tolerance = 0.5f)
 {
     if (is_between(point.x, pos1.x, pos2.x, tolerance) && is_between(point.y, pos1.y, pos2.y, tolerance))
     {
@@ -74,6 +73,24 @@ inline vec4 readColor(sf::Vector2u size, int x, int y)
     vec4 col;
     glReadPixels(x, size.y - y, 1, 1, GL_RGBA, GL_FLOAT, glm::value_ptr(col));
     return col;
+}
+
+inline void getPerpendicularEdge(vec2 p1, vec2 p2, float size, glm::vec2* vecs, bool front = false)
+{
+    glm::vec2 diff = glm::normalize(p2 - p1) * size;
+    glm::vec2 lOff = glm::mat2(0, -1, 1, 0) * diff;
+    glm::vec2 rOff = glm::mat2(0, 1, -1, 0) * diff;
+
+    if (front)
+    {
+        vecs[0] = p1 + lOff;
+        vecs[1] = p1 + rOff;
+    }
+    else
+    {
+        vecs[0] = p2 + lOff;
+        vecs[1] = p2 + rOff;
+    }
 }
 
 #endif // STRUCTS_H_INCLUDED

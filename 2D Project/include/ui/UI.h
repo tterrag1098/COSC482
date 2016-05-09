@@ -31,7 +31,7 @@ class Listener;
 class Tool;
 class ColorPicker;
 class ThicknessSlider;
-class FillButton;
+class OptionButton;
 
 class UI
 {
@@ -46,7 +46,7 @@ private:
 
     ColorPicker *colorpicker;
     ThicknessSlider *thickness;
-    FillButton *fillBut;
+    OptionButton *option;
 
     void keyPressed(sf::Event::KeyEvent keyevent);
     void keyboardStateProcessing();
@@ -70,7 +70,8 @@ public:
     GraphicsEngine* getEngine() const;
     glm::vec4 getSelectedColor() const;
     int getThickness() const;
-    bool shouldFill() const;
+    bool optionState() const;
+    const Tool* getTool() const;
 
     void setToolActive(Tool *tool);
     void addListener(Listener *l);

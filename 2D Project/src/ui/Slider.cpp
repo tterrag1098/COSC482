@@ -3,9 +3,9 @@
 #include "Button.h"
 #include "UI.h"
 
-Slider::Slider(int x, int y, int width, int min, int max) : Drawable(false), width(width), min(min), max(max), dragging(false)
+Slider::Slider(int x, int y, int width, int min, int max, glm::vec4 color) : Drawable(false), width(width), min(min), max(max), dragging(false)
 {
-    bar = new Box({x, y}, width + 10, 10);
+    bar = new Box({x, y}, width + 10, 10, color);
     thumb = new Button({x, y}, 10);
 
     Drawable::children.push_back(bar);

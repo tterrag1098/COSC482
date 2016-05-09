@@ -1,21 +1,24 @@
-#ifndef THICKNESSSLIDER_H
-#define THICKNESSSLIDER_H
+#ifndef FILLBUTTON_H
+#define FILLBUTTON_H
 
 #include "Listeners.h"
 #include "Drawable.h"
 #include "TextRendererTTF.h"
 
+class UI;
 class GraphicsEngine;
 class StateButton;
 class Box;
+class TexturedBox;
 
-class FillButton : public Listener, public Drawable
+class OptionButton : public Listener, public Drawable
 {
 public:
-    FillButton(GraphicsEngine *ge);
-    virtual ~FillButton();
+    OptionButton(UI *ui);
+    virtual ~OptionButton();
 
     void resized(sf::Vector2u size) override;
+    void refresh() override;
     void draw() override;
 
     virtual bool contains(glm::vec2 point) override { return false; };
@@ -23,16 +26,19 @@ public:
     bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
     bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
 
-    bool fill();
+    bool state();
 
 protected:
 private:
+    UI *ui;
     GraphicsEngine *ge;
     StateButton *but;
     Box *bg;
+    GLuint texId;
+    TexturedBox *iconOn, *iconOff;
     TextRendererTTF text;
 
     glm::vec2 pos;
     const int width, height;
 };
-#endif // THICKNESSSLIDER_H
+#endif // FILLBUTTON_H

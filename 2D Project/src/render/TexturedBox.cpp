@@ -9,10 +9,8 @@ void TexturedBox::refresh()
 {
     vert({corner.x, corner.y + height}, color, {uvs.x, uvs.w});
     vert({corner.x + width, corner.y + height}, color, {uvs.z, uvs.w});
-    vert({corner.x + width, corner.y}, color, {uvs.z, uvs.y});
     vert({corner.x, corner.y}, color, {uvs.x, uvs.y});
-
-    index_quad(1);
+    vert({corner.x + width, corner.y}, color, {uvs.z, uvs.y});
 }
 
 void TexturedBox::draw()

@@ -178,17 +178,21 @@ Currently empty, no allocated memory to clear.
 
 GraphicsEngine::~GraphicsEngine() {}
 
-void GraphicsEngine::addObject(Drawable *obj, bool removable)
+void GraphicsEngine::addObject(Drawable *obj)
 {
     obj->load();
     objects.push_back(obj);
     std::stable_sort(objects.begin(), objects.end(), [](const Drawable* a, const Drawable* b) { return a->sortIndex() < b->sortIndex(); });
 
-    if (removable)
-    {
-        undoStack.push_back(obj);
-        redoStack.clear();
-    }
+    undoStack.push_back(obj);
+    redoStack.clear();
+}
+
+void GraphicsEngine::removeObject(Drawable *obj)
+{
+    objects.erase(std::find(objects.begin(), objects.end(), obj));
+    undoStack.erase(std::find(undoStack.begin(), undoStack.end(), obj));
+    delete obj;
 }
 
 void GraphicsEngine::addUIElement(Drawable *obj)
@@ -323,6 +327,10 @@ void GraphicsEngine::screenshotPNG()
 
 void GraphicsEngine::resize()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glUseProgram(defaultShader);
+
+    sf::Vector2u size = getSize();
     glViewport(0, 0, getSize().x, getSize().y);
 
     for (Drawable *d : objects)

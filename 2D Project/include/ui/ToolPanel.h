@@ -22,7 +22,7 @@ public:
     bool mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
     bool mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx) override;
 
-    void addButton(Tool *tool);
+    void addButton(Tool *tool, bool currentTool = false);
 
 protected:
 private:

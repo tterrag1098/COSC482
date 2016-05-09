@@ -20,7 +20,7 @@ bool ToolBox::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
     if (ctx.event.button == sf::Mouse::Left)
     {
-        ctx.getUI()->getEngine()->addObject(lastBox = new Box({ctx.event.x, ctx.event.y}, 0, 0, ctx.getUI()->getSelectedColor()));
+        ctx.getUI()->getEngine()->addObject(lastBox = new Box({ctx.event.x, ctx.event.y}, 0, 0, ctx.getUI()->getSelectedColor(), ctx.getUI()->optionState(), ctx.getUI()->getThickness()));
         return true;
     }
     return false;

@@ -32,7 +32,7 @@ and IDs, and finally loads the object data up to the graphics card.
 
 */
 
-Box::Box(glm::vec2 c, GLfloat w, GLfloat h, glm::vec4 col) : Drawable(true), corner(c), width(w), height(h), color(col) {}
+Box::Box(glm::vec2 c, GLfloat w, GLfloat h, glm::vec4 col, bool f, int t) : Drawable(false), corner(c), width(w), height(h), color(col), fill(f), thickness(t) {}
 
 /**
 \brief Destructor
@@ -58,12 +58,38 @@ the two arrays.
 
 void Box::refresh()
 {
-    vert({corner.x, corner.y + height}, color);
-    vert({corner.x + width, corner.y + height}, color);
-    vert({corner.x + width, corner.y}, color);
-    vert({corner.x, corner.y}, color);
+    if (fill || std::abs(width) < thickness || std::abs(height) < thickness)
+    {
+        vert({corner.x, corner.y + height}, color);
+        vert({corner.x + width, corner.y + height}, color);
+        vert(corner, color);
+        vert({corner.x + width, corner.y}, color);
+    }
+    else
+    {
+        glm::vec2 size = {thickness * ((width > 0) - (width < 0)), thickness * ((height > 0) - (height < 0))};
 
-    index_quad(1);
+        vert(corner, color);
+        vert(corner + size, color);
+
+        vert({corner.x + width, corner.y}, color);
+        vert({corner.x + width - size.x, corner.y + size.y}, color);
+
+        vert(corner + glm::vec2(width, height), color);
+        vert(corner + glm::vec2(width, height) - size, color);
+
+        vert({corner.x, corner.y + height}, color);
+        vert({corner.x + size.x, corner.y + height - size.y}, color);
+
+        // Complete the loop
+        vert(verts[0], color);
+        vert(verts[1], color);
+    }
+}
+
+GLuint Box::getDrawMode() const
+{
+    return GL_TRIANGLE_STRIP;
 }
 
 /**

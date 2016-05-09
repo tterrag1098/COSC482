@@ -36,11 +36,14 @@ protected:
     GLfloat height;       ///< Height of the box.
     glm::vec2 corner;     ///< The corner of the box.
     glm::vec4 color;      ///< The color of the box.
+    bool fill;
+    float thickness;
 
-    virtual void refresh() override;
+    void refresh() override;
+    GLuint getDrawMode() const override;
 
 public:
-    Box(glm::vec2 c = {0, 0}, GLfloat w = 1, GLfloat h = 1, glm::vec4 col = WHITE);
+    Box(glm::vec2 c = {0, 0}, GLfloat w = 1, GLfloat h = 1, glm::vec4 col = WHITE, bool fill = true, int thickness = 1);
     ~Box();
 
     bool contains(glm::vec2 p);

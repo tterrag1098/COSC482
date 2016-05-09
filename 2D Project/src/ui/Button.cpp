@@ -74,6 +74,12 @@ void Button::setCorner(glm::vec2 p)
     load();
 }
 
+void Button::setPressed(bool p)
+{
+    pressed = p;
+    load();
+}
+
 glm::vec2 Button::getCorner()
 {
     return pos;

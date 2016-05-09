@@ -21,9 +21,9 @@ ColorPicker::ColorPicker(GraphicsEngine *ge) : ge(ge), width(180), height(150)
 
     Drawable::children.push_back(color);
 
-    r = new Slider(0, pos.y + 35, 128, 0, 255);
-    g = new Slider(0, pos.y + 55, 128, 0, 255);
-    b = new Slider(0, pos.y + 75, 128, 0, 255);
+    r = new Slider(0, pos.y + 35, 128, 0, 255, RED);
+    g = new Slider(0, pos.y + 55, 128, 0, 255, GREEN);
+    b = new Slider(0, pos.y + 75, 128, 0, 255, BLUE);
     a = new Slider(0, pos.y + 95, 128, 0, 255);
     a->setValue(255);
 

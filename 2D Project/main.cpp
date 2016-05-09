@@ -35,12 +35,16 @@ the SFML interface for OpenGL.
 
 int main()
 {
+    std::cout << "Starting" << std::endl;
+
     sf::RenderWindow d;
     if (glewInit())
     {
         std::cerr << "Unable to initialize GLEW ... exiting" << std::endl;
         exit(EXIT_FAILURE);
     }
+
+    std::cout << "GLEW Loaded. Continuing..." << std::endl;
 
     std::string progName = "Faux-Paint";
     GraphicsEngine ge(progName, 800, 600);

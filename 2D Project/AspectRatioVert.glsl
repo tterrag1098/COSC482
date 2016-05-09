@@ -15,7 +15,7 @@ This is a simple GLSL pass through vertex shader.
 
 */
 
-layout(location = 0) in vec2 position;
+layout(location = 0) in vec4 position;
 layout(location = 1) in vec4 icolor;
 layout(location = 2) in vec2 itex_coord;
 
@@ -28,5 +28,5 @@ void main()
 {
 	tex_coord = itex_coord;
     color = icolor;
-    gl_Position = Projection*vec4(position, 0, 1);
+    gl_Position = Projection*position;
 }

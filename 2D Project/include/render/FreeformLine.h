@@ -19,10 +19,11 @@ class FreeformLine : public Drawable
         GLuint getDrawMode() const override;
 
     protected:
+        std::vector<glm::vec2> points;
+        glm::vec4 color;
+
     private:
         float size;
-        glm::vec4 color;
-        std::vector<glm::vec2> points;
 };
 
 #endif // FREEFORMLINE_H

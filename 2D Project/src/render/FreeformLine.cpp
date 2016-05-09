@@ -21,7 +21,7 @@ bool FreeformLine::contains(glm::vec2 point)
 {
     for (int i = 0; i < points.size() - 1; i++)
     {
-        if (onLine(points[i], points[i + 1], point))
+        if (onLine(points[i], points[i + 1], point, size))
         {
             return true;
         }
@@ -61,19 +61,20 @@ void FreeformLine::refresh()
     {
         for (int i = 0; i < points.size() - 1; i++)
         {
-            glm::vec2 p1 = points[i];
-            glm::vec2 p2 = points[i + 1];
-            glm::vec2 diff = glm::normalize(p2 - p1) * size;
-            glm::vec2 lOff = glm::mat2(0, -1, 1, 0) * diff;
-            glm::vec2 rOff = glm::mat2(0, 1, -1, 0) * diff;
+            glm::vec2 verts[2];
 
             if (i == 0)
             {
-                vert(p1 + lOff, color);
-                vert(p1 + rOff, color);
+                getPerpendicularEdge(points[i], points[i + 1], size, verts, true);
+
+                vert(verts[0], color);
+                vert(verts[1], color);
             }
-            vert(p2 + lOff, color);
-            vert(p2 + rOff, color);
+
+            getPerpendicularEdge(points[i], points[i + 1], size, verts);
+
+            vert(verts[0], color);
+            vert(verts[1], color);
         }
     }
 }

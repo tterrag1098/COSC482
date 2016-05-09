@@ -7,23 +7,25 @@ Listener::~Listener()
 
 bool Listener::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
+    bool res = false;
     for (Listener *l : children)
     {
         if (l->mousePressed(ctx))
         {
-            return true;
+            res = true;
         }
     }
-    return false;
+    return res;
 }
 
 bool Listener::mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
+    bool res = false;
     for (Listener *l : children)
     {
         if (l->mouseReleased(ctx))
         {
-            return true;
+            res = true;
         }
     }
     return false;
@@ -31,11 +33,12 @@ bool Listener::mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 
 bool Listener::mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx)
 {
+    bool res = false;
     for (Listener *l : children)
     {
         if (l->mouseMoved(ctx))
         {
-            return true;
+            res = true;
         }
     }
     return false;
