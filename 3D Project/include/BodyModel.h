@@ -1,20 +1,16 @@
 #ifndef BODYMODEL_H
 #define BODYMODEL_H
 
-#include "Body.h"
-#include "../GraphicsEngine.h"
+#include "BodyDrawable.h"
 #include "../Models.h"
-#include "../Drawable.h"
 
-class BodyModel : public Body, public Drawable
+class BodyModel : public BodyDrawable
 {
     public:
         BodyModel(Models *m, glm::dvec3 pos, double mass);
         virtual ~BodyModel();
 
-        void draw(glm::mat4 pvm) override;
-        glm::mat4 getModelMat() override;
-        void applyForce(double tickDiff) override;
+        void draw(GraphicsEngine *ge) override;
 
     protected:
     private:

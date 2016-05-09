@@ -88,7 +88,7 @@ public:
 
     void load(GLint v, GLint c, GLint n, GLint t);
     void load() override;
-    void draw(glm::mat4 pvm) override;
+    void draw(GraphicsEngine *ge) override;
 
     void setDrawBorder(GLboolean d);
     void setDrawFaces(GLboolean d);

@@ -11,7 +11,7 @@ class Body
 
         void updatePosition(glm::dvec3 pos);
 
-        glm::dvec3& getPos();
+        glm::dvec3 getPos();
         glm::dvec3& getVelocity();
         glm::dvec3& getForce();
 

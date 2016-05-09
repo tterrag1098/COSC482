@@ -12,28 +12,49 @@
 
 #include <vector>
 
+class GraphicsEngine;
+
 class Drawable
 {
 public:
     virtual ~Drawable();
 
-    virtual void draw(glm::mat4 pvm);
+    virtual void draw(GraphicsEngine *ge);
 
     virtual void load();
-
-    virtual glm::mat4 getModelMat();
 
     Material getMaterial();
     int getLight();
     void assignLight(GLuint lightID);
 
 protected:
-    Drawable(Material mat, bool visible = true);
+    Drawable(Material mat, bool indexed = true, bool visible = true);
+
+    void vert(glm::vec3 pos, glm::vec4 color, glm::vec2 uv = {0, 0});
+    void index_quad(int count);
+
+    bool useLighting = true;
+    bool useTexture = true;
+
+    virtual void refresh();
+
+    virtual GLuint getDrawMode() const;
+
+    virtual glm::mat4 getModelMat();
+
+    std::vector<glm::vec3> verts;
+    std::vector<glm::vec4> colors;
+    std::vector<glm::vec2> uvs;
+    std::vector<GLuint> indices;
 
     std::vector<Drawable*> children;
 
 private:
-    bool visible;
+    GLuint vboptr;  ///< ID for the VBO.
+    GLuint bufptr;  ///< ID for the array buffer.
+    GLuint eboptr;  ///< ID for the index array buffer.
+
+    bool indexed, visible;
     Material material;
     int light = -1;
 };

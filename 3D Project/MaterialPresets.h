@@ -213,6 +213,14 @@ static Material turquoise(
     12.8
 );
 
+static Material fullbright(
+    0.0, 0.0, 0.0, 1.0,
+    0.0, 0.0, 0.0, 1.0,
+    0.0, 0.0, 0.0, 1.0,
+    1.0, 1.0, 1.0, 1.0,
+    32.0
+);
+
 }
 
 

@@ -1,26 +1,16 @@
 #include "BodyModel.h"
+#include "../GraphicsEngine.h"
 
-BodyModel::BodyModel(Models *m, glm::dvec3 pos, double mass) : Drawable(m->getMaterial()), Body(pos, mass), model(m)
+BodyModel::BodyModel(Models *m, glm::dvec3 pos, double mass) : BodyDrawable(m->getMaterial(), pos, mass), model(m)
 {
-    children.push_back(model);
+    model->load();
 }
 
-BodyModel::~BodyModel()
-{
-    //dtor
-}
+BodyModel::~BodyModel() {}
 
-void BodyModel::draw(glm::mat4 pvm)
+void BodyModel::draw(GraphicsEngine *ge)
 {
-    Drawable::draw(pvm);
-}
-
-void BodyModel::applyForce(double tickDiff)
-{
-    Body::applyForce(tickDiff);
-}
-
-glm::mat4 BodyModel::getModelMat()
-{
-    return glm::translate(Drawable::getModelMat(), glm::vec3(pos));
+    ge->updateModelMat(getModelMat());
+    model->draw(ge);
+    BodyDrawable::draw(ge);
 }

@@ -66,6 +66,7 @@ uniform vec3 eye;
 uniform vec4 GlobalAmbient;
 uniform int numLights;
 uniform bool useTexture;
+uniform bool useLighting;
 uniform mat4 textrans;
 
 uniform sampler2D tex;
@@ -80,7 +81,7 @@ void main()
     bool usingLights = false;
     vec4 globalAmbientPortion = Mat.ambient*GlobalAmbient;
 
-    for (int i = 0; i < numLights; i++)
+    for (int i = 0; useLighting && i < numLights; i++)
     {
         if (Lt[i].on)
         {

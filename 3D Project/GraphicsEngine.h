@@ -46,13 +46,15 @@ handles all of the graphics rendering in the program.
 
 */
 
+class Drawable;
+
 class GraphicsEngine : public sf::RenderWindow
 {
 private:
     GLenum mode;    ///< Mode, either point, line or fill.
     int sscount;    ///< Screenshot count to be appended to the screenshot filename.
 
-    std::vector<Drawable*> objects;
+    std::vector<BodyDrawable*> objects;
 
     SphericalCamera sphcamera;   ///< Spherical Camera
     YPRCamera yprcamera;         ///< Yaw-Pitch-Roll Camera
@@ -66,12 +68,14 @@ private:
     Models CMSphere;  ///< Sphere Object for Cube Map
 
     glm::mat4 projection;  ///< Projection Matrix
+    glm::mat4 view;        ///< View Matrix
     glm::mat4 model;       ///< Model Matrix
     glm::mat4 textrans;    ///< Texture transformation matrix.
 
     GLuint worldFbo;
     GLuint screenVao;
     GLuint fboTex;
+    GLuint rbo;
 
     PhysicsEngine *pe;
 
@@ -99,8 +103,12 @@ public:
     void screenshotJPG();
     void resize();
     void setSize(unsigned int, unsigned int);
-    void addObject(Drawable* obj, bool removable = true);
+    void addObject(BodyDrawable* obj, bool removable = true);
     GLfloat* getScreenBounds();
+
+    void updateModelMat(glm::mat4 modelMat);
+    void setUseLighting(bool use);
+    void setUseTexture(bool use);
 
     GLboolean isSphericalCameraOn();
     void setSphericalCameraOn();

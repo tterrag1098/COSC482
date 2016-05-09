@@ -16,7 +16,7 @@ void Body::applyForce(double tickDiff)
     force *= 0; // Clear out applied forces
 }
 
-glm::dvec3& Body::getPos()
+glm::dvec3 Body::getPos()
 {
     return pos;
 }

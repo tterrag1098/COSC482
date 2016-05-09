@@ -40,34 +40,27 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     screenShader(Shader("PostProcessing.vert", "PostProcessing.frag")),
     cmShader(Shader("CubeMap.vert", "CubeMap.frag"))
 {
-    glGenFramebuffers(1, &worldFbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
-
-    glGenTextures(1, &fboTex);
-    glBindTexture(GL_TEXTURE_2D, fboTex);
-
     screenShader.use();
-    glUniform1i(glGetUniformLocation(screenShader.program, "screenTex"), 0);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, getSize().x, getSize().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glGenFramebuffers(1, &worldFbo);
+    glGenTextures(1, &fboTex);
+    glGenRenderbuffers(1, &rbo);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
+    glBindTexture(GL_TEXTURE_2D, fboTex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0);
 
-    GLuint rbo;
-    glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, getSize().x, getSize().y);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR: Framebuffer is not complete!" << std::endl;
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glUniform1i(glGetUniformLocation(screenShader.program, "screenTex"), 0);
 
     glGenVertexArrays(1, &screenVao);
     GLuint buffer;
@@ -120,7 +113,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     Models *m3 = new Models();
     m3->createSphereOBJ(1, 20, 20);
     BodyModel *star3 = new BodyModel(m3, {10, 0, 0}, 10000);
-    star3->getVelocity().z = 3;
+    star3->getVelocity().y = 1;
+    star3->getVelocity().z = 1;
     addObject(star3);
     pe->addBody(star3);
 
@@ -151,7 +145,10 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     // Set position of spherical camera
     sphcamera.setPosition(30, 0, 90);
 
+    glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (SetVS)
     {
@@ -160,7 +157,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     }
     else
     {
-        setVerticalSyncEnabled(false);
+        setVerticalSyncEnabled(false);    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
+
         setFramerateLimit(0);
     }
 
@@ -218,7 +216,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    cmShader.use();
+    cmShader.use();    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
+
 
     //  Load in Cube Map
     glUniform1i(glGetUniformLocation(cmShader.program, "cmtex"), 0);
@@ -267,7 +266,7 @@ Currently empty, no allocated memory to clear.
 
 GraphicsEngine::~GraphicsEngine() {}
 
-void GraphicsEngine::addObject(Drawable *obj, bool removable)
+void GraphicsEngine::addObject(BodyDrawable *obj, bool removable)
 {
     obj->load();
     objects.push_back(obj);
@@ -287,6 +286,7 @@ void GraphicsEngine::addObject(Drawable *obj, bool removable)
                 180.0, 0.0,
                 1.0, 0.0, 0.0
             );
+        obj->assignLight(nextLight);
         LoadLight(lt, "Lt", nextLight++);
         glUniform1i(glGetUniformLocation(fboShader.program, "numLights"), nextLight);
     }
@@ -312,7 +312,6 @@ void GraphicsEngine::display()
     glEnable(GL_DEPTH_TEST);
 
     // Set view matrix via current camera.
-    glm::mat4 view(1.0);
     if (CameraNumber == 1)
         view = sphcamera.lookAt();
     else if (CameraNumber == 2)
@@ -320,10 +319,10 @@ void GraphicsEngine::display()
 
     glm::mat4 pvm = projection * view * model;
 
-    //cmShader.use();
-    //glUniformMatrix4fv(glGetUniformLocation(cmShader.program, "PVM"), 1, GL_FALSE, glm::value_ptr(pvm));
+    cmShader.use();
+    glUniformMatrix4fv(glGetUniformLocation(cmShader.program, "PVM"), 1, GL_FALSE, glm::value_ptr(pvm));
 
-    //CMSphere.draw(pvm);
+    CMSphere.draw(this);
 
     fboShader.use();
 
@@ -341,31 +340,23 @@ void GraphicsEngine::display()
     glBindTexture(GL_TEXTURE_2D, texID[0]);
 
     // Lighting pass
-    for (Drawable *obj : objects)
+    for (BodyDrawable *obj : objects)
     {
         if (obj->getLight() >= 0)
         {
-            glm::mat4 model = obj->getModelMat();
             char name[10];
             sprintf(name, "Lt[%d].position", obj->getLight());
-            glUniform4fv(glGetUniformLocation(fboShader.program, name), 1, glm::value_ptr(model * glm::vec4(0, 0, 0, 1)));
+            glm::vec3 pos = glm::vec3(obj->getPos());
+            glUniform4fv(glGetUniformLocation(fboShader.program, name), 1, glm::value_ptr(pos));
         }
     }
 
     // Drawing pass
-    for (Drawable* obj : objects)
+    for (BodyDrawable* obj : objects)
     {
-        glm::mat4 model = obj->getModelMat();
-        glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(pvm * model));
-
-        glm::mat3 nM(model);
-        nM = glm::transpose(glm::inverse(nM));
-        glUniformMatrix3fv(NormalLoc, 1, GL_FALSE, glm::value_ptr(nM));
-
         loadMaterial(obj->getMaterial());
 
-        obj->draw(pvm);
+        obj->draw(this);
     }
 
     glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*model));
@@ -387,6 +378,28 @@ void GraphicsEngine::display()
 
     printOpenGLErrors();
     sf::RenderWindow::display();
+}
+
+void GraphicsEngine::updateModelMat(glm::mat4 mat)
+{
+    fboShader.use();
+
+    glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(mat));
+    glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection * view * model * mat));
+
+    glm::mat3 nM(mat);
+    nM = glm::transpose(glm::inverse(nM));
+    glUniformMatrix3fv(NormalLoc, 1, GL_FALSE, glm::value_ptr(nM));
+}
+
+void GraphicsEngine::setUseLighting(bool use)
+{
+    glUniform1i(glGetUniformLocation(fboShader.program, "useLighting"), use);
+}
+
+void GraphicsEngine::setUseTexture(bool use)
+{
+    glUniform1i(glGetUniformLocation(fboShader.program, "useTexture"), use);
 }
 
 /**
@@ -452,6 +465,22 @@ void GraphicsEngine::resize()
 {
     glViewport(0, 0, getSize().x, getSize().y);
     projection = glm::perspective(50.0f*degf, (float)getSize().x/getSize().y, 0.01f, 1000.0f);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
+    glBindTexture(GL_TEXTURE_2D, fboTex);
+
+    screenShader.use();
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, getSize().x, getSize().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, getSize().x, getSize().y);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR: Framebuffer is not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 /**

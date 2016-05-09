@@ -133,7 +133,7 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    std::string progName = "Wavefront Simple OBJ File Loader";
+    std::string progName = "N-Body Simulator";
     GraphicsEngine ge(progName, 700, 500);
     UI ui(&ge);
 

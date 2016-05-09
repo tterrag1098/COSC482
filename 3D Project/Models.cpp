@@ -526,7 +526,7 @@ void Models::load(GLint v, GLint c, GLint n, GLint t)
 
 */
 
-void Models::draw(glm::mat4 pvm)
+void Models::draw(GraphicsEngine *ge)
 {
     if (drawFaces)
     {
