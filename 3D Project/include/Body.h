@@ -6,11 +6,13 @@
 class Body
 {
     public:
-        Body(glm::dvec3 pos, double mass);
+        Body(glm::dvec3 pos, float radius, double mass);
         virtual ~Body();
 
         void updatePosition(glm::dvec3 pos);
 
+        float getRadius();
+        glm::vec3 getPosF();
         glm::dvec3 getPos();
         glm::dvec3& getVelocity();
         glm::dvec3& getForce();
@@ -22,6 +24,7 @@ class Body
 
     protected:
         glm::dvec3 pos, vel, force;
+        float radius;
         double mass;
 
     private:

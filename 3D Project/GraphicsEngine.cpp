@@ -1,4 +1,5 @@
 #include "GraphicsEngine.h"
+#include "LineSeg.h"
 
 /**
 \file GraphicsEngine.cpp
@@ -96,25 +97,18 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
                  1
             );
 
-    Models *m = new Models(sun);
-    m->createSphereOBJ(3, 20, 20);
-    BodyModel *star = new BodyModel(m, {4, 0, 0}, 1000000000);
+    BodySphere *star = new BodySphere(sun, {4, 0, 0}, 3, 1000000000);
     star->getVelocity().z = -1.2;
     addObject(star);
     pe->addBody(star);
 
-    Models *m2 = new Models(sun);
-    m2->createSphereOBJ(3, 20, 20);
-    BodyModel *star2 = new BodyModel(m2, {-4, 0, 0}, 1000000000);
+    BodySphere *star2 = new BodySphere(sun, {-4, 0, 0}, 3, 1000000000);
     star2->getVelocity().z = 1.2;
     addObject(star2);
     pe->addBody(star2);
 
-    Models *m3 = new Models();
-    m3->createSphereOBJ(1, 20, 20);
-    BodyModel *star3 = new BodyModel(m3, {10, 0, 0}, 10000);
-    star3->getVelocity().y = 1;
-    star3->getVelocity().z = 1;
+    BodySphere *star3 = new BodySphere(Materials::whitePlastic, {10, 0, 0}, 1, 10000);
+    star3->getVelocity().y = 0.5;
     addObject(star3);
     pe->addBody(star3);
 
@@ -269,7 +263,7 @@ GraphicsEngine::~GraphicsEngine() {}
 void GraphicsEngine::addObject(BodyDrawable *obj, bool removable)
 {
     obj->load();
-    objects.push_back(obj);
+    bodies.push_back(obj);
 
     fboShader.use();
 
@@ -301,6 +295,8 @@ This function clears the screen and calls the draw functions of the box and circ
 
 void GraphicsEngine::display()
 {
+    sphcamera.setCenter(selected ? selected->getPosF() : glm::vec3(0));
+
     pe->updateObjects();
 
     glActiveTexture(GL_TEXTURE0);
@@ -340,11 +336,11 @@ void GraphicsEngine::display()
     glBindTexture(GL_TEXTURE_2D, texID[0]);
 
     // Lighting pass
-    for (BodyDrawable *obj : objects)
+    for (BodyDrawable *obj : bodies)
     {
         if (obj->getLight() >= 0)
         {
-            char name[10];
+            char name[20];
             sprintf(name, "Lt[%d].position", obj->getLight());
             glm::vec3 pos = glm::vec3(obj->getPos());
             glUniform4fv(glGetUniformLocation(fboShader.program, name), 1, glm::value_ptr(pos));
@@ -352,11 +348,16 @@ void GraphicsEngine::display()
     }
 
     // Drawing pass
-    for (BodyDrawable* obj : objects)
+    for (BodyDrawable* obj : bodies)
     {
         loadMaterial(obj->getMaterial());
 
         obj->draw(this);
+    }
+
+    for (Drawable *d : objects)
+    {
+        d->draw(this);
     }
 
     glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection*view*model));
@@ -400,6 +401,61 @@ void GraphicsEngine::setUseLighting(bool use)
 void GraphicsEngine::setUseTexture(bool use)
 {
     glUniform1i(glGetUniformLocation(fboShader.program, "useTexture"), use);
+}
+
+void GraphicsEngine::rayCastSelect(float mx, float my)
+{
+    glm::vec2 nds;
+
+    nds.x = (((float) mx / getSize().x) * 2) - 1;
+    nds.y = 1 - (((float) my / getSize().y) * 2);
+
+    glm::vec4 dir(nds, 1, 1);
+
+    dir = glm::inverse(projection) * dir;
+    dir = glm::normalize(glm::inverse(view) * dir);
+
+    std::vector<BodyDrawable*> intersections;
+
+    glm::vec3 o = sphcamera.getPosition();
+    glm::vec3 l = dir.xyz();
+
+    LineSeg *line = new LineSeg(o, o + (l * 100.0f));
+    line->load();
+    objects.push_back(line);
+
+    for (BodyDrawable *b : bodies)
+    {
+        glm::vec3 c(b->getPos());
+
+        float r = b->getRadius();
+
+        float res = glm::dot(l, o - c);
+        res *= res;
+
+        float mag = glm::length(o - c);
+        mag *= mag;
+        float r2 = r * r;
+
+        res = res - mag + r2;
+
+        if (res >= 0)
+        {
+            intersections.push_back(b);
+        }
+    }
+
+    float minDist = INT_MAX;
+    selected = NULL;
+    for (BodyDrawable *b : intersections)
+    {
+        float dist = glm::distance(o, glm::vec3(b->getPos()));
+        if (dist < minDist)
+        {
+            selected = b;
+            minDist = dist;
+        }
+    }
 }
 
 /**

@@ -22,7 +22,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/ProgRelease" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/NBodyFun" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -87,14 +87,14 @@
 		<Unit filename="YPRCamera.h" />
 		<Unit filename="include/Body.h" />
 		<Unit filename="include/BodyDrawable.h" />
-		<Unit filename="include/BodyModel.h" />
+		<Unit filename="include/BodySphere.h" />
 		<Unit filename="include/PhysicsEngine.h" />
 		<Unit filename="include/Shader.h" />
 		<Unit filename="include/TrailLine.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Body.cpp" />
 		<Unit filename="src/BodyDrawable.cpp" />
-		<Unit filename="src/BodyModel.cpp" />
+		<Unit filename="src/BodySphere.cpp" />
 		<Unit filename="src/PhysicsEngine.cpp" />
 		<Unit filename="src/Shader.cpp" />
 		<Unit filename="src/TrailLine.cpp" />

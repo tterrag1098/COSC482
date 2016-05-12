@@ -4,11 +4,11 @@
 #include "BodyDrawable.h"
 #include "../Models.h"
 
-class BodyModel : public BodyDrawable
+class BodySphere : public BodyDrawable
 {
     public:
-        BodyModel(Models *m, glm::dvec3 pos, double mass);
-        virtual ~BodyModel();
+        BodySphere(Material m, glm::dvec3 pos, float radius, double mass);
+        virtual ~BodySphere();
 
         void draw(GraphicsEngine *ge) override;
 

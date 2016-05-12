@@ -24,8 +24,6 @@ public:
     virtual void load();
 
     Material getMaterial();
-    int getLight();
-    void assignLight(GLuint lightID);
 
 protected:
     Drawable(Material mat, bool indexed = true, bool visible = true);
@@ -56,7 +54,6 @@ private:
 
     bool indexed, visible;
     Material material;
-    int light = -1;
 };
 
 #endif // DRAWABLE_H

@@ -26,7 +26,7 @@
 #include "Models.h"
 #include "ObjModel.h"
 #include "PhysicsEngine.h"
-#include "BodyModel.h"
+#include "BodySphere.h"
 
 /**
 \file GraphicsEngine.h
@@ -54,7 +54,10 @@ private:
     GLenum mode;    ///< Mode, either point, line or fill.
     int sscount;    ///< Screenshot count to be appended to the screenshot filename.
 
-    std::vector<BodyDrawable*> objects;
+    std::vector<BodyDrawable*> bodies;
+    std::vector<Drawable*> objects;
+
+    BodyDrawable *selected = NULL; ///< Selected object.
 
     SphericalCamera sphcamera;   ///< Spherical Camera
     YPRCamera yprcamera;         ///< Yaw-Pitch-Roll Camera
@@ -117,6 +120,8 @@ public:
 
     void loadLight(Light Lt);
     void loadMaterial(Material Mat);
+
+    void rayCastSelect(float mx, float my);
 
     void turnLightOn();
     void turnLightOff();

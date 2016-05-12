@@ -23,6 +23,7 @@ SphericalCamera::SphericalCamera()
     r = 1;
     theta = 0;
     psi = 0;
+    center = {0, 0, 0};
 }
 
 /**
@@ -44,6 +45,17 @@ void SphericalCamera::setPosition(float R, float Theta, float Psi)
 }
 
 /**
+\brief Sets the center (focal point) of teh camera.
+
+\param center --- The position to set.
+
+*/
+void SphericalCamera::setCenter(glm::vec3 c)
+{
+    center = c;
+}
+
+/**
 \brief Returns the lookat matrix for the current position and line of sight to the origin.
 
 \return The lookat matrix for the current position and line of sight to the origin.
@@ -53,7 +65,6 @@ void SphericalCamera::setPosition(float R, float Theta, float Psi)
 glm::mat4 SphericalCamera::lookAt()
 {
     glm::vec3 eye = glm::vec3(r*cos(psi*deg)*cos(theta*deg),r*sin(psi*deg),r*cos(psi*deg)*sin(theta*deg));
-    glm::vec3 center = glm::vec3(0, 0, 0);
     glm::vec3 up = glm::vec3(0, 1, 0);
 
     return glm::lookAt(eye, center, up);
@@ -62,7 +73,9 @@ glm::mat4 SphericalCamera::lookAt()
 
 glm::vec3 SphericalCamera::getPosition()
 {
-    return glm::vec3(r*cos(psi*deg)*cos(theta*deg),r*sin(psi*deg),r*cos(psi*deg)*sin(theta*deg));
+    glm::vec3 orbit(r*cos(psi*deg)*cos(theta*deg),r*sin(psi*deg),r*cos(psi*deg)*sin(theta*deg));
+    glm::vec3 res = orbit + center;
+    return res;
 }
 
 /**

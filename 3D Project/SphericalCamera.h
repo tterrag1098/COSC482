@@ -33,10 +33,12 @@ private:
     float r;      ///< Radius of camera to origin.
     float theta;  ///< Theta rotation on the xz plane counter clockwise from positive x axis.
     float psi;    ///< Psi rotation from the xz plane to radial.
+    glm::vec3 center; ///< Center (focal point) of the camera.
 
 public:
     SphericalCamera();
     void setPosition(float R, float Theta, float Psi);
+    void setCenter(glm::vec3 center);
     glm::mat4 lookAt();
 
     glm::vec3 getPosition();

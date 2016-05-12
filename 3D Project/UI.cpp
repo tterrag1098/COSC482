@@ -94,6 +94,7 @@ void UI::processMouseMoved(sf::Event::MouseMoveEvent mouseMoveEvent)
 
     if (ge->isSphericalCameraOn() && mouseDown)
     {
+        if (LastPosition.x != mouseMoveEvent.x || LastPosition.y != mouseMoveEvent.y) dragging = true;
         if (ctrldown)
         {
             ge->getSphericalCamera()->addR((LastPosition.y - mouseMoveEvent.y)*0.25);
@@ -140,6 +141,14 @@ void UI::processMouseButtonReleased(sf::Event::MouseButtonEvent mouseButtonEvent
     if (mouseButtonEvent.button == sf::Mouse::Left)
     {
         mouseDown = false;
+        if (dragging)
+        {
+            dragging = false;
+        }
+        else
+        {
+            ge->rayCastSelect(mouseButtonEvent.x, mouseButtonEvent.y);
+        }
     }
 }
 

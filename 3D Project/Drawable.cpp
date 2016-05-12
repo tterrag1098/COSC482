@@ -123,16 +123,6 @@ Material Drawable::getMaterial()
     return material;
 }
 
-void Drawable::assignLight(GLuint lightID)
-{
-    light = lightID;
-}
-
-int Drawable::getLight()
-{
-    return light;
-}
-
 void Drawable::vert(glm::vec3 pos, glm::vec4 color, glm::vec2 uv)
 {
     verts.push_back(pos);

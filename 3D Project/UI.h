@@ -28,6 +28,7 @@ class UI
 private:
     GraphicsEngine* ge;  ///< Pointer to the GraphicsEngine that this processor is attached.
     bool mouseDown;      ///< Boolean tracking of the left mouse button.
+    bool dragging;       ///< Boolean tracking drag state.
 
     sf::Vector2i LastPosition;  ///< Last position of the mouse on the screen.
 
