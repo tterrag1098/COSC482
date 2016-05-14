@@ -12,13 +12,17 @@ Drawable::Drawable(Material mat, bool indexed, bool visible) : material(mat), in
             glGenBuffers(1, &eboptr);
         }
     }
+    else
+    {
+        vboptr = 0;
+    }
 }
 
 Drawable::Drawable(bool indexed) : Drawable(Materials::whitePlastic, indexed) {}
 
 Drawable::~Drawable()
 {
-    if (visible)
+    if (vboptr)
     {
         glBindVertexArray(vboptr);
         glDeleteBuffers(1, &bufptr);
@@ -117,12 +121,12 @@ void Drawable::draw(GraphicsEngine *ge)
     ge->setUseTexture(true);
 }
 
-glm::mat4 Drawable::getModelMat()
+glm::mat4 Drawable::getModelMat() const
 {
     return glm::mat4(1.0);
 }
 
-Material Drawable::getMaterial()
+Material Drawable::getMaterial() const
 {
     return material;
 }
@@ -153,4 +157,9 @@ void Drawable::index_quad(int count)
 GLuint Drawable::getDrawMode() const
 {
     return GL_TRIANGLES;
+}
+
+void Drawable::setVisible(bool vis)
+{
+    visible = vis;
 }

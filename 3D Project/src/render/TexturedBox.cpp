@@ -15,7 +15,7 @@ void TexturedBox::refresh()
 
 void TexturedBox::draw(GraphicsEngine *ge)
 {
-    ge->activateTexture(texId);
+    ge->activateTexture(texId, ge->uiShader);
     Box::draw(ge);
-    ge->activateTexture(-1);
+    ge->activateTexture(-1, ge->uiShader);
 }

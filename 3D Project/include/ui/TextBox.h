@@ -23,6 +23,9 @@ class TextBox : public Drawable, public Listener
         bool keyInput(InputContext ctx) override;
 
         std::string getText();
+        void setText(std::string text);
+
+        void setFilter(std::function<bool(char)> filter);
 
     protected:
     private:
@@ -36,6 +39,8 @@ class TextBox : public Drawable, public Listener
         int width, fontsize;
         std::string text;
         glm::vec4 textcolor;
+
+        std::function<bool(char)> filter;
 
         static constexpr int padY = 3;
         static constexpr int padX = 3;

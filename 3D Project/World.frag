@@ -78,14 +78,12 @@ void main()
     float deg = 0.017453292519943296;
 
     vec4 cc = vec4(0.0);
-    bool usingLights = false;
     vec4 globalAmbientPortion = Mat.ambient*GlobalAmbient;
 
     for (int i = 0; useLighting && i < numLights; i++)
     {
         if (Lt[i].on)
         {
-            usingLights = true;
             vec3 n = normalize(normal);
             vec3 l = normalize(vec3(Lt[i].position)-vec3(position));
             vec3 v = normalize(eye-vec3(position));
@@ -121,12 +119,10 @@ void main()
         }
     }
 
-    cc = min(cc + globalAmbientPortion + Mat.emission, vec4(1.0));
+	if (useLighting) cc = min(cc + globalAmbientPortion + Mat.emission, vec4(1.0));
+	else cc = color;
 
-    if (usingLights)
-        fColor = cc;
-    else
-        fColor = color;
+    fColor = cc;
 
 	if (useTexture)
 	{

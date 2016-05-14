@@ -19,11 +19,21 @@ public:
 
     void updateObjects();
 
+    void setSimulationSpeed(double speed);
+
+    void pauseUnpause(); ///< Toggles the pause state;
+    void setPaused(bool pause);
+    bool isPaused() const;
+
     void addBody(Body *b);
+    void removeBody(const Body *b);
+
 protected:
 private:
+    double simSpeed = 1;
+    bool paused = true;
+
     sf::Clock clock;
-    bool firstTick = true;
     void applyForce(Body *b1, Body *b2);
 
     std::vector<Body*> bodies;

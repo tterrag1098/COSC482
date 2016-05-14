@@ -113,12 +113,20 @@ public:
     void screenshotJPG();
     void resize();
     void setSize(unsigned int, unsigned int);
+
     void addBody(BodyDrawable* obj); ///< Adds a physics object to the world. Will be processed for lighting etc.
+    void removeBody(const BodyDrawable* obj); ///< Removes a physics object from the world.
+
     void addObject(Drawable* obj); ///< Adds a non-physics element to the world.
     void addUIElement(Drawable* obj); ///< Adds a static UI element to the screen. Will not be affected by camera movements or post processing.
-    GLuint loadTexture(std::string path);
-    void activateTexture(int texId);
+
+    void setSelected(BodyDrawable *obj); ///< Force sets the selected object.
+
+    GLuint loadTexture(std::string path, Shader activeShader);
+    void activateTexture(int texId, Shader activeShader);
     GLfloat* getScreenBounds();
+    const BodyDrawable* getSelectedBody() const;
+    PhysicsEngine* getPhysics() const;
 
     void updateModelMat(glm::mat4 modelMat);
     void setUseLighting(bool use);

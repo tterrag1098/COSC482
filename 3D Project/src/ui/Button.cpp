@@ -16,42 +16,41 @@ void Button::refresh()
         col_dark = temp;
     }
 
-    int in = 2 + (size / 12);
+    int in = 2 + (std::min(width, height) / 12);
 
     vert(pos, col_light);
     vert(pos + vec2(in, in), col_light);
-    vert(pos + vec2(size - in, in), col_light);
-    vert(pos + vec2(size, 0), col_light);
+    vert(pos + vec2(width - in, in), col_light);
+    vert(pos + vec2(width, 0), col_light);
 
-    vert(pos + vec2(size, 0), col_light);
-    vert(pos + vec2(size - in, in), col_light);
-    vert(pos + vec2(size - in, size - in), col_light);
-    vert(pos + vec2(size, size), col_light);
+    vert(pos + vec2(width, 0), col_light);
+    vert(pos + vec2(width - in, in), col_light);
+    vert(pos + vec2(width - in, height - in), col_light);
+    vert(pos + vec2(width, height), col_light);
 
-    vert(pos + vec2(size, size), col_dark);
-    vert(pos + vec2(size - in, size - in), col_dark);
-    vert(pos + vec2(in, size - in), col_dark);
-    vert(pos + vec2(0, size), col_dark);
+    vert(pos + vec2(width, height), col_dark);
+    vert(pos + vec2(width - in, height - in), col_dark);
+    vert(pos + vec2(in, height - in), col_dark);
+    vert(pos + vec2(0, height), col_dark);
 
-    vert(pos + vec2(0, size), col_dark);
-    vert(pos + vec2(in, size - in), col_dark);
+    vert(pos + vec2(0, height), col_dark);
+    vert(pos + vec2(in, height - in), col_dark);
     vert(pos + vec2(in, in), col_dark);
     vert(pos, col_dark);
 
     vert(pos + vec2(in, in), col_center);
-    vert(pos + vec2(size - in, in), col_center);
-    vert(pos + vec2(size - in, size - in), col_center);
-    vert(pos + vec2(in, size - in), col_center);
+    vert(pos + vec2(width - in, in), col_center);
+    vert(pos + vec2(width - in, height - in), col_center);
+    vert(pos + vec2(in, height - in), col_center);
 
     index_quad(5);
 }
 
 bool Button::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
-    if (ctx.event.x > pos.x && ctx.event.x < pos.x + size && ctx.event.y > pos.y && ctx.event.y < pos.y + size)
+    if (contains({ctx.event.x, ctx.event.y}))
     {
-        pressed = true;
-        load();
+        setPressed(true);
         return true;
     }
     return false;
@@ -61,8 +60,7 @@ bool Button::mouseReleased(ListenerContext<sf::Event::MouseButtonEvent> ctx)
 {
     if (pressed)
     {
-        pressed = false;
-        load();
+        setPressed(false);
         return true;
     }
     return false;
@@ -81,8 +79,22 @@ void Button::setCorner(glm::vec2 p)
 
 void Button::setPressed(bool p)
 {
+    if (p && pressed != p) fireCallbacks();
     pressed = p;
     load();
+}
+
+void Button::onPressed(std::function<void()>&& f)
+{
+    callbacks.push_back(f);
+}
+
+void Button::fireCallbacks()
+{
+    for (std::function<void()> f : callbacks)
+    {
+        f();
+    }
 }
 
 glm::vec2 Button::getCorner()
@@ -90,13 +102,18 @@ glm::vec2 Button::getCorner()
     return pos;
 }
 
-int Button::getSize()
+int Button::getWidth()
 {
-    return size;
+    return width;
+}
+
+int Button::getHeight()
+{
+    return height;
 }
 
 bool Button::contains(glm::vec2 p)
 {
-    bool ret = p.x > pos.x && p.x < pos.x + size && p.y > pos.y && p.y < pos.y + size;
+    bool ret = p.x > pos.x && p.x < pos.x + width && p.y > pos.y && p.y < pos.y + height;
     return ret;
 }

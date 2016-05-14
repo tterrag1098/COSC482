@@ -126,6 +126,8 @@ the SFML interface for OpenGL.
 
 int main()
 {
+    srand(time(0));
+
     sf::RenderWindow d;
     if (glewInit())
     {

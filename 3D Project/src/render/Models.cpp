@@ -22,7 +22,6 @@ Models::Models(Material mat) : Drawable(mat)
     lat = 0;
     dat = NULL;
     normals = NULL;
-    srand(static_cast<unsigned int>(clock()));
 
     vPosition = 0;
     vColor = 1;

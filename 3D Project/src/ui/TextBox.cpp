@@ -18,11 +18,18 @@ TextBox::TextBox(TextRendererTTF *t, glm::vec2 p, int w, int f, glm::vec4 bgc, g
     focused = false;
     clearSelection();
     clock.restart();
+
+    filter = [](char){ return true; };
 }
 
 TextBox::~TextBox()
 {
     delete bg;
+}
+
+void TextBox::setFilter(std::function<bool(char)> f)
+{
+    filter = f;
 }
 
 void TextBox::draw(GraphicsEngine *ge)
@@ -37,6 +44,7 @@ void TextBox::draw(GraphicsEngine *ge)
     Drawable::draw(ge);
 
     tr->setScreenSize(ge->getSize().x, ge->getSize().y);
+    tr->setColor(textcolor);
 
     int x = pos.x + padX;
     int y = ge->getSize().y - pos.y - fontsize - padY + 1;
@@ -55,9 +63,9 @@ void TextBox::draw(GraphicsEngine *ge)
         tr->setColor(glm::vec4(1.0f - textcolor.xyz(), 1));
         tr->draw(selected, x + tr->textWidth(before), y);
         tr->setColor(textcolor);
-
-        ge->uiShader.use();
     }
+
+    ge->uiShader.use();
 }
 
 void TextBox::refresh()
@@ -118,6 +126,18 @@ std::string TextBox::getSelected()
     return text.substr(selBegin, selEnd - selBegin);
 }
 
+std::string TextBox::getText()
+{
+    return text;
+}
+
+void TextBox::setText(std::string t)
+{
+    text = t;
+    clearSelection();
+    cursorPos = 0;
+}
+
 void TextBox::erase(bool forward)
 {
     if (selBegin != selEnd)
@@ -173,12 +193,13 @@ bool TextBox::mousePressed(ButtonContext ctx)
 
 bool TextBox::mouseMoved(MoveContext ctx)
 {
-    #ifdef COMPAT_WIN
     if (bg->contains({ctx.event.x, ctx.event.y}))
     {
+        #ifdef COMPAT_WIN
         SetCursor(LoadCursor(NULL, IDC_IBEAM));
+        #endif // COMPAT_WIN
+        return true;
     }
-    #endif // COMPAT_WIN
 
     if (focused && ctx.getUI()->isMouseDown())
     {
@@ -192,7 +213,10 @@ bool TextBox::mouseMoved(MoveContext ctx)
             selEnd = p2;
             load();
         }
+        return true;
     }
+
+    return false;
 }
 
 bool TextBox::keyPressed(KeyContext ctx)
@@ -232,6 +256,8 @@ bool TextBox::keyPressed(KeyContext ctx)
 bool TextBox::keyInput(InputContext ctx)
 {
     char c = ctx.event.unicode & 0xFF;
+    if (!filter(c)) return false;
+
     std::string in(&c);
     if (focused)
     {

@@ -53,7 +53,7 @@ bool Slider::mousePressed(ListenerContext<sf::Event::MouseButtonEvent> ctx)
     bool pressed = Listener::mousePressed(ctx);
     if (!pressed && bar->contains({ctx.event.x, ctx.event.y}))
     {
-        thumb->setCorner({ctx.event.x - (thumb->getSize() / 2), thumb->getCorner().y});
+        thumb->setCorner({ctx.event.x - (thumb->getWidth() / 2), thumb->getCorner().y});
         calculateValue();
         thumb->setPressed(true);
         pressed = true;
@@ -81,7 +81,7 @@ bool Slider::mouseMoved(ListenerContext<sf::Event::MouseMoveEvent> ctx)
         glm::vec2 lastPos = ctx.getUI()->getPrevMouseClick();
         glm::vec2 corner = thumb->getCorner();
         float move = pressPos.x + (mouse.x - lastPos.x);
-        corner.x = std::max(bar->getCorner().x, std::min(move, bar->getCorner().x + bar->getWidth() - thumb->getSize()));
+        corner.x = std::max(bar->getCorner().x, std::min(move, bar->getCorner().x + bar->getWidth() - thumb->getWidth()));
         calculateValue();
         thumb->setCorner(corner);
         return true;

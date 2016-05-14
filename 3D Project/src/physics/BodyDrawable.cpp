@@ -13,7 +13,7 @@ void BodyDrawable::applyForce(double tickDiff)
     trail.update(pos);
 }
 
-glm::mat4 BodyDrawable::getModelMat()
+glm::mat4 BodyDrawable::getModelMat() const
 {
     return glm::translate(Drawable::getModelMat(), glm::vec3(pos));
 }

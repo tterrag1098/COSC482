@@ -1,6 +1,7 @@
 #ifndef STRUCTS_H_INCLUDED
 #define STRUCTS_H_INCLUDED
 
+#define GLM_SWIZZLE
 #include "GL/glew.h"
 #include <random>
 #include <sstream>
@@ -91,6 +92,40 @@ inline void getPerpendicularEdge(vec2 p1, vec2 p2, float size, glm::vec2* vecs, 
         vecs[0] = p2 + lOff;
         vecs[1] = p2 + rOff;
     }
+}
+
+inline std::string printMass(double mass)
+{
+    std::stringstream ret;
+    ret << std::setprecision(3);
+
+    if (mass < 1000)
+    {
+        ret << mass << " Thousand";
+    }
+    else if (mass < 1000000)
+    {
+        ret << mass/1000 << " Million";
+    }
+    else if (mass < 1e9)
+    {
+        ret << mass/1e6 << " Billion";
+    }
+    else if (mass < 1e12)
+    {
+        ret << mass/1e9 << " Trillion";
+    }
+    else if (mass < 1e15)
+    {
+        ret << mass/1e12 << " Quadrillion";
+    }
+    else
+    {
+        ret << mass/1e15 << " Quintillion";
+    }
+
+    ret << " kg";
+    return ret.str();
 }
 
 #endif // STRUCTS_H_INCLUDED

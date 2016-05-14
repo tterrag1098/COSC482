@@ -16,7 +16,7 @@ public:
     void assignLight(GLuint lightID);
 protected:
 
-    glm::mat4 getModelMat() override;
+    glm::mat4 getModelMat() const override;
     GLuint getDrawMode() const override;
 
 private:

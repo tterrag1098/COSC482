@@ -4,13 +4,13 @@ in vec4 color;
 in vec2 tex_coord;
 
 uniform sampler2D tex;
-uniform bool useTex;
+uniform bool useTexture;
 
 out vec4 fColor;
 
 void main()
 {
-    if (useTex)
+    if (useTexture)
         fColor = texture(tex, tex_coord);
     else
         fColor = color;

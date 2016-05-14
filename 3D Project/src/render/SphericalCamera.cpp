@@ -39,9 +39,9 @@ SphericalCamera::SphericalCamera()
 
 void SphericalCamera::setPosition(float R, float Theta, float Psi)
 {
-    r = R;
-    theta = Theta;
-    psi = Psi;
+    setR(R);
+    setTheta(Theta);
+    setPsi(Psi);
 }
 
 /**
@@ -69,7 +69,6 @@ glm::mat4 SphericalCamera::lookAt()
 
     return glm::lookAt(eye, center, up);
 }
-
 
 glm::vec3 SphericalCamera::getPosition()
 {
@@ -113,8 +112,8 @@ void SphericalCamera::addTheta(float num)
 void SphericalCamera::addPsi(float num)
 {
     psi += num;
-    if (psi > 90) psi = 90;
-    if (psi < -90) psi = -90;
+    if (psi > 89.99f) psi = 89.99f;
+    if (psi < -89.99f) psi = -89.99f;
 }
 
 /**
@@ -154,8 +153,8 @@ void SphericalCamera::setTheta(float num)
 void SphericalCamera::setPsi(float num)
 {
     psi = num;
-    if (psi > 90) psi = 90;
-    if (psi < -90) psi = -90;
+    if (psi > 89.99f) psi = 89.99f;
+    if (psi < -89.99f) psi = -89.99f;
 }
 
 /**

@@ -17,32 +17,37 @@ void Body::applyForce(double tickDiff)
     force *= 0; // Clear out applied forces
 }
 
-float Body::getRadius()
+float Body::getRadius() const
 {
     return radius;
 }
 
-glm::vec3 Body::getPosF()
+glm::vec3 Body::getPosF() const
 {
     return glm::vec3(getPos());
 }
 
-glm::dvec3 Body::getPos()
+glm::dvec3 Body::getPos() const
 {
     return pos;
 }
 
-glm::dvec3& Body::getVelocity()
+glm::dvec3 Body::getVelocity() const
 {
     return vel;
 }
 
-glm::dvec3& Body::getForce()
+void Body::setVelocity(glm::dvec3 v)
+{
+    vel = v;
+}
+
+glm::dvec3 Body::getForce() const
 {
     return force;
 }
 
-double Body::getMass()
+double Body::getMass() const
 {
     return mass;
 }

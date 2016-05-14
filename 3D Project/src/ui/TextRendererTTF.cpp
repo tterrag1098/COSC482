@@ -196,6 +196,11 @@ void TextRendererTTF::setScreenSize(GLuint w, GLuint h)
     ScreenHeight = h;
 }
 
+void TextRendererTTF::setScreenSize(sf::Vector2u size)
+{
+    setScreenSize(size.x, size.y);
+}
+
 /**
 \brief Sets the color of the font.
 

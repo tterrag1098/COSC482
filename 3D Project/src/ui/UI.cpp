@@ -2,6 +2,8 @@
 #include "Listeners.h"
 #include "Button.h"
 #include "TextBox.h"
+#include "BodyInfo.h"
+#include "SimulationControl.h"
 
 /**
 \file UI.cpp
@@ -28,10 +30,19 @@ UI::UI(GraphicsEngine* graph)
     mouseDown = false;
 
     tr = new TextRendererTTF("assets/arial.ttf");
-
+/*
     TextBox *text = new TextBox(getTextRenderer(), {10, 10}, 500, 30);
     ge->addUIElement(text);
     addListener(text);
+*/
+
+    BodyInfo *info = new BodyInfo(this, {10, 10});
+    ge->addUIElement(info);
+    addListener(info);
+
+    SimulationControl *control = new SimulationControl(this, {10, 100});
+    ge->addUIElement(control);
+    addListener(control);
 
 /*
     std::vector<Button*> tests = {new Button({100, 160}, 10), new Button({120, 160}, 20), new Button({160, 160}, 40), new Button({240, 160}, 80)};
@@ -495,5 +506,12 @@ void UI::keyboardStateProcessingYPRCamera()
 /** \brief Handles mouse scrolling, and zooms the camera accordingly */
 void UI::processMouseScrolled(sf::Event::MouseWheelEvent event)
 {
-
+    if (ge->isSphericalCameraOn())
+    {
+        ge->getSphericalCamera()->addR(-event.delta * 0.1f * ge->getSphericalCamera()->getR());
+    }
+    else
+    {
+        ge->getYPRCamera()->moveForward(-event.delta);
+    }
 }

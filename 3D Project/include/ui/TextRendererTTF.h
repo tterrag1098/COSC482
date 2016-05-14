@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <SFML/System/Vector2.hpp>
 
 #include "Shader.h"
 
@@ -115,6 +116,8 @@ public:
     ~TextRendererTTF();
 
     void setScreenSize(GLuint w, GLuint h);
+    void setScreenSize(sf::Vector2u size);
+
     void setColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
     void setColor(GLfloat c[4]);
     void setColor(glm::vec4 col);

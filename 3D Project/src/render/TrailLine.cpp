@@ -2,9 +2,9 @@
 
 TrailLine::TrailLine() : Drawable(Materials::fullbright, false)
 {
-    clock.restart();
     useLighting = false;
     useTexture = false;
+    color = to_rgb({rand_float(), 0.7f, 1, 1}).rgb();
 }
 
 TrailLine::~TrailLine() {}
@@ -13,13 +13,13 @@ void TrailLine::update(glm::dvec3 pos)
 {
     bool pathUpdated = false;
 
-    if (path.empty() || glm::distance(path.front().pos, pos) > 0.1)
+    if (path.empty() || glm::distance(path.front(), pos) > 0.1)
     {
-        path.push_front({pos, clock.getElapsedTime().asMilliseconds()});
+        path.push_front(pos);
         pathUpdated = true;
     }
 
-    while (!path.empty() && clock.getElapsedTime().asMilliseconds() - path.back().timestamp > PATH_TIMEOUT)
+    while (!path.empty() && path.size() > MAX_SEGMENTS)
     {
         path.pop_back();
         pathUpdated = true;
@@ -33,12 +33,13 @@ void TrailLine::update(glm::dvec3 pos)
 
 void TrailLine::refresh()
 {
-    for (PathPoint p : path)
+    for (int i = 0; i < path.size(); i++)
     {
-        float age = (clock.getElapsedTime().asMilliseconds() - p.timestamp) / PATH_TIMEOUT;
-        float a = 1 - (3 * age * age) + 2;
+        float age = (float) i / MAX_SEGMENTS;
+        float fadein = i / 40.0f;
+        float a = fadein <= 1.0f ? ((fadein + 1) * (fadein + 1)) - 1 : 1 - (3 * age * age) + 2;
         a = std::min(1.0f, a);
-        vert(glm::vec3(p.pos), glm::vec4(1, 1, 1, a));
+        vert(glm::vec3(path[i]), glm::vec4(color, a));
     }
 }
 

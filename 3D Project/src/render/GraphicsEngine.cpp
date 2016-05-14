@@ -105,13 +105,28 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     addBody(star);
     pe->addBody(star);
 
-    BodySphere *earth = new BodySphere(Materials::whitePlastic, {-15, 0, 0}, 0.3, 1e10);
-    earth->getVelocity().z = 7;
-    addBody(earth);
-    pe->addBody(earth);
+    BodySphere *earth1 = new BodySphere(Materials::whitePlastic, {-10, 0, -5}, 0.3, 1e10);
+    earth1->setVelocity({0, 0.5, 7});
+    addBody(earth1);
+    pe->addBody(earth1);
+
+    BodySphere *earth2 = new BodySphere(Materials::whitePlastic, {6, 0, -8}, 0.3, 1e10);
+    earth2->setVelocity({-8, -0.8, 0});
+    addBody(earth2);
+    pe->addBody(earth2);
+
+    BodySphere *earth3 = new BodySphere(Materials::whitePlastic, {12, 0, 4}, 0.3, 1e10);
+    earth3->setVelocity({0, 0.5, -6});
+    addBody(earth3);
+    pe->addBody(earth3);
+
+    BodySphere *earth4 = new BodySphere(Materials::whitePlastic, {0, 0, 15}, 0.3, 1e10);
+    earth4->setVelocity({7, -0.5, 0});
+    addBody(earth4);
+    pe->addBody(earth4);
 
     BodySphere *moon = new BodySphere(Materials::whitePlastic, {-15 - 0.5, 0, 0}, 0.1, 1e5);
-    moon->getVelocity().z = 8;
+    moon->setVelocity({0, 0.6, 8});
     addBody(moon);
     pe->addBody(moon);
 
@@ -147,17 +162,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    if (SetVS)
-    {
-        setVerticalSyncEnabled(true);
-        setFramerateLimit(60);
-    }
-    else
-    {
-        setVerticalSyncEnabled(false);    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
-
-        setFramerateLimit(0);
-    }
+    setFramerateLimit(0);
+    setVerticalSyncEnabled(false);
 
     //mat = Materials::redPlastic;
     //mat = Materials::bluePlastic;
@@ -168,7 +174,7 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glm::vec4 GlobalAmbient(0.2, 0.2, 0.2, 1);
     glUniform4fv(glGetUniformLocation(fboShader.program, "GlobalAmbient"), 1, glm::value_ptr(GlobalAmbient));
 
-    CMSphere.createSphereOBJ(10000, 20, 20);
+    CMSphere.createSphereOBJ(100000, 40, 40);
     CMSphere.load(0, 1, 2, 3);
 
     model = glm::mat4(1.0);
@@ -263,19 +269,44 @@ Currently empty, no allocated memory to clear.
 
 GraphicsEngine::~GraphicsEngine() {}
 
-void GraphicsEngine::activateTexture(int texId)
+GLuint GraphicsEngine::loadTexture(std::string path, Shader activeShader)
 {
-    fboShader.use();
+    sf::Image texture;
+    bool texloaded = texture.loadFromFile(path);
 
+    if (!texloaded)
+    {
+        std::cerr << "Could not load texture." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    GLuint texID;
+    glGenTextures(1, &texID);
+    glUniform1i(glGetUniformLocation(activeShader.program, "tex"), 1);
+
+    //  Load the texture into texture memory.
+    glBindTexture(GL_TEXTURE_2D, texID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    return texID;
+}
+
+void GraphicsEngine::activateTexture(int texId, Shader activeShader)
+{
     if (texId >= 0)
     {
         glActiveTexture(GL_TEXTURE0+1);
-        glUniform1i(useTextureLoc, 1);
+        glUniform1i(glGetUniformLocation(activeShader.program, "useTexture"), 1);
         glBindTexture(GL_TEXTURE_2D, texId);
     }
     else
     {
-        glUniform1i(useTextureLoc, 0);
+        glUniform1i(glGetUniformLocation(activeShader.program, "useTexture"), 0);
     }
 }
 
@@ -305,6 +336,15 @@ void GraphicsEngine::addBody(BodyDrawable *obj)
     }
 }
 
+void GraphicsEngine::removeBody(const BodyDrawable *obj)
+{
+    bodies.erase(std::find(bodies.begin(), bodies.end(), obj));
+    if (obj->getLight() >= 0)
+    {
+        turnLightOff("Lt", obj->getLight());
+    }
+}
+
 void GraphicsEngine::addObject(Drawable *obj)
 {
     objects.push_back(obj);
@@ -315,6 +355,16 @@ void GraphicsEngine::addUIElement(Drawable *obj)
 {
     ui.push_back(obj);
     obj->load();
+}
+
+const BodyDrawable* GraphicsEngine::getSelectedBody() const
+{
+    return selected;
+}
+
+PhysicsEngine* GraphicsEngine::getPhysics() const
+{
+    return pe;
 }
 
 /**
@@ -499,6 +549,11 @@ void GraphicsEngine::rayCastSelect(float mx, float my)
     }
 }
 
+void GraphicsEngine::setSelected(BodyDrawable *obj)
+{
+    selected = obj;
+}
+
 /**
 \brief Changes the fill and line mode being used.
 
@@ -564,7 +619,7 @@ void GraphicsEngine::resize()
     float h = getSize().y;
 
     glViewport(0, 0, getSize().x, getSize().y);
-    projection = glm::perspective(50.0f*degf, w/h, 0.01f, 100000.0f);
+    projection = glm::perspective(50.0f*degf, w/h, 0.1f, 200000.0f);
 
     uiShader.use();
     glm::mat4 uiProj = glm::ortho(0.0f, w, h, 0.0f);

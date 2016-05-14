@@ -1,5 +1,6 @@
 #include "PhysicsEngine.h"
 #include <iostream>
+#include <algorithm>
 
 PhysicsEngine::PhysicsEngine()
 {
@@ -14,12 +15,36 @@ void PhysicsEngine::addBody(Body *b)
     bodies.push_back(b);
 }
 
+void PhysicsEngine::removeBody(const Body *b)
+{
+    bodies.erase(std::find(bodies.begin(), bodies.end(), b));
+}
+
+void PhysicsEngine::setSimulationSpeed(double speed)
+{
+    simSpeed = speed;
+}
+
+void PhysicsEngine::pauseUnpause()
+{
+    setPaused(!isPaused());
+}
+
+void PhysicsEngine::setPaused(bool pause)
+{
+    paused = pause;
+}
+
+bool PhysicsEngine::isPaused() const
+{
+    return paused;
+}
+
 void PhysicsEngine::updateObjects()
 {
-    if (firstTick)
+    if (paused)
     {
         clock.restart();
-        firstTick = false;
         return;
     }
 
@@ -32,7 +57,7 @@ void PhysicsEngine::updateObjects()
             applyForce(b1, b2);
         }
     }
-    double time = clock.getElapsedTime().asMilliseconds() / 2000.0;
+    double time = clock.getElapsedTime().asMilliseconds() / (1000 / simSpeed);
     for (Body *b : bodies)
     {
         b->applyForce(time);
