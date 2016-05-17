@@ -81,10 +81,8 @@ private:
 
     GLuint worldFbo;
     GLuint screenVao;
-    GLuint fboTex[2];
+    GLuint fboTex;
     GLuint rbo;
-    GLuint pingpongFBO[2];
-    GLuint pingpongBuffer[2];
 
     GLint tempHolder; ///< Temporary holder value for glGet calls.
 
@@ -110,7 +108,6 @@ public:
     Shader screenShader;   ///< ID of the post-processing shader.
     Shader cmShader;       ///< ID of the cube map shader program.
     Shader uiShader;       ///< ID of the ui passthrough shader.
-    Shader blurShader;     ///< ID of the gaussian blur shader.
 
     GLuint uiProjLoc;      ///< Location ID of the UI projection matrix uniform.
 
