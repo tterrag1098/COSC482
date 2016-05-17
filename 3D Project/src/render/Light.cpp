@@ -15,7 +15,7 @@
 
 */
 
-Light::Light() {}
+Light::Light() : Light(false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) {}
 
 /**
 \brief Constructor

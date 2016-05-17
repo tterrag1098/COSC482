@@ -22,7 +22,6 @@
 #include "Material.h"
 #include "Light.h"
 #include "Models.h"
-#include "ObjModel.h"
 #include "PhysicsEngine.h"
 #include "BodySphere.h"
 
@@ -90,10 +89,6 @@ private:
 
     void screenshot(std::string ext);
     void printOpenGLErrors();
-    void print_GLM_Matrix(glm::mat4 m);
-    void print_GLM_Matrix(glm::mat3 m);
-
-
 
 public:
     GraphicsEngine(std::string, GLint, GLint);
@@ -119,6 +114,7 @@ public:
     void setSize(unsigned int, unsigned int);
 
     void addBody(BodyDrawable* obj); ///< Adds a physics object to the world. Will be processed for lighting etc.
+    void updateLight(BodyDrawable *obj); ///< Updates the lighting information of a body.
     void removeBody(const BodyDrawable* obj); ///< Removes a physics object from the world.
 
     void addObject(Drawable* obj); ///< Adds a non-physics element to the world.

@@ -35,9 +35,9 @@ There are several dependencies needed to use this class,
 - LoadShaders.h and LoadShaders.cpp to be compiled into the project.
 - GLEW
 
-\author    Guus Sliepen, Sylvain Beucler, and Don Spickler
-\version   1.1
-\date      Written: 1/15/2016  <BR> Revised: 1/15/2016
+\author    Guus Sliepen, Sylvain Beucler, Don Spickler, and Garrett Spicer-Davis
+\version   1.2
+\date      Written: 1/15/2016  <BR> Revised: 5/16/2016
 
 */
 

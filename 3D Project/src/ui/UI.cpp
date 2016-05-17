@@ -13,9 +13,9 @@
 \file UI.cpp
 \brief User interface processor for the program.
 
-\author    Don Spickler
-\version   1.1
-\date      Written: 3/22/2016  <BR> Revised: 3/22/2016
+\author    Don Spickler & Garrett Spicer-Davis
+\version   1.2
+\date      Written: 3/22/2016  <BR> Revised: 5/16/2016
 
 */
 
@@ -40,6 +40,8 @@ UI::UI(GraphicsEngine* graph)
     addListener(text);
 */
 
+    // Load UI elements
+
     BodyInfo *info = new BodyInfo(this, {10, 10}, ge->getBodies());
     ge->addUIElement(info);
     addListener(info);
@@ -61,6 +63,7 @@ UI::UI(GraphicsEngine* graph)
     ge->addUIElement(hide);
     addListener(hide);
     hide->onPressed([hide, info, props, control]{
+        // Toggle all visibilities and move this button
         info->setVisible(!info->isVisible());
         props->setVisible(!props->isVisible());
         control->setVisible(!control->isVisible());
@@ -133,8 +136,7 @@ void UI::processEvents()
     while (ge->pollEvent(event))
     {
         // Close Window or Escape Key Pressed: exit
-        if (event.type == sf::Event::Closed ||
-                (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+        if (event.type == sf::Event::Closed)
             ge->close();
 
         // Key is pressed.
@@ -271,25 +273,6 @@ void UI::processMouseButtonReleased(sf::Event::MouseButtonEvent mouseButtonEvent
 
 \param keyevent --- The SFML key code for the key pressed.
 
-\remark
-
-- Number keys: Selects the material
-- Model Selection:
-    - Z - Teapot
-    - X - Sphere
-    - C - Torus
-    - V - Trefoil
-    - B - Umbilic Torus
-    - N - Braided Torus
-    - M - Helical Torus
-    - L - Mobius Strip
-    - K - Tessellated Wall - 1x1
-    - J - Tessellated Wall - 20x20
-
-- R: Resets the window size to 700 X 500.
-- A: Resets the window size to 600 X 600.
-- F7: Activates the basic shader.
-- F8: Activates the halfway shader.
 - F9: Saves a screen shot of the graphics window to a png file.
 - F10: Saves a screen shot of the graphics window to a jpeg file.
 - F11: Turns on the spherical camera.
@@ -329,14 +312,6 @@ void UI::keyPressed(sf::Event::KeyEvent keyevent)
 
     case sf::Keyboard::M:
         ge->changeMode();
-        break;
-
-    case sf::Keyboard::R:
-        ge->setSize(700, 500);
-        break;
-
-    case sf::Keyboard::A:
-        ge->setSize(600, 600);
         break;
 
     default:

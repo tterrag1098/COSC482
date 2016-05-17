@@ -11,8 +11,8 @@
 \file Material.h
 \brief Header file for Material.cpp
 
-\author    Don Spickler
-\version   1.1
+\author    Don Spickler & Garrett Spicer-Davis
+\version   1.2
 \date      Written: 2/28/2016  <BR> Revised: 2/28/2016
 
 */
@@ -21,6 +21,8 @@
 \class Material
 
 \brief The Material class is simply a class for holding Phong model material properties.
+
+This version of Material uses textures for diffuse and specular, rather than a flat color.
 
 */
 

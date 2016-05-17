@@ -9,23 +9,33 @@
 #include "UI.h"
 
 /**
-\mainpage Wavefront Simple OBJ File Loader
+\mainpage N-Body Simulator
 
 \tableofcontents
 
 \section intro Introduction
 
-This example shows how to load a simple Wavefront obj file.  In addition,
-it uses several light sources and several textures, including a cube map
-drawn on a sphere, of a starfield.  The GraphicsEngine.cpp file has several
-commented lines of code that will allow the user to quickly make updates
-to the scene and the properties of the materials, lights, and textures.
+This program is a 3D simulator that represents planetary systems with N-body gravitational equations.
 
-\author    Don Spickler
-\version   1.1
-\date      Written: 4/10/2016  <BR> Revised: 4/10/2016
+It allows the user to define their own planetary bodies, each with unique properties, then watch the result of the simulation.
+
+\author    Garrett Spicer-Davis
+\version   1.0
+\date      Written: 5/16/2016
 
 \section usage Usage
+
+To select a body, simply click on it.
+
+Once a body is selected, it can be edited using the pane on the left, and the changes can be applied with the "Apply" button.
+It can also be deleted using the "Delete" button in the top section.
+
+To deselect a body, click in empty space.
+
+With no body selected, a new body can be added. Use the many options on the left to configure the new body.
+A ghost body will be shown representing what the new body will look like once created.
+
+On the center of the left pane, the simulation speed can be changed, and the simulation can be paused and started.
 
 \subsection run Running the Program
 
@@ -33,22 +43,11 @@ to the scene and the properties of the materials, lights, and textures.
 
 \subsection options User Options
 
-- Escape:  Ends the program.
 - M: Toggles between fill mode and line mode to draw the triangles.
-- R: Resets the window size to 700 X 500.
-- A: Resets the window size to 600 X 600.
-- X: Toggles the graphing of the axes.
 - F9: Saves a screen shot of the graphics window to a png file.
 - F10: Saves a screen shot of the graphics window to a jpeg file.
 - F11: Turns on the spherical camera.
 - F12: Turns on the yaw-pitch-roll camera.
-
-- Alt+Left: Increases the light's theta value.
-- Alt+Right: Decreases the light's theta value.
-- Alt+Up: Increases the light's psi value.
-- Alt+Down: Decreases the light's psi value.
-- Alt+Ctrl+Up: Decreases the light's radius.
-- Alt+Ctrl+Down: Increases the light's radius.
 
 If the spherical camera is currently selected,
 
@@ -78,12 +77,7 @@ If the yaw-pitch-roll camera is currently selected,
 
 If the spherical camera is currently selected, a click and drag with the left mouse
 button will alter the theta and psi angles of the spherical camera to give the impression
-of the mouse grabbing and moving the coordinate system.
-
-\note Note that the shader programs "VertexShaderLightingTexture.glsl" and "PhongMultipleLightsAndTexture.glsl"
-are expected to be in the same folder as the executable.  Your graphics card must also be
-able to support OpenGL version 3.3 to run this program.
-
+of the mouse grabbing and moving the coordinate system. Scrolling will zoom in and out.
 
 ---
 
@@ -107,9 +101,9 @@ of their respective owners.  USE OF THIS SOFTWARE INDICATES THAT YOU AGREE TO TH
 This is the main program driver that sets up the graphics engine, the user interface
 class, and links the two.
 
-\author    Don Spickler
-\version   1.1
-\date      Written: 2/28/2016  <BR> Revised: 2/28/2016
+\author    Don Spickler & Garrett Spicer-Davis
+\version   1.2
+\date      Written: 2/28/2016  <BR> Revised: 5/16/2016
 
 */
 

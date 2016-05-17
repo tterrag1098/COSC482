@@ -21,9 +21,11 @@ BodyProperties::BodyProperties(UI *ui, BodyInfo *i, glm::vec2 p) : GuiBase(ui, p
 
     pos.y += linesize;
     tMass = new TextBox(tr, pos, 150, fontsize);
+    tMass->setFilter([](char c){ return isdigit(c) || c == '.'; });
 
     pos.y += linesize;
     tRadius = new TextBox(tr, pos, 150, fontsize);
+    tRadius->setFilter([](char c){ return isdigit(c) || c == '.'; });
 
     pos.y += linesize*2;
     tPickerCenter = new TypePicker<BodyDrawable>(tr, pos, 150, fontsize, ui->getEngine()->getBodies());
@@ -32,33 +34,41 @@ BodyProperties::BodyProperties(UI *ui, BodyInfo *i, glm::vec2 p) : GuiBase(ui, p
     tOrbitRadius = new TextBox(tr, pos, 150, fontsize);
     tOrbitRadius->setText("10");
 
+    std::function<bool(char)> filter = [](char c){ return isdigit(c) || c == '.' || c == '-'; };
+
     pos.y += linesize;
     tOrbitLat = new TextBox(tr, pos, 150, fontsize);
     tOrbitLat->setText("0");
+    tOrbitLat->setFilter(filter);
 
     pos.y += linesize;
     tOrbitLong = new TextBox(tr, pos, 150, fontsize);
     tOrbitLong->setText("0");
+    tOrbitLong->setFilter(filter);
 
     pos.y += linesize;
     tVelX = new TextBox(tr, pos, 150, fontsize);
     tVelX->setText("0");
+    tVelX->setFilter(filter);
 
     pos.y += linesize;
     tVelY = new TextBox(tr, pos, 150, fontsize);
     tVelY->setText("0");
+    tVelY->setFilter(filter);
 
     pos.y += linesize;
     tVelZ = new TextBox(tr, pos, 150, fontsize);
     tVelZ->setText("0");
+    tVelZ->setFilter(filter);
 
     apply = new TextButton(pos, tr, "Apply", fontsize);
     apply->setCorner({p.x + (width / 2) - (apply->getWidth() / 2), p.y + hshort - padding - apply->getHeight()});
-    apply->onPressed([this]{
+    apply->onPressed([this, ui]{
         prevSel->setName(tName->getText());
         prevSel->setType(tPickerBody->getSelected());
         prevSel->setMass(tMass->getDouble());
         prevSel->setRadius(tRadius->getDouble());
+        ui->getEngine()->updateLight(prevSel);
     });
 
     apply->load();

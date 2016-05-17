@@ -15,9 +15,9 @@
 \file Models.h
 \brief Header file for Models.cpp
 
-\author    Don Spickler
-\version   1.1
-\date      Written: 2/28/2016  <BR> Revised: 2/28/2016
+\author    Don Spickler & Garrett Spicer-Davis
+\version   1.2
+\date      Written: 2/28/2016  <BR> Revised: 5/16/2016
 
 */
 

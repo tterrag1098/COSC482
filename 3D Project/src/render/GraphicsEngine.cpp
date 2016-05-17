@@ -44,6 +44,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     cmShader(Shader("CubeMap.vert", "CubeMap.frag")),
     uiShader(Shader("Passthrough.vert", "Passthrough.frag"))
 {
+    std::cout << "Creating GL Objects..." << std::endl;
+
     uiShader.use();
     uiProjLoc = glGetUniformLocation(uiShader.program, "Projection");
 
@@ -95,6 +97,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
 
     pe = new PhysicsEngine();
 
+    std::cout << "Loading Materials..." << std::endl;
+
     STAR->mat = Material(loadTexture("assets/sun.jpg", fboShader), loadTexture("assets/sun_spec.jpg", fboShader), 0.75f, 0.75f, 0.75f, 1, 0.2f);
     EARTH->mat = Material(loadTexture("assets/earth.jpg", fboShader), loadTexture("assets/earth_spec.jpg", fboShader), 0, 0, 0, 0, 20);
     MOON->mat = Material(loadTexture("assets/moon.jpg", fboShader), loadTexture("assets/moon_spec.jpg", fboShader), 0, 0, 0, 0, 10);
@@ -107,6 +111,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     ALIEN2->mat = Material(loadTexture("assets/alien2.jpg", fboShader), loadTexture("assets/alien2_spec.jpg", fboShader), 0, 0, 0, 0, 30);
 
     ghost = new GhostPlanet();
+
+    std::cout << "Loading Default System..." << std::endl;
 
     BodySphere *star = new BodySphere("Sun", STAR, {0, 0, 0}, 3, 1e13);
     addBody(star);
@@ -197,38 +203,18 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(nM));
     glUniformMatrix3fv(NormalLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
-//  Texture transformation matrix experiments
+    //  Texture transformation matrix experiments
     textrans = glm::mat4(1.0);
-//    textrans = glm::rotate(textrans, 45*degf, glm::vec3(0, 0, 1));
-//    textrans = glm::translate(textrans, glm::vec3(0.5, 0.25, 0));
-//    textrans = glm::scale(textrans, glm::vec3(2, 2, 1));
-
-    sf::Image texture;
-    std::string filename;
-
-    glGenTextures(6, texID);
-    filename = "assets/earth.jpg";
-
-    if (!texture.loadFromFile(filename))
-        std::cerr << "Could not load texture: " << filename << std::endl;
 
     //  Link the texture to the shader.
     GLuint tex1_uniform_loc = glGetUniformLocation(fboShader.program, "tex");
     glUniform1i(tex1_uniform_loc, 0);
 
-    //  Load the texture into texture memory.
-    glBindTexture(GL_TEXTURE_2D, texID[0]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    std::cout << "Loading Cubemap Textures..." << std::endl;
 
     cmShader.use();
 
     glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
-
 
     //  Load in Cube Map
     glUniform1i(glGetUniformLocation(cmShader.program, "cmtex"), 0);
@@ -244,6 +230,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    sf::Image texture;
 
     texture.loadFromFile("assets/skybox_left.png");
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, texture.getSize().x, texture.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr());
@@ -280,6 +268,8 @@ GraphicsEngine::~GraphicsEngine() {}
 GLuint GraphicsEngine::loadTexture(std::string path, Shader activeShader)
 {
     sf::Image texture;
+
+    std::cout << "Loading texture from file: " << path << std::endl;
     bool texloaded = texture.loadFromFile(path);
 
     if (!texloaded)
@@ -329,9 +319,17 @@ void GraphicsEngine::addBody(BodyDrawable *obj)
     bodies.push_back(obj);
 
     fboShader.use();
+    updateLight(obj);
+}
 
-    if (obj->getMaterial().getEmission().xyz() != glm::vec3(0, 0, 0))
+void GraphicsEngine::updateLight(BodyDrawable *obj)
+{
+    bool emissive = obj->getMaterial().getEmission().xyz() != glm::vec3(0, 0, 0);
+    bool hadlight = obj->getLight() >= 0;
+
+    if (emissive)
     {
+        // Recalculate lighting strength
         glm::vec4 e = obj->getMaterial().getEmission();
         Light lt;
         lt.setLight(true,
@@ -342,10 +340,24 @@ void GraphicsEngine::addBody(BodyDrawable *obj)
                 e,
                 180.0, 0.0,
                 glm::vec3(1.0, 0.0, 0.0)
-            );
-        obj->assignLight(nextLight);
-        LoadLight(lt, "Lt", nextLight++);
-        glUniform1i(glGetUniformLocation(fboShader.program, "numLights"), nextLight);
+        );
+        // If object does not yet have a light ID, generate it one
+        if (!hadlight)
+        {
+            obj->assignLight(nextLight);
+            LoadLight(lt, "Lt", nextLight++);
+            glUniform1i(glGetUniformLocation(fboShader.program, "numLights"), nextLight);
+        }
+        // Otherwise, update its current ID
+        else
+        {
+            LoadLight(lt, "Lt", obj->getLight());
+        }
+    }
+    else if (hadlight)
+    {
+        // Load a dummy light which is defaulted to off
+        LoadLight(Light(), "Lt", obj->getLight());
     }
 }
 
@@ -401,6 +413,7 @@ void GraphicsEngine::display()
 {
     pe->updateObjects();
 
+    // Limit camera to sensible area
     sphcamera.setCenter(selected ? selected->getPosF() : glm::vec3(0));
     sphcamera.setR(std::min(10000.0f, sphcamera.getR()));
     if (selected)
@@ -409,6 +422,8 @@ void GraphicsEngine::display()
     }
 
     glActiveTexture(GL_TEXTURE0);
+
+    // Draw entire scene to an FBO for post-processing (mostly unused)
 
     // First pass
     glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
@@ -454,6 +469,8 @@ void GraphicsEngine::display()
     }
 
     // Drawing pass
+
+    // Draw physics objects
     for (BodyDrawable* obj : bodies)
     {
         loadMaterial(obj->getMaterial());
@@ -465,6 +482,8 @@ void GraphicsEngine::display()
         obj->draw(this);
     }
 
+
+    // Draw the ghost planet with culling to avoid blending issues
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     loadMaterial(ghost->getMaterial());
@@ -476,6 +495,7 @@ void GraphicsEngine::display()
     glFrontFace(GL_CCW);
     glDisable(GL_CULL_FACE);
 
+    // Draw non-physics objects
     for (Drawable *d : objects)
     {
         d->draw(this);
@@ -487,6 +507,8 @@ void GraphicsEngine::display()
     screenShader.use();
 
     // Second pass
+
+    // Bind and draw FBO
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -499,6 +521,7 @@ void GraphicsEngine::display()
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 
+    // Draw UI elements
     uiShader.use();
     for (Drawable *d : ui)
     {
@@ -533,6 +556,12 @@ void GraphicsEngine::setFullbright(bool fb)
     glUniform1i(glGetUniformLocation(fboShader.program, "fullbright"), fb);
 }
 
+/**
+\brief Selects an object based on mouse coords
+
+Casts a ray based on the passed click coordinates and sets the selected object to the closest
+collision to the camera.
+*/
 void GraphicsEngine::rayCastSelect(float mx, float my)
 {
     glm::vec2 nds;
@@ -550,7 +579,8 @@ void GraphicsEngine::rayCastSelect(float mx, float my)
     glm::vec3 o = sphcamera.getPosition();
     glm::vec3 l = dir.xyz();
 
-#ifdef RAYTRACE_DEBUG
+
+#ifdef RAYTRACE_DEBUG // Enable this to get a line for every ray cast
     LineSeg *line = new LineSeg(o, o + (l * 100.0f));
     line->load();
     objects.push_back(line);
@@ -663,9 +693,11 @@ void GraphicsEngine::resize()
     projection = glm::perspective(50.0f*degf, w/h, 0.1f, 200000.0f);
 
     uiShader.use();
+    // Use a pixel aligned orthogonal projection for the UI
     glm::mat4 uiProj = glm::ortho(0.0f, w, h, 0.0f);
     glUniformMatrix4fv(uiProjLoc, 1, GL_FALSE, glm::value_ptr(uiProj));
 
+    // Regen FBO textures on resize
     glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
     glBindTexture(GL_TEXTURE_2D, fboTex);
 
@@ -734,46 +766,6 @@ void GraphicsEngine::printOpenGLErrors()
     }
 }
 
-/**
-\brief Prints the glm matrix to the console window.  Remember that glm
-matrices are column major. This is for the 3 X 3 matrices.
-
-\param m --- the glm matrix to be displayed.
-
-*/
-
-void GraphicsEngine::print_GLM_Matrix(glm::mat4 m)
-{
-    for (int r = 0; r < 4; r++)
-    {
-        for (int c = 0; c < 4; c++)
-            printf("%7.2f", m[c][r]);
-
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
-
-
-/**
-\brief Prints the glm matrix to the console window.  Remember that glm
-matrices are column major. This is for the 3 X 3 matrices.
-
-\param m --- the glm matrix to be displayed.
-
-*/
-
-void GraphicsEngine::print_GLM_Matrix(glm::mat3 m)
-{
-    for (int r = 0; r < 3; r++)
-    {
-        for (int c = 0; c < 3; c++)
-            printf("%7.2f", m[c][r]);
-
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
 
 /**
 \brief Returns true if the spherical camera is currently in use.

@@ -19,8 +19,11 @@ glm::mat4 BodyDrawable::getModelMat() const
 {
     auto mat = Drawable::getModelMat();
     glm::vec3 trans = glm::vec3(pos);
+    // Translate to actual position
     mat = glm::translate(mat, trans);
+    // Correct sphere model rotation
     mat = glm::rotate(mat, 90.0f * degf, glm::vec3(-1, 0, 0));
+    // Correct reversed UVs
     mat = glm::scale(mat, glm::vec3(-1, -1, -1));
     return mat;
 }

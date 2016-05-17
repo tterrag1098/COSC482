@@ -10,6 +10,13 @@
 #include "Box.h"
 #include "GraphicsEngine.h"
 
+/**
+\class TypePicker
+
+\brief A UI element which holds a list of objects, and provides left and right arrows to switch between them.
+
+*/
+
 template <typename T>
 class TypePicker : public Listener, public Drawable
 {

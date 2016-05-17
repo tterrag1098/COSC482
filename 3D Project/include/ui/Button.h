@@ -5,6 +5,13 @@
 #include "Listeners.h"
 #include "glm/glm.hpp"
 
+/**
+\class Button
+
+\brief A basic button used in UI elements
+
+*/
+
 class Button : public Drawable, public Listener
 {
 public:
@@ -26,7 +33,7 @@ public:
 
     bool contains(glm::vec2 pos);
 
-    void onPressed(std::function<void()>&& callback);
+    void onPressed(std::function<void()>&& callback); ///< Register a callback for when this button is pressed.
 
 protected:
     int width, height;

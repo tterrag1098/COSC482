@@ -9,6 +9,12 @@ class GraphicsEngine;
 class Button;
 class TexturedBox;
 
+/**
+\class SimulationControl
+
+\brief UI element which contains the controls for the simulation speed and play/pause/
+*/
+
 class SimulationControl : public GuiBase
 {
     public:

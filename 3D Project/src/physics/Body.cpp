@@ -26,6 +26,7 @@ Body::~Body()
 
 void Body::applyForce(double tickDiff)
 {
+    // Update the velocity and position based on the time difference factor.
     vel += (tickDiff * force) / mass;
     pos += tickDiff * vel;
     force *= 0; // Clear out applied forces

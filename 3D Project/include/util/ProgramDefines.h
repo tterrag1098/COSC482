@@ -17,6 +17,8 @@ The file is simply for convenience so that multiple headers do not need to redef
 // SetVS sets the Vertical Sync for SFML.  When true, the frame rate will be very close to the
 // refresh rate of the machine.  When false, the frame rate will run at maximum speed.
 #define SetVS true
+
+// Remove this definition for compilation on other platforms. Disables the I-bar cursor icon on text boxes.
 #define COMPAT_WIN
 
 #define BUFFER_OFFSET(x) ((const void*) (x))

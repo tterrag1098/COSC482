@@ -5,6 +5,7 @@
 
 class UI;
 
+/**\brief Base class for listener contexts. Contains the event and the UI instance */
 template <typename T>
 class ListenerContext
 {
@@ -21,6 +22,7 @@ private:
     UI *ui;
 };
 
+/**\brief Convenience to construct a context with type inference */
 template<typename T>
 inline ListenerContext<T> create_ctx(UI *ui, T event)
 {
@@ -32,6 +34,7 @@ typedef ListenerContext<sf::Event::MouseMoveEvent> MoveContext;
 typedef ListenerContext<sf::Event::KeyEvent> KeyContext;
 typedef ListenerContext<sf::Event::TextEvent> InputContext;
 
+/**\brief Base class for listener objects. Methods are provided for all major UI events.*/
 class Listener
 {
 public:

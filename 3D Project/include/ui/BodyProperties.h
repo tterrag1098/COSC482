@@ -9,6 +9,12 @@ class BodyInfo;
 class TextBox;
 class GhostPlanet;
 
+/**
+\class BodyProperties
+
+\brief UI element containing all the options for editing and creating bodies.
+*/
+
 class BodyProperties : public GuiBase
 {
     friend class GhostPlanet;
@@ -19,7 +25,7 @@ class BodyProperties : public GuiBase
 
         void draw(GraphicsEngine *ge) override;
 
-        void onBodyRemoved(BodyDrawable *b);
+        void onBodyRemoved(BodyDrawable *b); ///< Callback from BodyInfo to be notified when a body is removed.
 
     protected:
     private:

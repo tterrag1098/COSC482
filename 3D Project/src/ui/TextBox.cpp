@@ -139,7 +139,11 @@ std::string TextBox::getText()
 
 double TextBox::getDouble()
 {
-    return std::stod(getText() == "" ? "0" : getText());
+    try {
+        return std::stod(getText());
+    } catch (std::exception e) {
+        return 0;
+    }
 }
 
 void TextBox::setText(std::string t)
@@ -178,6 +182,8 @@ void TextBox::clearSelection()
 
 bool TextBox::mousePressed(ButtonContext ctx)
 {
+    if (!visible) return false;
+
     glm::vec2 p(ctx.event.x, ctx.event.y);
 
     if (bg->contains(p))
@@ -204,12 +210,13 @@ bool TextBox::mousePressed(ButtonContext ctx)
 
 bool TextBox::mouseMoved(MoveContext ctx)
 {
+    if (!visible) return false;
+
     if (bg->contains({ctx.event.x, ctx.event.y}))
     {
         #ifdef COMPAT_WIN
         SetCursor(LoadCursor(NULL, IDC_IBEAM));
         #endif // COMPAT_WIN
-        return true;
     }
 
     if (focused && ctx.getUI()->isMouseDown())
@@ -232,6 +239,8 @@ bool TextBox::mouseMoved(MoveContext ctx)
 
 bool TextBox::keyPressed(KeyContext ctx)
 {
+    if (!visible) return false;
+
     if (focused)
     {
         bool ctrl = ctx.getUI()->anyDown({sf::Keyboard::RControl, sf::Keyboard::LControl});
@@ -270,6 +279,8 @@ bool TextBox::keyPressed(KeyContext ctx)
 
 bool TextBox::keyInput(InputContext ctx)
 {
+    if (!visible) return false;
+
     if (ctx.event.unicode > 127) return false;
 
     char c = ctx.event.unicode & 0x7F;

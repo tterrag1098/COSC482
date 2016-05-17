@@ -8,6 +8,12 @@
 
 class Box;
 
+/**
+\class TextBox
+
+\brief A basic text box. Supports typing, selecting, backspacing, deleting, and filtering
+
+*/
 class TextBox : public Drawable, public Listener
 {
     public:
@@ -23,10 +29,10 @@ class TextBox : public Drawable, public Listener
         bool keyInput(InputContext ctx) override;
 
         std::string getText();
-        double getDouble();
+        double getDouble(); ///< Convenience method to get the current text as a double, if possible. Returns 0 if not.
         void setText(std::string text);
 
-        void setFilter(std::function<bool(char)> filter);
+        void setFilter(std::function<bool(char)> filter); ///< Register a filter for the text box. Will be called with every character entered.
 
     protected:
     private:

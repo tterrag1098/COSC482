@@ -26,9 +26,7 @@ SimulationControl::SimulationControl(UI *ui, glm::vec2 p) : GuiBase(ui, p, w, h)
 
     text = new TextBox(tr, pos, 50, fontsize);
     text->setText("1.0");
-    text->setFilter([](char c){
-        return isdigit(c) || c == '.';
-    });
+    text->setFilter([](char c){ return isdigit(c) || c == '.'; });
     pos.x += 50 + spacing;
 
     p01 = new TextButton(pos, tr, "+0.1", fontsize);

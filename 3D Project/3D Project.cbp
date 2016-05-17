@@ -14,6 +14,8 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="include" />
+					<Add directory="include/ui" />
+					<Add directory="include/render" />
 				</Compiler>
 				<Linker>
 					<Add library="sfml-graphics-d" />
@@ -22,13 +24,15 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/NBodyFun" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/NBodySimulator" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add directory="include" />
+					<Add directory="include/ui" />
+					<Add directory="include/render" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -43,6 +47,10 @@
 			<Add option="-Wall" />
 			<Add option="-DSFML_DYNAMIC" />
 			<Add directory="C:/Program Files (x86)/CodeBlocks/MinGW/include" />
+			<Add directory="X:/Development/COSC482/3D Project/include/render" />
+			<Add directory="X:/Development/COSC482/3D Project/include/ui" />
+			<Add directory="X:/Development/COSC482/3D Project/include/physics" />
+			<Add directory="X:/Development/COSC482/3D Project/include/util" />
 		</Compiler>
 		<Linker>
 			<Add library="mingw32" />
@@ -53,51 +61,80 @@
 			<Add library="glew32" />
 			<Add library="opengl32" />
 			<Add library="glu32" />
+			<Add library="freetype" />
 			<Add directory="C:/Program Files (x86)/CodeBlocks/MinGW/lib" />
 		</Linker>
-		<Unit filename="Axes.cpp" />
-		<Unit filename="Axes.h" />
 		<Unit filename="CubeMap.frag" />
 		<Unit filename="CubeMap.vert" />
-		<Unit filename="Drawable.cpp" />
-		<Unit filename="Drawable.h" />
-		<Unit filename="GraphicsEngine.cpp" />
-		<Unit filename="GraphicsEngine.h" />
-		<Unit filename="Light.cpp" />
-		<Unit filename="Light.h" />
-		<Unit filename="Material.cpp" />
-		<Unit filename="Material.h" />
-		<Unit filename="MaterialPresets.h" />
-		<Unit filename="Models.cpp" />
-		<Unit filename="Models.h" />
-		<Unit filename="ObjModel.cpp" />
-		<Unit filename="ObjModel.h" />
+		<Unit filename="Passthrough.frag" />
+		<Unit filename="Passthrough.vert" />
 		<Unit filename="PostProcessing.frag" />
 		<Unit filename="PostProcessing.vert" />
-		<Unit filename="ProgramDefines.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="SphericalCamera.cpp" />
-		<Unit filename="SphericalCamera.h" />
-		<Unit filename="UI.cpp" />
-		<Unit filename="UI.h" />
 		<Unit filename="World.frag" />
 		<Unit filename="World.vert" />
-		<Unit filename="YPRCamera.cpp" />
-		<Unit filename="YPRCamera.h" />
-		<Unit filename="include/Body.h" />
-		<Unit filename="include/BodyDrawable.h" />
-		<Unit filename="include/BodySphere.h" />
-		<Unit filename="include/PhysicsEngine.h" />
-		<Unit filename="include/Shader.h" />
-		<Unit filename="include/TrailLine.h" />
+		<Unit filename="include/physics/Body.h" />
+		<Unit filename="include/physics/BodyDrawable.h" />
+		<Unit filename="include/physics/BodySphere.h" />
+		<Unit filename="include/physics/PhysicsEngine.h" />
+		<Unit filename="include/render/Box.h" />
+		<Unit filename="include/render/Drawable.h" />
+		<Unit filename="include/render/GhostPlanet.h" />
+		<Unit filename="include/render/GraphicsEngine.h" />
+		<Unit filename="include/render/Light.h" />
+		<Unit filename="include/render/LineSeg.h" />
+		<Unit filename="include/render/Material.h" />
+		<Unit filename="include/render/Models.h" />
+		<Unit filename="include/render/Shader.h" />
+		<Unit filename="include/render/SphericalCamera.h" />
+		<Unit filename="include/render/TexturedBox.h" />
+		<Unit filename="include/render/TrailLine.h" />
+		<Unit filename="include/render/YPRCamera.h" />
+		<Unit filename="include/ui/BodyInfo.h" />
+		<Unit filename="include/ui/BodyProperties.h" />
+		<Unit filename="include/ui/Button.h" />
+		<Unit filename="include/ui/GuiBase.h" />
+		<Unit filename="include/ui/Listeners.h" />
+		<Unit filename="include/ui/SimulationControl.h" />
+		<Unit filename="include/ui/Slider.h" />
+		<Unit filename="include/ui/StateButton.h" />
+		<Unit filename="include/ui/TextBox.h" />
+		<Unit filename="include/ui/TextButton.h" />
+		<Unit filename="include/ui/TextRendererTTF.h" />
+		<Unit filename="include/ui/TypePicker.h" />
+		<Unit filename="include/ui/UI.h" />
+		<Unit filename="include/util/ProgramDefines.h" />
+		<Unit filename="include/util/utils.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="src/Body.cpp" />
-		<Unit filename="src/BodyDrawable.cpp" />
-		<Unit filename="src/BodySphere.cpp" />
-		<Unit filename="src/PhysicsEngine.cpp" />
-		<Unit filename="src/Shader.cpp" />
-		<Unit filename="src/TrailLine.cpp" />
+		<Unit filename="src/physics/Body.cpp" />
+		<Unit filename="src/physics/BodyDrawable.cpp" />
+		<Unit filename="src/physics/BodySphere.cpp" />
+		<Unit filename="src/physics/PhysicsEngine.cpp" />
+		<Unit filename="src/render/Box.cpp" />
+		<Unit filename="src/render/Drawable.cpp" />
+		<Unit filename="src/render/GhostPlanet.cpp" />
+		<Unit filename="src/render/GraphicsEngine.cpp" />
+		<Unit filename="src/render/Light.cpp" />
+		<Unit filename="src/render/LineSeg.cpp" />
+		<Unit filename="src/render/Material.cpp" />
+		<Unit filename="src/render/Models.cpp" />
+		<Unit filename="src/render/Shader.cpp" />
+		<Unit filename="src/render/SphericalCamera.cpp" />
+		<Unit filename="src/render/TexturedBox.cpp" />
+		<Unit filename="src/render/TrailLine.cpp" />
+		<Unit filename="src/render/YPRCamera.cpp" />
+		<Unit filename="src/ui/BodyInfo.cpp" />
+		<Unit filename="src/ui/BodyProperties.cpp" />
+		<Unit filename="src/ui/Button.cpp" />
+		<Unit filename="src/ui/GuiBase.cpp" />
+		<Unit filename="src/ui/Listener.cpp" />
+		<Unit filename="src/ui/SimulationControl.cpp" />
+		<Unit filename="src/ui/Slider.cpp" />
+		<Unit filename="src/ui/StateButton.cpp" />
+		<Unit filename="src/ui/TextBox.cpp" />
+		<Unit filename="src/ui/TextButton.cpp" />
+		<Unit filename="src/ui/TextRendererTTF.cpp" />
+		<Unit filename="src/ui/UI.cpp" />
+		<Unit filename="src/util/utils.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

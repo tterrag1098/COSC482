@@ -59,7 +59,7 @@ in vec4 color;
 in vec3 normal;
 in vec2 tex_coord;
 
-uniform Light Lt[10];
+uniform Light Lt[20];
 uniform Material Mat;
 uniform vec3 eye;
 uniform vec4 GlobalAmbient;

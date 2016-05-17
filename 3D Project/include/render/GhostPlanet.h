@@ -7,6 +7,12 @@
 
 class GraphicsEngine;
 
+/**
+\class GhostPlanet
+
+\brief A translucent preview of the body currently being created.
+*/
+
 class GhostPlanet : public BodySphere
 {
     public:

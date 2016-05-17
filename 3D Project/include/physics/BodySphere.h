@@ -4,6 +4,11 @@
 #include "BodyDrawable.h"
 #include "Models.h"
 
+/**
+\class BodySphere
+
+\brief Basic implementation of BodyDrawable, where the model used is a sphere.
+*/
 class BodySphere : public BodyDrawable
 {
     public:

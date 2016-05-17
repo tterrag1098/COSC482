@@ -5,6 +5,11 @@
 #include "Drawable.h"
 #include "TrailLine.h"
 
+/**
+\class BodyDrawable
+
+\brief Combines Body and Drawable. Contains basic code for a renderable physics object, such as type, lighting, and trail.
+*/
 class BodyDrawable : public Body, public Drawable
 {
 public:

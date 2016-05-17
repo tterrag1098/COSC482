@@ -20,6 +20,7 @@ class GuiBase : public Drawable, public Listener
         bool mousePressed(ButtonContext ctx) override;
         bool mouseReleased(ButtonContext ctx) override;
 
+        /** \brief Convenience utility to register a child to both superclasses */
         template <typename T>
         void addChild(T* t)
         {
@@ -27,6 +28,7 @@ class GuiBase : public Drawable, public Listener
             Listener::children.push_back(t);
         }
 
+        /** \brief Convenience utility to register children to both superclasses */
         template <typename T>
         void addChildren(std::initializer_list<T*> ts)
         {

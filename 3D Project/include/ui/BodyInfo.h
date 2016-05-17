@@ -8,6 +8,12 @@ class GraphicsEngine;
 class TextButton;
 class BodyProperties;
 
+/**
+\class BodyInfo
+
+\brief The UI element containing basic information about the selected body. Also allows deletion of said object.
+*/
+
 class BodyInfo : public GuiBase
 {
     public:
@@ -16,8 +22,8 @@ class BodyInfo : public GuiBase
 
         void draw(GraphicsEngine *ge) override;
 
-        void setProps(BodyProperties *props);
-        void onBodyAdded(BodyDrawable *b);
+        void setProps(BodyProperties *props); ///< Use for hacky callback to properties to update removed objects.
+        void onBodyAdded(BodyDrawable *b); ///< Called from BodyProperties to notify of an added body.
 
     protected:
     private:
