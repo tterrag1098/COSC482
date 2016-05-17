@@ -14,7 +14,7 @@ TextBox::TextBox(TextRendererTTF *t, glm::vec2 p, int w, int f, glm::vec4 bgc, g
     tr->setFontSize(fontsize);
 
     cursorPos = 0;
-    text = "text";
+    text = "";
     focused = false;
     clearSelection();
     clock.restart();
@@ -34,6 +34,8 @@ void TextBox::setFilter(std::function<bool(char)> f)
 
 void TextBox::draw(GraphicsEngine *ge)
 {
+    if (!visible) return;
+
     if (clock.getElapsedTime().asMilliseconds() > 500)
     {
         cursorState = !cursorState;
@@ -45,6 +47,7 @@ void TextBox::draw(GraphicsEngine *ge)
 
     tr->setScreenSize(ge->getSize().x, ge->getSize().y);
     tr->setColor(textcolor);
+    tr->setFontSize(fontsize);
 
     int x = pos.x + padX;
     int y = ge->getSize().y - pos.y - fontsize - padY + 1;
@@ -71,6 +74,7 @@ void TextBox::draw(GraphicsEngine *ge)
 void TextBox::refresh()
 {
     Drawable::refresh();
+    tr->setFontSize(fontsize);
 
     if (selBegin != selEnd)
     {
@@ -110,6 +114,8 @@ void TextBox::refresh()
 
 int TextBox::getPosFromX(int x)
 {
+    tr->setFontSize(fontsize);
+
     int i = 0;
     char c;
     int px = pos.x + padX;
@@ -129,6 +135,11 @@ std::string TextBox::getSelected()
 std::string TextBox::getText()
 {
     return text;
+}
+
+double TextBox::getDouble()
+{
+    return std::stod(getText() == "" ? "0" : getText());
 }
 
 void TextBox::setText(std::string t)
@@ -241,6 +252,10 @@ bool TextBox::keyPressed(KeyContext ctx)
             load();
             break;
 
+        case sf::Keyboard::BackSpace:
+            erase(false);
+            break;
+
         case sf::Keyboard::Delete:
             erase(true);
             break;
@@ -255,25 +270,15 @@ bool TextBox::keyPressed(KeyContext ctx)
 
 bool TextBox::keyInput(InputContext ctx)
 {
-    char c = ctx.event.unicode & 0xFF;
-    if (!filter(c)) return false;
+    if (ctx.event.unicode > 127) return false;
+
+    char c = ctx.event.unicode & 0x7F;
+    if (!isprint(c) || !filter(c)) return false;
 
     std::string in(&c);
     if (focused)
     {
-        bool type = false;
-        switch(c)
-        {
-        case '\b':
-            erase(false);
-            break;
-
-        default:
-            type = true;
-            break;
-        }
-
-        if (type && tr->textWidth(text) + tr->textWidth(in) < width - 3)
+        if (tr->textWidth(text) + tr->textWidth(in) < width - 3)
         {
             if (selBegin != selEnd)
             {

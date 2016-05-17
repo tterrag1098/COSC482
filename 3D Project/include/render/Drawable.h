@@ -3,7 +3,6 @@
 
 #include "ProgramDefines.h"
 #include "Material.h"
-#include "MaterialPresets.h"
 #include "utils.h"
 
 #include <GL/glew.h>
@@ -16,6 +15,8 @@
 
 class GraphicsEngine;
 
+static const Material white(0, 0, 0, 0, 0, 0, 0);
+
 class Drawable
 {
 public:
@@ -26,10 +27,13 @@ public:
     virtual void load();
 
     Material getMaterial() const;
+    void setMaterial(Material m);
+
     void setVisible(bool vis);
+    bool isVisible() { return visible; }
 
 protected:
-    Drawable(Material mat = Materials::whitePlastic, bool indexed = true, bool visible = true);
+    Drawable(Material mat = white, bool indexed = true, bool visible = true);
     Drawable(bool indexed);
 
     void vert(glm::vec3 pos, glm::vec4 color = WHITE, glm::vec2 uv = {0, 0});
@@ -40,7 +44,7 @@ protected:
     void index_quad(int count);
 
     bool useLighting = true;
-    bool useTexture = true;
+    bool fullbright = false;
 
     virtual void refresh();
 

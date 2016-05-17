@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 #include "Drawable.h"
 #include <SFML/System/Clock.hpp>
-#include "MaterialPresets.h"
 
 class TrailLine : public Drawable
 {

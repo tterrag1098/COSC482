@@ -14,7 +14,7 @@
 \brief Constructor, default.
 
 */
-Models::Models() : Models(Materials::whitePlastic) {}
+Models::Models() : Models(Material()) {}
 
 Models::Models(Material mat) : Drawable(mat)
 {
@@ -30,14 +30,11 @@ Models::Models(Material mat) : Drawable(mat)
 
     reload = GL_FALSE;
     drawFaces = GL_TRUE;
-    drawBorder = GL_TRUE;
 
     red = 1;
     green = 1;
     blue = 1;
-    bred = 0;
-    bgreen = 0;
-    bblue = 0;
+    alpha = 1;
 }
 
 /**
@@ -55,9 +52,6 @@ Models::~Models()
     glBindVertexArray(vboptr);
     glDeleteBuffers(1, &bufptr);
     glDeleteBuffers(1, &eboptr);
-    glBindVertexArray(vboptr2);
-    glDeleteBuffers(1, &bufptr2);
-    glDeleteBuffers(1, &eboptr2);
 }
 
 /**
@@ -239,18 +233,6 @@ void Models::reverseNormals()
 }
 
 /**
-\brief Sets the border drawing flag.
-
-\param d --- New value of the border drawing flag.
-
-*/
-
-void Models::setDrawBorder(GLboolean d)
-{
-    drawBorder = d;
-}
-
-/**
 \brief Sets the face drawing flag.
 
 \param d --- New value of the face drawing flag.
@@ -271,28 +253,12 @@ void Models::setDrawFaces(GLboolean d)
 
 */
 
-void Models::setColor(GLfloat r, GLfloat g, GLfloat b)
+void Models::setColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 {
     red = r;
     green = g;
     blue = b;
-    load();
-}
-
-/**
-\brief Sets the border color.
-
-\param r --- Red component of the border.
-\param g --- Green component of the border.
-\param b --- Blue component of the border.
-
-*/
-
-void Models::setBorderColor(GLfloat r, GLfloat g, GLfloat b)
-{
-    bred = r;
-    bgreen = g;
-    bblue = b;
+    alpha = a;
     load();
 }
 
@@ -325,19 +291,15 @@ void Models::load(GLint v, GLint c, GLint n, GLint t)
     vTex = t;
 
     GLuint *indices;
-    GLuint *border_indices;
     GLfloat *points;
     GLfloat *colors;
     GLfloat *normalvectors;
-    GLfloat *border_colors;
     GLfloat *tex;
 
     indices = new GLuint[6*(lon)*(lat)];
-    border_indices = new GLuint[4*(lon)*(lat)+2*(lon+lat)];
     points = new GLfloat[4*(lon+1)*(lat+1)];
     normalvectors = new GLfloat[3*(lon+1)*(lat+1)];
     colors = new GLfloat[4*(lon+1)*(lat+1)];
-    border_colors = new GLfloat[4*(lon+1)*(lat+1)];
     tex = new GLfloat[2*(lon+1)*(lat+1)];
 
     for (int i = 0; i < (lon+1)*(lat+1); i++)
@@ -345,11 +307,7 @@ void Models::load(GLint v, GLint c, GLint n, GLint t)
         colors[4*i] = red;
         colors[4*i+1] = green;
         colors[4*i+2] = blue;
-        colors[4*i+3] = 1;
-        border_colors[4*i] = bred;
-        border_colors[4*i+1] = bgreen;
-        border_colors[4*i+2] = bblue;
-        border_colors[4*i+3] = 1;
+        colors[4*i+3] = alpha;
     }
 
     for (int i = 0; i < lon+1; i++)
@@ -387,28 +345,6 @@ void Models::load(GLint v, GLint c, GLint n, GLint t)
             indices[indexarraypos++] = (i+1)*(lat+1)+j+1;
             indices[indexarraypos++] = i*(lat+1)+j+1;;
         }
-
-    indexarraypos = 0;
-    for (int i = 0; i < lon; i++)
-        for (int j = 0; j < lat; j++)
-        {
-            border_indices[indexarraypos++] = i*(lat+1)+j;
-            border_indices[indexarraypos++] = (i+1)*(lat+1)+j;
-            border_indices[indexarraypos++] = i*(lat+1)+j;
-            border_indices[indexarraypos++] = i*(lat+1)+j+1;
-        }
-
-    for (int i = 0; i < lon; i++)
-    {
-        border_indices[indexarraypos++] = i*(lat+1)+lat;
-        border_indices[indexarraypos++] = (i+1)*(lat+1)+lat;
-    }
-
-    for (int j = 0; j < lat; j++)
-    {
-        border_indices[indexarraypos++] = lon*(lat+1)+j;
-        border_indices[indexarraypos++] = lon*(lat+1)+j+1;
-    }
 
     if (!reload)
         glGenVertexArrays(1, &vboptr);
@@ -458,32 +394,7 @@ void Models::load(GLint v, GLint c, GLint n, GLint t)
     glEnableVertexAttribArray(vNormal);
     glEnableVertexAttribArray(vTex);
 
-    if (!reload)
-        glGenVertexArrays(1, &vboptr2);
-
-    glBindVertexArray(vboptr2);
-
-    if (!reload)
-        glGenBuffers(1, &eboptr2);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboptr2);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 (4*(lon)*(lat)+2*(lon+lat))*sizeof(GLuint),
-                 border_indices, GL_DYNAMIC_DRAW);
-
-	if (!reload)
-        glGenBuffers(1, &bufptr2);
-
-    glBindBuffer(GL_ARRAY_BUFFER, bufptr2);
-    glBufferData(GL_ARRAY_BUFFER, 4*(lon+1)*(lat+1)*sizeof(GLfloat)
-                 + 4*(lon+1)*(lat+1)*sizeof(GLfloat)
-                 + 3*(lon+1)*(lat+1)*sizeof(GLfloat)
-                 + 2*(lon+1)*(lat+1)*sizeof(GLfloat),
-                 NULL, GL_DYNAMIC_DRAW);
-
     glBufferSubData(GL_ARRAY_BUFFER, 0, 4*(lon+1)*(lat+1)*sizeof(GLfloat), points);
-    glBufferSubData(GL_ARRAY_BUFFER, 4*(lon+1)*(lat+1)*sizeof(GLfloat),
-                    4*(lon+1)*(lat+1)*sizeof(GLfloat), border_colors);
     glBufferSubData(GL_ARRAY_BUFFER, 4*(lon+1)*(lat+1)*sizeof(GLfloat)
                     + 4*(lon+1)*(lat+1)*sizeof(GLfloat),
                     3*(lon+1)*(lat+1)*sizeof(GLfloat), normalvectors);
@@ -510,11 +421,9 @@ void Models::load(GLint v, GLint c, GLint n, GLint t)
     glEnableVertexAttribArray(vTex);
 
     if (indices) delete indices;
-    if (border_indices) delete border_indices;
     if (points) delete points;
     if (normalvectors) delete normalvectors;
     if (colors) delete colors;
-    if (border_colors) delete border_colors;
     if (tex) delete tex;
 
     reload = GL_FALSE;
@@ -532,15 +441,6 @@ void Models::draw(GraphicsEngine *ge)
         glBindVertexArray(vboptr);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboptr);
         glDrawElements(GL_TRIANGLES, 6*lon*lat, GL_UNSIGNED_INT, NULL);
-    }
-
-    if (drawBorder)
-    {
-        glBindVertexArray(vboptr2);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboptr2);
-        glLineWidth(2);
-        glDrawElements(GL_LINES, 4*(lon)*(lat)+2*(lon+lat), GL_UNSIGNED_INT, NULL);
-        glLineWidth(1);
     }
 }
 

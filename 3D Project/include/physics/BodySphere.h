@@ -7,14 +7,16 @@
 class BodySphere : public BodyDrawable
 {
     public:
-        BodySphere(Material m, glm::dvec3 pos, float radius, double mass);
+        BodySphere(std::string name, BodyType *t, glm::dvec3 pos, float radius, double mass);
         virtual ~BodySphere();
 
         void draw(GraphicsEngine *ge) override;
 
+        void setRadius(float r) override;
+
     protected:
-    private:
         Models *model;
+    private:
 };
 
 #endif // BODYMODEL_H

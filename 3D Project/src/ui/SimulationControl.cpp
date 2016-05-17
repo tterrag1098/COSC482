@@ -15,36 +15,35 @@ SimulationControl::SimulationControl(UI *ui, glm::vec2 p) : GuiBase(ui, p, w, h)
 
     glm::vec2 pos = p + (float) padding;
     pos.y += 14 + spacing;
+    pos.x += 6;
 
-    m1 = new TextButton(pos, tr, "-1");
+    m1 = new TextButton(pos, tr, "-1", fontsize);
     m1->onPressed([this]{ addSpeed(-1); });
     pos.x += m1->getWidth() + spacing;
-    m01  = new TextButton(pos, tr, "-0.1");
+    m01  = new TextButton(pos, tr, "-0.1", fontsize);
     m01->onPressed([this]{ addSpeed(-0.1); });
     pos.x += m01->getWidth() + spacing;
 
-    text = new TextBox(tr, pos + glm::vec2(0, (m1->getHeight() / 2) - 11), 50, 14);
+    text = new TextBox(tr, pos, 50, fontsize);
     text->setText("1.0");
     text->setFilter([](char c){
-        return isdigit(c) || c == '.' || c == '\b';
+        return isdigit(c) || c == '.';
     });
     pos.x += 50 + spacing;
 
-    p01 = new TextButton(pos, tr, "+0.1");
+    p01 = new TextButton(pos, tr, "+0.1", fontsize);
     p01->onPressed([this]{ addSpeed(0.1); });
     pos.x += p01->getWidth() + spacing;
-    p1 = new TextButton(pos, tr, "+1");
+    p1 = new TextButton(pos, tr, "+1", fontsize);
     p1->onPressed([this]{ addSpeed(1); });
 
-    pos.x = p.x + padding;
+    pos.x = m1->getCorner().x;
     pos.y += p1->getHeight() + spacing;
-    pause = new Button(pos, width - (padding * 2) - 1, 25);
+    pause = new Button(pos, 200, 25);
 
     addChildren({m1, m01, p01, p1});
     addChild(pause);
     addChild(text);
-
-    TexturedBox *playIcon, *pauseIcon;
 
     ui->getEngine()->uiShader.use();
     GLuint tex = ui->getEngine()->loadTexture("assets/playpause.png", ui->getEngine()->uiShader);
@@ -54,11 +53,9 @@ SimulationControl::SimulationControl(UI *ui, glm::vec2 p) : GuiBase(ui, p, w, h)
 
     pauseIcon->setVisible(false);
 
-    pause->onPressed([this, ui, playIcon, pauseIcon]{
+    pause->onPressed([this, ui]{
         PhysicsEngine *pe = ui->getEngine()->getPhysics();
         pe->pauseUnpause();
-        playIcon->setVisible(pe->isPaused());
-        pauseIcon->setVisible(!(pe->isPaused()));
         load();
     });
 }
@@ -81,6 +78,10 @@ SimulationControl::~SimulationControl()
 void SimulationControl::draw(GraphicsEngine *ge)
 {
     Drawable::draw(ge);
+    if (!visible) return;
+
+    playIcon->setVisible(ge->getPhysics()->isPaused());
+    pauseIcon->setVisible(!(ge->getPhysics()->isPaused()));
 
     std::string title = "Simulation Control";
     TextRendererTTF *tr = ui->getTextRenderer();

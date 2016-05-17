@@ -7,6 +7,7 @@ class TextButton;
 class TextBox;
 class GraphicsEngine;
 class Button;
+class TexturedBox;
 
 class SimulationControl : public GuiBase
 {
@@ -22,6 +23,8 @@ class SimulationControl : public GuiBase
         TextButton *m1, *m01, *p01, *p1;
         Button *pause;
         TextBox *text;
+
+        TexturedBox *playIcon, *pauseIcon;
 
         void addSpeed(double amt);
 

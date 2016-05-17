@@ -2,6 +2,7 @@
 #define MATERIAL_H_INCLUDED
 
 #define GLM_SWIZZLE
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -26,60 +27,34 @@
 class Material
 {
 private:
-    glm::vec4 ambient;   ///< Ambient color of the material.
-    glm::vec4 diffuse;   ///< Diffuse color of the material.
-    glm::vec4 specular;  ///< Specular color of the material.
+    GLuint diffuse, specular; ///< Texture IDs.
     glm::vec4 emission;  ///< Emission color of the material.
     float shininess;     ///< Shininess exponent of the material.
 
 public:
     Material();
-    Material(glm::vec4 a,
-             glm::vec4 d,
-             glm::vec4 s,
-             glm::vec4 e,
-             float sh
-            );
+    Material(GLuint diffuse, GLuint specular, glm::vec4 e, float sh);
 
-    Material(float ar, float ag, float ab, float aa,
-             float dr, float dg, float db, float da,
-             float sr, float sg, float sb, float sa,
-             float er, float eg, float eb, float ea,
-             float sh
-            );
+    Material(GLuint diffuse, GLuint specular, float er, float eg, float eb, float ea, float sh);
 
     ~Material();
 
-    void setMaterial(glm::vec4 a,
-                     glm::vec4 d,
-                     glm::vec4 s,
-                     glm::vec4 e,
-                     float sh
-                    );
+    void setMaterial(GLuint diffuse, GLuint specular, glm::vec4 e, float sh);
 
-    void setMaterial(float ar, float ag, float ab, float aa,
-                     float dr, float dg, float db, float da,
-                     float sr, float sg, float sb, float sa,
-                     float er, float eg, float eb, float ea,
-                     float sh
-                    );
+    void setMaterial(GLuint diffuse, GLuint specular, float er, float eg, float eb, float ea, float sh);
 
+    GLuint getDiffuse();
+    GLuint getSpecular();
 
-    glm::vec4 getAmbient();
-    glm::vec4 getDiffuse();
-    glm::vec4 getSpecular();
     glm::vec4 getEmission();
     float getShininess();
 
-    void setAmbient(glm::vec4 a);
-    void setDiffuse(glm::vec4 d);
-    void setSpecular(glm::vec4 s);
+    void setDiffuse(GLuint texID);
+    void setSpecular(GLuint texID);
+
     void setEmission(glm::vec4 e);
     void setShininess(float sh);
 
-    void setAmbient(float ar, float ag, float ab, float aa);
-    void setDiffuse(float dr, float dg, float db, float da);
-    void setSpecular(float sr, float sg, float sb, float sa);
     void setEmission(float er, float eg, float eb, float ea);
 
 };

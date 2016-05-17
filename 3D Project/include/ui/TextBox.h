@@ -23,6 +23,7 @@ class TextBox : public Drawable, public Listener
         bool keyInput(InputContext ctx) override;
 
         std::string getText();
+        double getDouble();
         void setText(std::string text);
 
         void setFilter(std::function<bool(char)> filter);
@@ -42,7 +43,7 @@ class TextBox : public Drawable, public Listener
 
         std::function<bool(char)> filter;
 
-        static constexpr int padY = 3;
+        static constexpr int padY = 6;
         static constexpr int padX = 3;
 
         bool focused;

@@ -4,6 +4,10 @@
 #include "TextBox.h"
 #include "BodyInfo.h"
 #include "SimulationControl.h"
+#include "BodyProperties.h"
+#include "GhostPlanet.h"
+
+#include <string>
 
 /**
 \file UI.cpp
@@ -36,13 +40,32 @@ UI::UI(GraphicsEngine* graph)
     addListener(text);
 */
 
-    BodyInfo *info = new BodyInfo(this, {10, 10});
+    BodyInfo *info = new BodyInfo(this, {10, 10}, ge->getBodies());
     ge->addUIElement(info);
     addListener(info);
+    info->setVisible(true);
 
-    SimulationControl *control = new SimulationControl(this, {10, 100});
+    SimulationControl *control = new SimulationControl(this, {10, 130});
     ge->addUIElement(control);
     addListener(control);
+    control->setVisible(true);
+
+    BodyProperties *props = new BodyProperties(this, info, {10, 230});
+    ge->addUIElement(props);
+    addListener(props);
+    props->setVisible(true);
+    info->setProps(props);
+    ge->getGhost()->setProps(props);
+
+    TextButton *hide = new TextButton({20 + GuiBase::w, 10}, getTextRenderer(), "Toggle UI", 16);
+    ge->addUIElement(hide);
+    addListener(hide);
+    hide->onPressed([hide, info, props, control]{
+        info->setVisible(!info->isVisible());
+        props->setVisible(!props->isVisible());
+        control->setVisible(!control->isVisible());
+        hide->setCorner(info->isVisible() ? hide->getCorner() + glm::vec2(GuiBase::w + 10, 0) : hide->getCorner() - glm::vec2(GuiBase::w + 10, 0));
+    });
 
 /*
     std::vector<Button*> tests = {new Button({100, 160}, 10), new Button({120, 160}, 20), new Button({160, 160}, 40), new Button({240, 160}, 80)};

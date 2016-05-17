@@ -1,5 +1,7 @@
 #include "GraphicsEngine.h"
 #include "LineSeg.h"
+#include "Body.h"
+#include "GhostPlanet.h"
 
 /**
 \file GraphicsEngine.cpp
@@ -40,7 +42,8 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     fboShader(Shader("World.vert", "World.frag")),
     screenShader(Shader("PostProcessing.vert", "PostProcessing.frag")),
     cmShader(Shader("CubeMap.vert", "CubeMap.frag")),
-    uiShader(Shader("Passthrough.vert", "Passthrough.frag"))
+    uiShader(Shader("Passthrough.vert", "Passthrough.frag")),
+    blurShader(Shader("PostProcessing.vert", "Blur.frag"))
 {
     uiShader.use();
     uiProjLoc = glGetUniformLocation(uiShader.program, "Projection");
@@ -48,22 +51,31 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     screenShader.use();
 
     glGenFramebuffers(1, &worldFbo);
-    glGenTextures(1, &fboTex);
+    glGenTextures(2, fboTex);
     glGenRenderbuffers(1, &rbo);
 
     glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
-    glBindTexture(GL_TEXTURE_2D, fboTex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0);
+    for (GLuint i = 0; i < 2; i++)
+    {
+        glBindTexture(GL_TEXTURE_2D, fboTex[i]);
+        glTexImage2D(
+            GL_TEXTURE_2D, 0, GL_RGB16F, getSize().x, getSize().y, 0, GL_RGB, GL_FLOAT, NULL
+        );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        // attach texture to framebuffer
+        glFramebufferTexture2D(
+            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, fboTex[i], 0
+        );
+    }
 
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, getSize().x, getSize().y);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glUniform1i(glGetUniformLocation(screenShader.program, "screenTex"), 0);
 
@@ -91,44 +103,74 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
+    glGenFramebuffers(2, pingpongFBO);
+    glGenTextures(2, pingpongBuffer);
+    for (GLuint i = 0; i < 2; i++)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, getSize().x, getSize().y, 0, GL_RGB, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0);
+    }
+
+    blurShader.use();
+    glUniform1i(glGetUniformLocation(blurShader.program, "image"), 0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     pe = new PhysicsEngine();
 
-    Material sun(
-                 0, 0, 0, 0,
-                 0, 0, 0, 0,
-                 0, 0, 0, 0,
-                 1, 1, 0.8, 1,
-                 1
-            );
+    STAR->mat = Material(loadTexture("assets/sun.jpg", fboShader), loadTexture("assets/sun_spec.jpg", fboShader), 0.75f, 0.75f, 0.75f, 1, 0.2f);
+    EARTH->mat = Material(loadTexture("assets/earth.jpg", fboShader), loadTexture("assets/earth_spec.jpg", fboShader), 0, 0, 0, 0, 20);
+    MOON->mat = Material(loadTexture("assets/moon.jpg", fboShader), loadTexture("assets/moon_spec.jpg", fboShader), 0, 0, 0, 0, 10);
 
-    BodySphere *star = new BodySphere(sun, {0, 0, 0}, 3, 1e13);
+    BARREN1->mat = Material(loadTexture("assets/barren1.jpg", fboShader), loadTexture("assets/barren1_spec.jpg", fboShader), 0, 0, 0, 0, 10);
+    BARREN2->mat = Material(loadTexture("assets/barren2.jpg", fboShader), loadTexture("assets/barren2_spec.jpg", fboShader), 0, 0, 0, 0, 20);
+    BARREN3->mat = Material(loadTexture("assets/barren3.jpg", fboShader), loadTexture("assets/barren3_spec.jpg", fboShader), 0, 0, 0, 0, 10);
+
+    ALIEN1->mat = Material(loadTexture("assets/alien1.jpg", fboShader), loadTexture("assets/alien1_spec.jpg", fboShader), 0, 0, 0, 0, 20);
+    ALIEN2->mat = Material(loadTexture("assets/alien2.jpg", fboShader), loadTexture("assets/alien2_spec.jpg", fboShader), 0, 0, 0, 0, 30);
+
+    ghost = new GhostPlanet();
+
+    BodySphere *star = new BodySphere("Sun", STAR, {0, 0, 0}, 3, 1e13);
     addBody(star);
     pe->addBody(star);
+    selected = star;
 
-    BodySphere *earth1 = new BodySphere(Materials::whitePlastic, {-10, 0, -5}, 0.3, 1e10);
+    BodySphere *earth1 = new BodySphere("Earth", EARTH, {-10, 0, -5}, 0.3, 1e10);
     earth1->setVelocity({0, 0.5, 7});
     addBody(earth1);
     pe->addBody(earth1);
 
-    BodySphere *earth2 = new BodySphere(Materials::whitePlastic, {6, 0, -8}, 0.3, 1e10);
+    BodySphere *earth2 = new BodySphere("Barren1", BARREN1, {6, 0, -8}, 0.3, 1e10);
     earth2->setVelocity({-8, -0.8, 0});
     addBody(earth2);
     pe->addBody(earth2);
 
-    BodySphere *earth3 = new BodySphere(Materials::whitePlastic, {12, 0, 4}, 0.3, 1e10);
+    BodySphere *earth3 = new BodySphere("Barren2", BARREN2, {12, 0, 4}, 0.3, 1e10);
     earth3->setVelocity({0, 0.5, -6});
     addBody(earth3);
     pe->addBody(earth3);
 
-    BodySphere *earth4 = new BodySphere(Materials::whitePlastic, {0, 0, 15}, 0.3, 1e10);
+    BodySphere *earth4 = new BodySphere("Barren3", BARREN3, {0, 0, 15}, 0.3, 1e10);
     earth4->setVelocity({7, -0.5, 0});
     addBody(earth4);
     pe->addBody(earth4);
 
-    BodySphere *moon = new BodySphere(Materials::whitePlastic, {-15 - 0.5, 0, 0}, 0.1, 1e5);
-    moon->setVelocity({0, 0.6, 8});
+    BodySphere *moon = new BodySphere("Alien1", ALIEN1, {-15, 0, 0}, 0.3, 1e10);
+    moon->setVelocity({0, -1, 8});
     addBody(moon);
     pe->addBody(moon);
+
+    BodySphere *moon2 = new BodySphere("Alien2", ALIEN2, {15, 0, 0}, 0.3, 1e10);
+    moon2->setVelocity({0, 1, -8});
+    addBody(moon2);
+    pe->addBody(moon2);
 
     if (!fboShader.program)
     {
@@ -162,16 +204,10 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    setFramerateLimit(0);
+    setFramerateLimit(240);
     setVerticalSyncEnabled(false);
 
-    //mat = Materials::redPlastic;
-    //mat = Materials::bluePlastic;
-    mat = Materials::chrome;
-
-    loadMaterial(mat);
-
-    glm::vec4 GlobalAmbient(0.2, 0.2, 0.2, 1);
+    glm::vec4 GlobalAmbient(0.05f, 0.05f, 0.05f, 1);
     glUniform4fv(glGetUniformLocation(fboShader.program, "GlobalAmbient"), 1, glm::value_ptr(GlobalAmbient));
 
     CMSphere.createSphereOBJ(100000, 40, 40);
@@ -200,8 +236,7 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     std::string filename;
 
     glGenTextures(6, texID);
-
-    filename = "assets/sunmap.jpg";
+    filename = "assets/earth.jpg";
 
     if (!texture.loadFromFile(filename))
         std::cerr << "Could not load texture: " << filename << std::endl;
@@ -219,7 +254,9 @@ GraphicsEngine::GraphicsEngine(std::string title, GLint width, GLint height) :
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    cmShader.use();    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
+    cmShader.use();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
 
 
     //  Load in Cube Map
@@ -296,6 +333,11 @@ GLuint GraphicsEngine::loadTexture(std::string path, Shader activeShader)
     return texID;
 }
 
+GLuint GraphicsEngine::loadMaterial(std::string path)
+{
+
+}
+
 void GraphicsEngine::activateTexture(int texId, Shader activeShader)
 {
     if (texId >= 0)
@@ -317,18 +359,18 @@ void GraphicsEngine::addBody(BodyDrawable *obj)
 
     fboShader.use();
 
-    if (obj->getMaterial().getEmission() != glm::vec4(0, 0, 0, 1))
+    if (obj->getMaterial().getEmission().xyz() != glm::vec3(0, 0, 0))
     {
         glm::vec4 e = obj->getMaterial().getEmission();
         Light lt;
         lt.setLight(true,
-                0.0, 0.0, 0.0, 1.0,
-                -1.0, -1.0, -1.0,
-                0.0, 0.0, 0.0, 1.0,
-                e.r, e.g, e.b, e.a,
-                e.r, e.g, e.b, e.a,
+                glm::vec4(0.0, 0.0, 0.0, 1.0),
+                glm::vec3(-1.0, -1.0, -1.0),
+                glm::vec4(0.05, 0.05, 0.05, 1.0),
+                e*0.75f,
+                e,
                 180.0, 0.0,
-                1.0, 0.0, 0.0
+                glm::vec3(1.0, 0.0, 0.0)
             );
         obj->assignLight(nextLight);
         LoadLight(lt, "Lt", nextLight++);
@@ -357,14 +399,24 @@ void GraphicsEngine::addUIElement(Drawable *obj)
     obj->load();
 }
 
-const BodyDrawable* GraphicsEngine::getSelectedBody() const
+BodyDrawable* GraphicsEngine::getSelectedBody() const
 {
     return selected;
+}
+
+std::vector<BodyDrawable*> GraphicsEngine::getBodies() const
+{
+    return bodies;
 }
 
 PhysicsEngine* GraphicsEngine::getPhysics() const
 {
     return pe;
+}
+
+GhostPlanet* GraphicsEngine::getGhost() const
+{
+    return ghost;
 }
 
 /**
@@ -379,14 +431,13 @@ void GraphicsEngine::display()
     pe->updateObjects();
 
     sphcamera.setCenter(selected ? selected->getPosF() : glm::vec3(0));
+    sphcamera.setR(std::min(10000.0f, sphcamera.getR()));
+    if (selected)
+    {
+        sphcamera.setR(std::max(selected->getRadius() * 2, sphcamera.getR()));
+    }
 
     glActiveTexture(GL_TEXTURE0);
-
-    // First pass
-    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // We're not using stencil buffer now
-    glEnable(GL_DEPTH_TEST);
 
     // Set view matrix via current camera.
     if (CameraNumber == 1)
@@ -401,6 +452,14 @@ void GraphicsEngine::display()
 
     CMSphere.draw(this);
 
+    // First pass
+    glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
+    GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, attachments);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // We're not using stencil buffer now
+    glEnable(GL_DEPTH_TEST);
+
     fboShader.use();
 
     glm::vec3 eye;
@@ -412,9 +471,6 @@ void GraphicsEngine::display()
     glUniform3fv(glGetUniformLocation(fboShader.program, "eye"), 1, glm::value_ptr(eye));
 
     glUniformMatrix4fv(texTransLoc, 1, GL_FALSE, glm::value_ptr(textrans));
-
-    //turnLightsOn("Lt", 3);
-    glBindTexture(GL_TEXTURE_2D, texID[0]);
 
     // Lighting pass
     for (BodyDrawable *obj : bodies)
@@ -432,9 +488,24 @@ void GraphicsEngine::display()
     for (BodyDrawable* obj : bodies)
     {
         loadMaterial(obj->getMaterial());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, obj->getMaterial().getDiffuse());
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, obj->getMaterial().getSpecular());
 
         obj->draw(this);
     }
+
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    loadMaterial(ghost->getMaterial());
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, ghost->getMaterial().getDiffuse());
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, ghost->getMaterial().getSpecular());
+    ghost->draw(this);
+    glFrontFace(GL_CCW);
+    glDisable(GL_CULL_FACE);
 
     for (Drawable *d : objects)
     {
@@ -448,13 +519,31 @@ void GraphicsEngine::display()
 
     // Second pass
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     screenShader.use();
     glBindVertexArray(screenVao);
     glDisable(GL_DEPTH_TEST);
-    glBindTexture(GL_TEXTURE_2D, fboTex);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, fboTex[1]);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    blurShader.use();
+    GLboolean horizontal = true, first_iteration = true;
+    GLuint amount = 10;
+    for (GLuint i = 0; i < amount; i++)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
+        glUniform1i(glGetUniformLocation(blurShader.program, "horizontal"), horizontal);
+        glBindTexture(GL_TEXTURE_2D, first_iteration ? fboTex[1] : pingpongBuffer[!horizontal]);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        horizontal = !horizontal;
+        if (first_iteration)
+            first_iteration = false;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, pingpongBuffer[1]);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 
@@ -486,10 +575,10 @@ void GraphicsEngine::setUseLighting(bool use)
     glUniform1i(glGetUniformLocation(fboShader.program, "useLighting"), use);
 }
 
-void GraphicsEngine::setUseTexture(bool use)
+void GraphicsEngine::setFullbright(bool fb)
 {
     if (glGetIntegerv(GL_CURRENT_PROGRAM, &tempHolder), tempHolder != fboShader.program) return;
-    glUniform1i(glGetUniformLocation(fboShader.program, "useTexture"), use);
+    glUniform1i(glGetUniformLocation(fboShader.program, "fullbright"), fb);
 }
 
 void GraphicsEngine::rayCastSelect(float mx, float my)
@@ -626,11 +715,18 @@ void GraphicsEngine::resize()
     glUniformMatrix4fv(uiProjLoc, 1, GL_FALSE, glm::value_ptr(uiProj));
 
     glBindFramebuffer(GL_FRAMEBUFFER, worldFbo);
-    glBindTexture(GL_TEXTURE_2D, fboTex);
+    glBindTexture(GL_TEXTURE_2D, fboTex[0]);
 
     screenShader.use();
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, getSize().x, getSize().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, getSize().x, getSize().y, 0, GL_RGB, GL_FLOAT, NULL);
+    glBindTexture(GL_TEXTURE_2D, fboTex[1]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, getSize().x, getSize().y, 0, GL_RGB, GL_FLOAT, NULL);
+
+    glBindTexture(GL_TEXTURE_2D, pingpongBuffer[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, getSize().x, getSize().y, 0, GL_RGB, GL_FLOAT, NULL);
+    glBindTexture(GL_TEXTURE_2D, pingpongBuffer[1]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, getSize().x, getSize().y, 0, GL_RGB, GL_FLOAT, NULL);
 
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, getSize().x, getSize().y);
@@ -833,9 +929,8 @@ void GraphicsEngine::loadMaterial(Material Mat)
 {
     fboShader.use();
 
-    glUniform4fv(glGetUniformLocation(fboShader.program, "Mat.ambient"), 1, glm::value_ptr(Mat.getAmbient()));
-    glUniform4fv(glGetUniformLocation(fboShader.program, "Mat.diffuse"), 1, glm::value_ptr(Mat.getDiffuse()));
-    glUniform4fv(glGetUniformLocation(fboShader.program, "Mat.specular"), 1, glm::value_ptr(Mat.getSpecular()));
+    glUniform1i(glGetUniformLocation(fboShader.program, "Mat.diffuse"), 1);
+    glUniform1i(glGetUniformLocation(fboShader.program, "Mat.specular"), 2);
     glUniform4fv(glGetUniformLocation(fboShader.program, "Mat.emission"), 1, glm::value_ptr(Mat.getEmission()));
     glUniform1f(glGetUniformLocation(fboShader.program, "Mat.shininess"), Mat.getShininess());
 }

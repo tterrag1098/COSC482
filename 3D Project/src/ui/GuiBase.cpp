@@ -1,7 +1,7 @@
 #include "GuiBase.h"
 #include "Box.h"
 
-GuiBase::GuiBase(UI *ui, glm::vec2 p, int w, int h) : Drawable(Materials::whitePlastic, false, false),
+GuiBase::GuiBase(UI *ui, glm::vec2 p, int w, int h) : Drawable(Material(), false, false),
     ui(ui), pos(p), width(w), height(h)
 {
     Drawable::children.push_back(bg = new Box(p, w, h, {0, 0, 0, 0.75}));

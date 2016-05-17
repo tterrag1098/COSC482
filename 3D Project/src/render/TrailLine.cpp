@@ -1,9 +1,8 @@
 #include "TrailLine.h"
 
-TrailLine::TrailLine() : Drawable(Materials::fullbright, false)
+TrailLine::TrailLine() : Drawable(Material(), false)
 {
     useLighting = false;
-    useTexture = false;
     color = to_rgb({rand_float(), 0.7f, 1, 1}).rgb();
 }
 

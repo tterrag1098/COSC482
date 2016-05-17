@@ -21,7 +21,6 @@
 #include "YPRCamera.h"
 #include "Material.h"
 #include "Light.h"
-#include "MaterialPresets.h"
 #include "Models.h"
 #include "ObjModel.h"
 #include "PhysicsEngine.h"
@@ -46,6 +45,7 @@ handles all of the graphics rendering in the program.
 */
 
 class Drawable;
+class GhostPlanet;
 
 class GraphicsEngine : public sf::RenderWindow
 {
@@ -56,6 +56,8 @@ private:
     std::vector<BodyDrawable*> bodies;
     std::vector<Drawable*> objects;
     std::vector<Drawable*> ui;
+
+    GhostPlanet *ghost;
 
     BodyDrawable *selected = NULL; ///< Selected object.
 
@@ -79,8 +81,10 @@ private:
 
     GLuint worldFbo;
     GLuint screenVao;
-    GLuint fboTex;
+    GLuint fboTex[2];
     GLuint rbo;
+    GLuint pingpongFBO[2];
+    GLuint pingpongBuffer[2];
 
     GLint tempHolder; ///< Temporary holder value for glGet calls.
 
@@ -90,6 +94,8 @@ private:
     void printOpenGLErrors();
     void print_GLM_Matrix(glm::mat4 m);
     void print_GLM_Matrix(glm::mat3 m);
+
+
 
 public:
     GraphicsEngine(std::string, GLint, GLint);
@@ -104,6 +110,7 @@ public:
     Shader screenShader;   ///< ID of the post-processing shader.
     Shader cmShader;       ///< ID of the cube map shader program.
     Shader uiShader;       ///< ID of the ui passthrough shader.
+    Shader blurShader;     ///< ID of the gaussian blur shader.
 
     GLuint uiProjLoc;      ///< Location ID of the UI projection matrix uniform.
 
@@ -123,14 +130,19 @@ public:
     void setSelected(BodyDrawable *obj); ///< Force sets the selected object.
 
     GLuint loadTexture(std::string path, Shader activeShader);
+    GLuint loadMaterial(std::string path);
+
     void activateTexture(int texId, Shader activeShader);
     GLfloat* getScreenBounds();
-    const BodyDrawable* getSelectedBody() const;
+    BodyDrawable* getSelectedBody() const;
+    std::vector<BodyDrawable*> getBodies() const;
     PhysicsEngine* getPhysics() const;
+
+    GhostPlanet* getGhost() const;
 
     void updateModelMat(glm::mat4 modelMat);
     void setUseLighting(bool use);
-    void setUseTexture(bool use);
+    void setFullbright(bool fb);
 
     GLboolean isSphericalCameraOn();
     void setSphericalCameraOn();

@@ -48,11 +48,10 @@ struct Light
 
 struct Material
 {
-    vec4 ambient;     ///< Ambient color of the material.
-    vec4 diffuse;     ///< Diffuse color of the material.
-    vec4 specular;    ///< Specular color of the material.
-    vec4 emission;    ///< Emission color of the material.
-    float shininess;  ///< Shininess exponent of the material.
+    sampler2D diffuse;	///< Diffuse map.
+	sampler2D specular; ///< Specular map.
+    vec4 emission;    	///< Emission color of the material.
+    float shininess;  	///< Shininess exponent of the material.
 };
 
 in vec4 position;
@@ -65,75 +64,86 @@ uniform Material Mat;
 uniform vec3 eye;
 uniform vec4 GlobalAmbient;
 uniform int numLights;
-uniform bool useTexture;
 uniform bool useLighting;
+uniform bool fullbright;
 uniform mat4 textrans;
 
-uniform sampler2D tex;
-
-out vec4 fColor;
+layout (location = 0) out vec4 fColor;
+layout (location = 1) out vec4 bColor;
 
 void main()
 {
     float deg = 0.017453292519943296;
 
     vec4 cc = vec4(0.0);
-    vec4 globalAmbientPortion = Mat.ambient*GlobalAmbient;
+    vec4 globalAmbientPortion = GlobalAmbient;
 
-    for (int i = 0; useLighting && i < numLights; i++)
-    {
-        if (Lt[i].on)
-        {
-            vec3 n = normalize(normal);
-            vec3 l = normalize(vec3(Lt[i].position)-vec3(position));
-            vec3 v = normalize(eye-vec3(position));
-			vec3 h = normalize(l + v);
-            float lightDistance =length(vec3(Lt[i].position)-vec3(position));
+	if (useLighting)
+	{
+		if (fullbright)
+		{
+			cc = texture(Mat.diffuse, tex_coord);
+		}
+		else if (length(Mat.emission) > 0.0f)
+		{
+			cc = vec4(texture(Mat.diffuse, tex_coord).xyz * min(vec3(1.0), Mat.emission.xyz*5), 1);
+		}
+		else
+		{
+			bool anylight = false;
+			for (int i = 0; i < numLights; i++)
+			{
+				if (Lt[i].on)
+				{	
+					anylight = true;
+					
+					vec3 n = normalize(normal);
+					vec3 l = normalize(vec3(Lt[i].position)-vec3(position));
+					vec3 v = normalize(eye-vec3(position));
+					vec3 h = normalize(l + v);
+					float lightDistance =length(vec3(Lt[i].position)-vec3(position));
 
-            float dfang = max(0.0, dot(l, n));
-            float specang = max(0.0, dot(n, h));
+					float dfang = max(0.0, dot(n, l));
+					float specang = max(0.0, dot(n, h));
+					
+					float attenuation = 1.0 / (Lt[i].attenuation[0] +
+											   Lt[i].attenuation[1] * lightDistance +
+											   Lt[i].attenuation[2] * lightDistance * lightDistance);
 
-            if (dfang == 0)
-                specang = 0;
+					float spotCos = dot(l, -normalize(Lt[i].spotDirection));
+					float SpotCosCutoff = cos(Lt[i].spotCutoff*deg);  // assumes that spotCutoff is in degrees
 
-            float attenuation = 1.0 / (Lt[i].attenuation[0] +
-                                       Lt[i].attenuation[1] * lightDistance +
-                                       Lt[i].attenuation[2] * lightDistance * lightDistance);
+					float spotFactor = 1.0;
+					if (spotCos < SpotCosCutoff && Lt[i].spotCutoff < 179.9)  // Only fade if a spotlight
+					{
+						float range = 1 + SpotCosCutoff;
+						spotFactor = pow(1 - (SpotCosCutoff - spotCos)/range, Lt[i].spotExponent);
+					}
 
-            float spotCos = dot(l, -normalize(Lt[i].spotDirection));
-            float SpotCosCutoff = cos(Lt[i].spotCutoff*deg);  // assumes that spotCutoff is in degrees
+					vec4 ambientPortion = texture(Mat.diffuse, tex_coord) * (Lt[i].ambient + GlobalAmbient);
+					vec4 diffusePortion = texture(Mat.diffuse, tex_coord) * Lt[i].diffuse * dfang * attenuation * spotFactor;
+					vec4 specularPortion = texture(Mat.specular, tex_coord) * Lt[i].specular * pow(specang, Mat.shininess) * attenuation * spotFactor * min(vec4(1.0), diffusePortion*5);
 
-            float spotFactor = 1.0;
-            if (spotCos < SpotCosCutoff && Lt[i].spotCutoff < 179.9)  // Only fade if a spotlight
-            {
-                float range = 1 + SpotCosCutoff;
-                spotFactor = pow(1 - (SpotCosCutoff - spotCos)/range, Lt[i].spotExponent);
-            }
-
-            vec4 ambientPortion = Mat.ambient*Lt[i].ambient;
-            vec4 diffusePortion = Mat.diffuse*Lt[i].diffuse*dfang*attenuation*spotFactor;
-            vec4 specularPortion = Mat.specular*Lt[i].specular*pow(specang, Mat.shininess)*attenuation*spotFactor;
-
-            vec4 c = ambientPortion + diffusePortion + specularPortion;
-            cc += min(c, vec4(1.0));
-        }
-    }
-
-	if (useLighting) cc = min(cc + globalAmbientPortion + Mat.emission, vec4(1.0));
-	else cc = color;
+					cc += ambientPortion + diffusePortion + specularPortion;
+				}
+			}
+			
+			if (!anylight)
+			{
+				cc = texture(Mat.diffuse, tex_coord)  * GlobalAmbient;
+			}
+		}
+		cc = min(cc * color, vec4(1.0));
+	}
+	else
+	{
+		cc = color;
+	}
 
     fColor = cc;
-
-	if (useTexture)
-	{
-		vec4 texhom = vec4(tex_coord, 0, 1);
-		vec4 transtex = textrans * texhom;
-		vec2 transtex2 = vec2(transtex);
-
-		vec4 texColor = texture(tex, transtex2);
-
-		fColor = 0.25*fColor + 0.75*texColor;
-	}
 	
-    fColor = min(fColor, vec4(1.0));
+	// Check whether fragment output is higher than threshold, if so output as brightness color
+    float brightness = dot(fColor.rgb, vec3(0.5, 0.5, 0.5));
+    if(brightness > 1.0)
+        bColor = vec4(fColor.rgb, 1.0);
 }

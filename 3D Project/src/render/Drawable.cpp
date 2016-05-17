@@ -18,7 +18,7 @@ Drawable::Drawable(Material mat, bool indexed, bool visible) : material(mat), in
     }
 }
 
-Drawable::Drawable(bool indexed) : Drawable(Materials::whitePlastic, indexed) {}
+Drawable::Drawable(bool indexed) : Drawable(white, indexed) {}
 
 Drawable::~Drawable()
 {
@@ -101,7 +101,7 @@ void Drawable::draw(GraphicsEngine *ge)
 
     ge->updateModelMat(getModelMat());
     ge->setUseLighting(useLighting);
-    ge->setUseTexture(useTexture);
+    ge->setFullbright(fullbright);
 
     if (visible)
     {
@@ -118,7 +118,7 @@ void Drawable::draw(GraphicsEngine *ge)
     }
 
     ge->setUseLighting(true);
-    ge->setUseTexture(true);
+    ge->setFullbright(false);
 }
 
 glm::mat4 Drawable::getModelMat() const
@@ -129,6 +129,11 @@ glm::mat4 Drawable::getModelMat() const
 Material Drawable::getMaterial() const
 {
     return material;
+}
+
+void Drawable::setMaterial(Material m)
+{
+    material = m;
 }
 
 void Drawable::vert(glm::vec3 pos, glm::vec4 color, glm::vec2 uv)
@@ -162,4 +167,8 @@ GLuint Drawable::getDrawMode() const
 void Drawable::setVisible(bool vis)
 {
     visible = vis;
+    for (Drawable *c : children)
+    {
+        c->setVisible(vis);
+    }
 }

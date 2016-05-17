@@ -13,6 +13,10 @@ class GuiBase : public Drawable, public Listener
         GuiBase(UI *ui, glm::vec2 pos, int width, int height);
         virtual ~GuiBase();
 
+        static constexpr int w = 225;
+        static constexpr int fontsize = 12;
+        static constexpr int padding = 6;
+
         bool mousePressed(ButtonContext ctx) override;
         bool mouseReleased(ButtonContext ctx) override;
 
@@ -35,10 +39,6 @@ class GuiBase : public Drawable, public Listener
 
         glm::vec2 pos;
         int width, height;
-
-        static constexpr int w = 225;
-        static constexpr int fontsize = 12;
-        static constexpr int padding = 6;
 
     private:
 };

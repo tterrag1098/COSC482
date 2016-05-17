@@ -6,6 +6,7 @@
 #include <random>
 #include <sstream>
 #include <iomanip>
+#include <cstdio>
 
 #include <SFML/System/Vector2.hpp>
 #include <glm/glm.hpp>
@@ -126,6 +127,22 @@ inline std::string printMass(double mass)
 
     ret << " kg";
     return ret.str();
+}
+
+inline std::string dbl2str(double d)
+{
+    size_t len = std::snprintf(0, 0, "%.10f", d);
+    std::string s(len+1, 0);
+    std::snprintf(&s[0], len+1, "%.10f", d);
+    // remove nul terminator
+    s.pop_back();
+    // remove trailing zeros
+    s.erase(s.find_last_not_of('0') + 1, std::string::npos);
+    // remove trailing point
+    if(s.back() == '.') {
+        s.pop_back();
+    }
+    return s;
 }
 
 #endif // STRUCTS_H_INCLUDED

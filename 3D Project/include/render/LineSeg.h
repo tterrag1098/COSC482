@@ -12,6 +12,9 @@ class LineSeg : public Drawable
         void refresh() override;
         GLuint getDrawMode() const override;
 
+        void setStart(glm::vec3 s);
+        void setEnd(glm::vec3 e);
+
     protected:
     private:
         glm::vec3 start, end;

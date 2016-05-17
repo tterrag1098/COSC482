@@ -10,7 +10,6 @@
 
 #include "ProgramDefines.h"
 #include "Drawable.h"
-#include "MaterialPresets.h"
 
 /**
 \file Models.h
@@ -61,21 +60,15 @@ private:
 
     GLboolean reload;      ///< Flag to reload the data to the graphics card.
     GLboolean drawFaces;   ///< Flag to draw the faces of the object.
-    GLboolean drawBorder;  ///< Flag to draw the border of the object.
 
     GLfloat red;    ///< Red component of the object color.
     GLfloat green;  ///< Green component of the object color.
     GLfloat blue;   ///< Blue component of the object color.
-    GLfloat bred;   ///< Red component of the object border color.
-    GLfloat bgreen; ///< Green component of the object border color.
-    GLfloat bblue;  ///< Blue component of the object border color.
+    GLfloat alpha;  ///< Alpha component of the object color.
 
     GLuint vboptr;  ///< ID for the VBO.
     GLuint bufptr;  ///< ID for the data buffer.
     GLuint eboptr;  ///< ID for the index buffer.
-    GLuint vboptr2; ///< ID for the VBO for the border.
-    GLuint bufptr2; ///< ID for the data buffer for the border.
-    GLuint eboptr2; ///< ID for the index buffer for the border.
 
     void CrossProd(GLfloat x1, GLfloat y1, GLfloat z1, GLfloat x2, GLfloat y2, GLfloat z2, GLfloat *cx, GLfloat *cy, GLfloat *cz);
     void resetArraySize(GLint ilon, GLint ilat);
@@ -90,12 +83,10 @@ public:
     void load() override;
     void draw(GraphicsEngine *ge) override;
 
-    void setDrawBorder(GLboolean d);
     void setDrawFaces(GLboolean d);
     void setColorCube(GLboolean d);
 
-    void setColor(GLfloat r, GLfloat g, GLfloat b);
-    void setBorderColor(GLfloat r, GLfloat g, GLfloat b);
+    void setColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
 
     void createNormals();
     void reverseNormals();

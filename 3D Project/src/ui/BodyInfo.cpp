@@ -4,9 +4,16 @@
 #include <iomanip>
 #include "TextButton.h"
 #include "Box.h"
+#include "BodyProperties.h"
 
-BodyInfo::BodyInfo(UI *ui, glm::vec2 p) : GuiBase(ui, p, w, h)
+BodyInfo::BodyInfo(UI *ui, glm::vec2 p, std::vector<BodyDrawable*> bodylist) : GuiBase(ui, p, w, h)
 {
+    bodyPicker = new TypePicker<BodyDrawable>(ui->getTextRenderer(), p + (float) padding, w - (padding * 2), fontsize, bodylist);
+    bodyPicker->onPressed([this, ui]{
+        ui->getEngine()->setSelected(bodyPicker->getSelected());
+    });
+    addChild(bodyPicker);
+
     delBut = new TextButton(p, ui->getTextRenderer(), "Delete", fontsize);
     Drawable::children.push_back(delBut);
     Listener::children.push_back(delBut);
@@ -14,12 +21,14 @@ BodyInfo::BodyInfo(UI *ui, glm::vec2 p) : GuiBase(ui, p, w, h)
     bg->setHeight(height);
 
     delBut->setCorner(p + glm::vec2((width / 2) - (delBut->getWidth() / 2) - padding, height - delBut->getHeight() - padding));
-    delBut->onPressed([ui]{
-        const BodyDrawable* body = ui->getEngine()->getSelectedBody();
+    delBut->onPressed([this, ui]{
+        BodyDrawable* body = ui->getEngine()->getSelectedBody();
         if (body)
         {
             ui->getEngine()->removeBody(body);
             ui->getEngine()->getPhysics()->removeBody(body);
+            bodyPicker->remove(body);
+            props->onBodyRemoved(body);
             ui->getEngine()->setSelected(NULL);
         }
     });
@@ -32,7 +41,9 @@ BodyInfo::~BodyInfo()
 
 void BodyInfo::draw(GraphicsEngine *ge)
 {
-    const BodyDrawable *sel = ge->getSelectedBody();
+    if (!visible) return;
+
+    BodyDrawable *sel = ge->getSelectedBody();
     TextRendererTTF *tr = ui->getTextRenderer();
 
     Drawable::draw(ge);
@@ -43,13 +54,16 @@ void BodyInfo::draw(GraphicsEngine *ge)
 
     if (sel)
     {
+        if (sel != bodyPicker->getSelected()) bodyPicker->setSelected(sel);
+
+        bodyPicker->setVisible(true);
         delBut->setVisible(true);
+
+        int x = pos.x + padding;
+        int y = ge->getSize().y - pos.y - padding - fontsize - 28;
 
         std::stringstream mass;
         mass << "Mass:     " << printMass(sel->getMass());
-
-        int x = pos.x + padding;
-        int y = ge->getSize().y - pos.y - padding - fontsize;
 
         tr->draw(mass.str(), x, y);
 
@@ -68,6 +82,7 @@ void BodyInfo::draw(GraphicsEngine *ge)
     }
     else
     {
+        bodyPicker->setVisible(false);
         delBut->setVisible(false);
 
         std::string s = "No Body Selected";
@@ -75,4 +90,14 @@ void BodyInfo::draw(GraphicsEngine *ge)
     }
 
     ge->uiShader.use();
+}
+
+void BodyInfo::onBodyAdded(BodyDrawable *b)
+{
+    bodyPicker->add(b);
+}
+
+void BodyInfo::setProps(BodyProperties *p)
+{
+    props = p;
 }

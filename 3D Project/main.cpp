@@ -136,7 +136,7 @@ int main()
     }
 
     std::string progName = "N-Body Simulator";
-    GraphicsEngine ge(progName, 700, 500);
+    GraphicsEngine ge(progName, 1200, 800);
     UI ui(&ge);
 
     long framecount = 0;
